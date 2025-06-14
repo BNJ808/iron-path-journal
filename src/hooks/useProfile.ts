@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,11 +29,9 @@ export const useProfile = () => {
 
     const updateProfileMutation = useMutation({
         mutationFn: async (updatedProfile: Partial<Profile> & { id: string }) => {
-            const { id, ...updateData } = updatedProfile;
             const { error, data } = await supabase
                 .from('profiles')
-                .update({ ...updateData, updated_at: new Date().toISOString() })
-                .eq('id', id)
+                .upsert({ ...updatedProfile, updated_at: new Date().toISOString() })
                 .select()
                 .single();
 
