@@ -1,12 +1,29 @@
 
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { TimerDrawer } from './timer/TimerDrawer';
 
 const Layout = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isTimerOpen, setIsTimerOpen] = useState(false);
+  const [lastPath, setLastPath] = useState('/');
+
+  useEffect(() => {
+    if (location.pathname !== '/timer') {
+      setLastPath(location.pathname);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname === '/timer') {
+      setIsTimerOpen(true);
+      navigate(lastPath, { replace: true });
+    }
+  }, [location.pathname, navigate, lastPath]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -28,6 +45,7 @@ const Layout = () => {
         <Outlet />
       </main>
       <BottomNav />
+      <TimerDrawer open={isTimerOpen} onOpenChange={setIsTimerOpen} />
     </div>
   );
 };
