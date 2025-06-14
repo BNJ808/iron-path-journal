@@ -2,7 +2,7 @@
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import StatCard from '@/components/StatCard';
 import { Dumbbell, Repeat, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
@@ -13,9 +13,10 @@ import { fr } from 'date-fns/locale';
 const chartConfig = {
   volume: {
     label: "Volume",
-    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
+
+const barColors = ["hsl(var(--accent-purple))", "hsl(var(--accent-blue))", "hsl(var(--accent-yellow))"];
 
 const StatsPage = () => {
     const { workouts, isLoading } = useWorkoutHistory();
@@ -118,7 +119,11 @@ const StatsPage = () => {
                                             hideLabel
                                         />} 
                                     />
-                                    <Bar dataKey="volume" fill="var(--color-volume)" radius={4} />
+                                    <Bar dataKey="volume" radius={4}>
+                                        {stats.chartData.map((_entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+                                        ))}
+                                    </Bar>
                                 </BarChart>
                             </ChartContainer>
                         </CardContent>
