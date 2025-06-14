@@ -19,7 +19,8 @@ export const useWorkoutHistory = () => {
                 .eq('user_id', userId)
                 .order('date', { ascending: false });
             if (error) throw new Error(error.message);
-            return data as Workout[];
+            // FIX: Cast to unknown first to align Supabase's JSON type with our local Workout type.
+            return data as unknown as Workout[];
         },
         enabled: !!userId,
     });
@@ -29,7 +30,8 @@ export const useWorkoutHistory = () => {
             if (!userId) throw new Error("User not authenticated");
             const { data, error } = await supabase
                 .from('workouts')
-                .insert([{ ...workout, user_id: userId }])
+                // FIX: Cast the inserted object to `any` to match Supabase's expectation for the JSON column.
+                .insert([{ ...workout, user_id: userId }] as any)
                 .select();
             if (error) throw new Error(error.message);
             return data[0];
