@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import StatCard from '@/components/StatCard';
-import { Dumbbell, Repeat, TrendingUp, BarChart as BarChartIcon } from 'lucide-react';
+import { Dumbbell, Repeat, TrendingUp, BarChart as BarChartIcon, Trophy } from 'lucide-react';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -28,17 +28,25 @@ const StatsPage = () => {
                 totalVolume: 0,
                 totalSets: 0,
                 chartData: [],
+                personalRecords: {},
             };
         }
 
         let totalVolume = 0;
         let totalSets = 0;
+        const personalRecords: { [key: string]: number } = {};
 
         const chartData = workouts
             .map(workout => {
                 const workoutVolume = workout.exercises.reduce((acc, exercise) => {
                     return acc + exercise.sets.reduce((setAcc, set) => {
                         totalSets++;
+                        
+                        const currentPR = personalRecords[exercise.name] || 0;
+                        if (set.weight > currentPR) {
+                            personalRecords[exercise.name] = set.weight;
+                        }
+
                         return setAcc + set.reps * set.weight;
                     }, 0);
                 }, 0);
@@ -57,6 +65,7 @@ const StatsPage = () => {
             totalVolume: Math.round(totalVolume),
             totalSets,
             chartData,
+            personalRecords,
         };
     }, [workouts]);
     
@@ -128,6 +137,29 @@ const StatsPage = () => {
                             </ChartContainer>
                         </CardContent>
                     </Card>
+
+                    {Object.keys(stats.personalRecords).length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-base">
+                                    <Trophy className="h-5 w-5 text-accent-yellow" />
+                                    Records Personnels (Poids max)
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="space-y-2">
+                                    {Object.entries(stats.personalRecords)
+                                        .sort(([a], [b]) => a.localeCompare(b))
+                                        .map(([exercise, pr]) => (
+                                            <li key={exercise} className="flex justify-between items-center text-sm">
+                                                <span>{exercise}</span>
+                                                <span className="font-bold">{pr} kg</span>
+                                            </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             )}
         </div>
