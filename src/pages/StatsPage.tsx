@@ -128,3 +128,5 @@ const StatsPage = () => {
         </div>
     );
 };
+
+export default StatsPage;
