@@ -1,4 +1,3 @@
-
 import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
@@ -137,15 +136,29 @@ const WorkoutPage = () => {
         return;
     }
     try {
-        const newExercises = template.exercises.map(exercise => ({
-            id: nanoid(),
-            exerciseId: exercise.exerciseId,
-            name: exercise.name,
-            notes: exercise.notes || '',
-            sets: exercise.sets.length > 0 
-                ? exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight) }))
-                : [{ id: nanoid(), reps: '', weight: '' }]
-        }));
+        const exerciseIds = template.exercises.map(ex => ex.exerciseId);
+        const lastPerformances = await getLastPerformances(exerciseIds);
+
+        const newExercises = template.exercises.map(exercise => {
+            const lastSets = lastPerformances[exercise.exerciseId];
+            
+            let newSets;
+            if (lastSets && lastSets.length > 0) {
+                newSets = lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight) }));
+            } else if (exercise.sets.length > 0) {
+                newSets = exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight) }));
+            } else {
+                newSets = [{ id: nanoid(), reps: '', weight: '' }];
+            }
+
+            return {
+                id: nanoid(),
+                exerciseId: exercise.exerciseId,
+                name: exercise.name,
+                notes: exercise.notes || '',
+                sets: newSets
+            };
+        });
 
         await createWorkout({
             exercises: newExercises,
