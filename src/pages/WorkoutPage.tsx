@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -135,3 +134,5 @@ const WorkoutPage = () => {
     </div>
   );
 };
+
+export default WorkoutPage;
