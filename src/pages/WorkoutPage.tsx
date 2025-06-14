@@ -13,7 +13,7 @@ const WorkoutPage = () => {
 
   const handleStartWorkout = async () => {
     try {
-      await createWorkout();
+      await createWorkout({});
       toast.success("Entraînement commencé !");
     } catch (error: any) {
       toast.error("Erreur au démarrage de l'entraînement: " + error.message);

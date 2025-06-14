@@ -1,4 +1,6 @@
 
+import { nanoid } from "nanoid";
+
 export const EXERCISES_DATABASE = {
   Pectoraux: {
     base: ['Développé couché avec barre', 'Développé couché avec haltères', 'Développé incliné avec haltères', 'Dips'],
@@ -31,3 +33,9 @@ export const EXERCISES_DATABASE = {
     finition: ['Kickback', 'Extensions au-dessus de la tête'],
   },
 };
+
+const allExercises = Object.values(EXERCISES_DATABASE)
+  .flatMap(group => Object.values(group).flat())
+  .map(name => ({ id: nanoid(), name: name }));
+
+export const exercises = allExercises.sort((a,b) => a.name.localeCompare(b.name));
