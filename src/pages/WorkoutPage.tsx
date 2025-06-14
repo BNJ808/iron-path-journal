@@ -1,174 +1,134 @@
 
-import { useState } from 'react';
+import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Plus } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { EXERCISES_DATABASE } from '@/data/exercises';
-import type { MuscleGroup } from '@/types';
-import ExerciseCard from '@/components/ExerciseCard';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AddExerciseDialog } from '@/components/workout/AddExerciseDialog';
+import { ExerciseItem } from '@/components/workout/ExerciseItem';
 import { toast } from 'sonner';
-import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
-import { useAuth } from '@/contexts/AuthContext';
+import { nanoid } from 'nanoid';
+import { Save } from 'lucide-react';
 
 const WorkoutPage = () => {
-  const [isSheetOpen, setSheetOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const today = new Date();
-  const { addWorkout } = useWorkoutHistory();
-  const { user } = useAuth();
-  const {
-    exercises,
-    notes: workoutNotes,
-    addExercise: addExerciseToWorkout,
-    removeExercise,
-    updateExercise,
-    setNotes: setWorkoutNotes,
-    clearWorkout,
-  } = useCurrentWorkout();
+  const { todayWorkout, isLoadingWorkout, createWorkout, updateWorkout } = useWorkouts();
 
-  const addExercise = (exerciseName: string) => {
-    addExerciseToWorkout(exerciseName);
-    setSheetOpen(false);
-    setSearchTerm('');
+  const handleStartWorkout = async () => {
+    try {
+      await createWorkout();
+      toast.success("Entraînement commencé !");
+    } catch (error: any) {
+      toast.error("Erreur au démarrage de l'entraînement: " + error.message);
+    }
   };
 
-  const finishWorkout = () => {
-    if (exercises.length === 0) {
-      toast.error("Impossible de terminer une séance vide.");
-      return;
-    }
-    if (!user) {
-        toast.error("Vous devez être connecté pour sauvegarder une séance.");
-        return;
-    }
+  const handleAddExercise = async (exercise: { id: string; name: string }) => {
+    if (!todayWorkout) return;
 
-    const workout = {
-      date: today.toISOString(),
-      exercises: exercises,
-      notes: workoutNotes,
+    const newExerciseLog: ExerciseLog = {
+      id: nanoid(),
+      exerciseId: exercise.id,
+      name: exercise.name,
+      sets: [{ id: nanoid(), reps: '', weight: '' }],
     };
+
+    const updatedExercises = [...todayWorkout.exercises, newExerciseLog];
     
-    addWorkout(workout, {
-      onSuccess: () => {
-        toast.success("Séance terminée et sauvegardée !");
-        clearWorkout();
-      },
-      onError: (error) => {
-        toast.error(`Erreur lors de la sauvegarde: ${error.message}`);
-      }
-    });
+    try {
+      await updateWorkout({ workoutId: todayWorkout.id, exercises: updatedExercises });
+      toast.info(`"${exercise.name}" ajouté à l'entraînement.`);
+    } catch (error: any) {
+      toast.error("Erreur à l'ajout de l'exercice: " + error.message);
+    }
   };
 
-  const muscleGroups = Object.keys(EXERCISES_DATABASE) as MuscleGroup[];
+  const handleUpdateExercise = async (updatedExercise: ExerciseLog) => {
+    if (!todayWorkout) return;
+    const updatedExercises = todayWorkout.exercises.map(ex => 
+      ex.id === updatedExercise.id ? updatedExercise : ex
+    );
+    try {
+      // Note: This updates on every change. For a better UX, you might want to debounce this.
+      await updateWorkout({ workoutId: todayWorkout.id, exercises: updatedExercises });
+    } catch (error: any) {
+      toast.error("Erreur à la mise à jour de l'exercice: " + error.message);
+    }
+  };
+  
+  const handleRemoveExercise = async (exerciseLogId: string) => {
+      if (!todayWorkout) return;
+      const updatedExercises = todayWorkout.exercises.filter(ex => ex.id !== exerciseLogId);
+      try {
+        await updateWorkout({ workoutId: todayWorkout.id, exercises: updatedExercises });
+        toast.success("Exercice retiré.");
+      } catch (error: any)        {
+        toast.error("Erreur à la suppression de l'exercice: " + error.message);
+      }
+  };
 
-  const filteredExercisesByGroup = muscleGroups.map(group => {
-    const exercisesInGroup = Object.values(EXERCISES_DATABASE[group]).flat();
-    const filtered = exercisesInGroup.filter(name => name.toLowerCase().includes(searchTerm.toLowerCase()));
-    return { group, exercises: filtered };
-  }).filter(g => g.exercises.length > 0);
+  const handleFinishWorkout = async () => {
+      if(!todayWorkout) return;
+      
+      const cleanedExercises = todayWorkout.exercises.map(ex => ({
+          ...ex,
+          sets: ex.sets.map(s => ({...s, reps: Number(s.reps) || 0, weight: Number(s.weight) || 0}))
+                     .filter(s => s.reps > 0 || s.weight > 0)
+      })).filter(ex => ex.sets.length > 0);
 
+      try {
+        await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises });
+        toast.success("Entraînement terminé et sauvegardé !");
+      } catch (error: any) {
+        toast.error("Erreur à la sauvegarde de l'entraînement: " + error.message);
+      }
+  };
 
+  if (isLoadingWorkout) {
+    return (
+      <div className="p-4 space-y-4 max-w-2xl mx-auto">
+        <Skeleton className="h-8 w-1/2 mb-4" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-40 w-full" />
+      </div>
+    );
+  }
+  
   return (
-    <div className="p-4">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-accent-blue">Séance du jour</h1>
-        <p className="text-gray-400 mt-1 capitalize">
-          {format(today, "eeee d MMMM yyyy", { locale: fr })}
-        </p>
-      </div>
+    <div className="p-4 space-y-4 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-100">Entraînement du jour</h1>
+      
+      {todayWorkout ? (
+        <div className="space-y-4">
+          {todayWorkout.exercises.length === 0 ? (
+            <div className="text-center text-gray-400 py-8 px-4 rounded-lg bg-gray-800/50">
+              <p>Commencez par ajouter un exercice à votre séance.</p>
+            </div>
+          ) : (
+            todayWorkout.exercises.map(ex => (
+              <ExerciseItem 
+                key={ex.id} 
+                exercise={ex} 
+                onUpdate={handleUpdateExercise}
+                onRemove={handleRemoveExercise}
+              />
+            ))
+          )}
 
-      <div className="space-y-4 mb-6">
-        {exercises.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Aucun exercice ajouté pour le moment.</p>
-        ) : (
-          exercises.map((exercise) => (
-            <ExerciseCard
-              key={exercise.id}
-              exercise={exercise}
-              onUpdateExercise={updateExercise}
-              onRemoveExercise={removeExercise}
-            />
-          ))
-        )}
-      </div>
+          <AddExerciseDialog onAddExercise={handleAddExercise} />
+          
+          <div className="border-t border-gray-700 pt-4"></div>
 
-      <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-        <SheetTrigger asChild>
-          <Button className="w-full">
-            <Plus className="mr-2 h-4 w-4" /> Ajouter un exercice
+          <Button onClick={handleFinishWorkout} disabled={!todayWorkout || todayWorkout.exercises.length === 0} className="w-full bg-accent-blue hover:bg-accent-blue/90">
+            <Save />
+            Terminer et Sauvegarder
           </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="h-[80%] flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Choisir un exercice</SheetTitle>
-          </SheetHeader>
-          <div className="px-3 pt-2 pb-4">
-            <input
-              type="text"
-              placeholder="Rechercher un exercice..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-accent-blue focus:border-accent-blue outline-none"
-            />
-          </div>
-          <div className="overflow-y-auto flex-grow pr-3">
-            <Accordion 
-              type="single" 
-              collapsible 
-              className="w-full"
-              // Ouvre le premier groupe si la recherche donne des résultats
-              value={searchTerm && filteredExercisesByGroup.length > 0 ? filteredExercisesByGroup[0].group : undefined}
-            >
-              {filteredExercisesByGroup.length > 0 ? (
-                filteredExercisesByGroup.map(({ group, exercises }) => (
-                  <AccordionItem value={group} key={group}>
-                    <AccordionTrigger>{group}</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="flex flex-col items-start">
-                        {exercises.map(exName => (
-                           <Button key={exName} variant="link" className="text-left justify-start w-full p-2 h-auto text-base text-foreground" onClick={() => addExercise(exName)}>
-                             {exName}
-                           </Button>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))
-              ) : (
-                <p className="text-center text-gray-500 py-6">Aucun exercice ne correspond à votre recherche.</p>
-              )}
-            </Accordion>
-          </div>
-        </SheetContent>
-      </Sheet>
 
-      <div className="mt-6">
-        <Label htmlFor="workout-notes" className="text-lg font-semibold text-gray-300 mb-2 block">
-            Notes de la séance
-        </Label>
-        <Textarea
-            id="workout-notes"
-            value={workoutNotes}
-            onChange={(e) => setWorkoutNotes(e.target.value)}
-            placeholder="Ajouter des notes générales sur la séance (ex: niveau d'énergie, etc.)"
-            className="bg-gray-700/50 border-gray-600/50 min-h-[100px]"
-            rows={3}
-        />
-      </div>
-
-      <Button 
-        className="w-full mt-6 bg-accent-blue hover:bg-blue-600 text-white font-bold" 
-        onClick={finishWorkout} 
-        disabled={exercises.length === 0}
-      >
-        Terminer la séance
-      </Button>
+        </div>
+      ) : (
+        <div className="text-center py-10">
+          <p className="text-gray-400 mb-4">Aucun entraînement en cours pour aujourd'hui.</p>
+          <Button onClick={handleStartWorkout}>Démarrer un entraînement</Button>
+        </div>
+      )}
     </div>
   );
 };
