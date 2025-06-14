@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { nanoid } from 'nanoid';
 import { EXERCISES_DATABASE } from '@/data/exercises';
 import type { Exercise, MuscleGroup } from '@/types';
+import ExerciseCard from '@/components/ExerciseCard';
 
 const WorkoutPage = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -31,6 +32,12 @@ const WorkoutPage = () => {
     setExercises(prev => prev.filter(ex => ex.id !== exerciseId));
   };
 
+  const updateExercise = (updatedExercise: Exercise) => {
+    setExercises(prev =>
+      prev.map(ex => (ex.id === updatedExercise.id ? updatedExercise : ex))
+    );
+  };
+
   const muscleGroups = Object.keys(EXERCISES_DATABASE) as MuscleGroup[];
 
   return (
@@ -47,12 +54,12 @@ const WorkoutPage = () => {
           <p className="text-gray-500 text-center py-8">Aucun exercice ajouté pour le moment.</p>
         ) : (
           exercises.map((exercise) => (
-            <div key={exercise.id} className="custom-card p-4 flex justify-between items-center">
-              <span className="font-semibold">{exercise.name}</span>
-              <Button variant="ghost" size="icon" onClick={() => removeExercise(exercise.id)}>
-                <Trash2 className="h-5 w-5 text-red-500" />
-              </Button>
-            </div>
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              onUpdateExercise={updateExercise}
+              onRemoveExercise={removeExercise}
+            />
           ))
         )}
       </div>
