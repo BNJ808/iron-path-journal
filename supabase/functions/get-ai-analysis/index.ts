@@ -54,7 +54,7 @@ async function handler(req: Request): Promise<Response> {
 
   if (!openAIApiKey) {
     return new Response(JSON.stringify({ error: 'Missing OPENAI_API_KEY' }), {
-      status: 500,
+      status: 200, // Always return 200 to pass detailed error in body
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
@@ -69,7 +69,7 @@ async function handler(req: Request): Promise<Response> {
       prompt = createExercisePrompt(data);
     } else {
       return new Response(JSON.stringify({ error: 'Invalid analysis type' }), {
-        status: 400,
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -92,7 +92,12 @@ async function handler(req: Request): Promise<Response> {
 
     if (!response.ok) {
         const errorBody = await response.json();
-        throw new Error(`OpenAI API error: ${response.statusText}, ${JSON.stringify(errorBody)}`);
+        const errorMessage = `OpenAI API error: ${errorBody.error?.message || response.statusText}`;
+        console.error(errorMessage);
+        return new Response(JSON.stringify({ error: errorMessage }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200, // Return 200 and pass error in body
+        });
     }
 
     const completion = await response.json();
@@ -103,12 +108,13 @@ async function handler(req: Request): Promise<Response> {
     })
   } catch (error) {
     console.error('Error in get-ai-analysis function:', error);
-    // Return the error message as plain text for easier debugging on the client
-    return new Response(error.message, {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'text/plain' },
+    // Return 200 and pass error in body
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }
 
 serve(handler)
+

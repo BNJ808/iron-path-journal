@@ -24,6 +24,8 @@ export const AiAnalysisCard = ({ title, type, data }: AiAnalysisCardProps) => {
       });
 
       if (error) throw new Error(error.message);
+      if (responseData.error) throw new Error(responseData.error);
+
       return responseData;
     },
     onSuccess: (responseData) => {
@@ -80,3 +82,4 @@ export const AiAnalysisCard = ({ title, type, data }: AiAnalysisCardProps) => {
     </Card>
   );
 };
+

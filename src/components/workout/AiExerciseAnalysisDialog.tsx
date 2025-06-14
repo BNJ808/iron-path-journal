@@ -48,6 +48,8 @@ export const AiExerciseAnalysisDialog = ({ exerciseId, exerciseName }: AiExercis
         });
 
         if (error) throw new Error(error.message);
+        if (responseData.error) throw new Error(responseData.error);
+
         return responseData;
     },
     onSuccess: (responseData) => {
@@ -104,3 +106,4 @@ export const AiExerciseAnalysisDialog = ({ exerciseId, exerciseName }: AiExercis
     </Dialog>
   );
 };
+
