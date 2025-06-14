@@ -16,13 +16,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
+import { useWorkouts } from '@/hooks/useWorkouts';
 import type { Workout } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { nanoid } from 'nanoid';
 
 const HistoryPage = () => {
     const { workouts, clearHistory, deleteWorkout, isLoading } = useWorkoutHistory();
-    const { startFromTemplate } = useCurrentWorkout();
+    const { createWorkout, todayWorkout, isLoadingWorkout } = useWorkouts();
     const navigate = useNavigate();
 
 
@@ -40,10 +41,41 @@ const HistoryPage = () => {
         });
     };
 
-    const handleCopyWorkout = (workout: Workout) => {
-        startFromTemplate(workout);
-        navigate('/workout');
-        toast.info("Séance copiée. Prête à être commencée !");
+    const handleCopyWorkout = async (workout: Workout) => {
+        if (isLoadingWorkout) {
+            toast.info("Veuillez patienter...");
+            return;
+        }
+
+        if (todayWorkout) {
+            toast.error("Un entraînement est déjà en cours. Terminez-le avant d'en commencer un nouveau.");
+            return;
+        }
+
+        try {
+            const newExercises = workout.exercises.map(exercise => ({
+                id: nanoid(),
+                exerciseId: exercise.exerciseId,
+                name: exercise.name,
+                notes: exercise.notes || '',
+                sets: exercise.sets.map(set => ({
+                    id: nanoid(),
+                    reps: String(set.reps),
+                    weight: String(set.weight),
+                })),
+            }));
+
+            await createWorkout({
+                exercises: newExercises,
+                notes: workout.notes || ''
+            });
+
+            navigate('/workout');
+            toast.success("Séance copiée. Un nouvel entraînement a été créé.");
+
+        } catch (error: any) {
+            toast.error("Erreur lors de la copie de la séance: " + error.message);
+        }
     };
 
     if (isLoading) {

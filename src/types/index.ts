@@ -1,4 +1,3 @@
-
 import { EXERCISES_DATABASE } from "@/data/exercises";
 
 export interface ExerciseSet {
@@ -10,6 +9,7 @@ export interface ExerciseSet {
 
 export interface Exercise {
   id:string;
+  exerciseId: string;
   name: string;
   sets: ExerciseSet[];
   notes?: string;
