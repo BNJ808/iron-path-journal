@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -11,12 +12,15 @@ import type { Exercise, MuscleGroup, Workout } from '@/types';
 import ExerciseCard from '@/components/ExerciseCard';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
+import { toast } from 'sonner';
 
 const WorkoutPage = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [workoutNotes, setWorkoutNotes] = useState('');
   const today = new Date();
+  const { addWorkout } = useWorkoutHistory();
 
   const addExercise = (exerciseName: string) => {
     const newExercise: Exercise = {
@@ -42,8 +46,7 @@ const WorkoutPage = () => {
 
   const finishWorkout = () => {
     if (exercises.length === 0) {
-      console.log("Impossible de terminer une séance vide.");
-      // Idéalement, on afficherait une notification toast ici.
+      toast.error("Impossible de terminer une séance vide.");
       return;
     }
 
@@ -54,9 +57,8 @@ const WorkoutPage = () => {
       notes: workoutNotes,
     };
     
-    console.log("Séance terminée:", workout);
-    // C'est ici qu'on sauvegardera la séance pour l'historique.
-    // Pour l'instant, on la journalise et on réinitialise l'état.
+    addWorkout(workout);
+    toast.success("Séance terminée et sauvegardée !");
     
     setExercises([]);
     setWorkoutNotes('');
