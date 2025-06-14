@@ -1,5 +1,6 @@
+
 import { NavLink } from 'react-router-dom';
-import { Dumbbell, BarChart3, History, Timer } from 'lucide-react';
+import { Dumbbell, BarChart3, History, Timer, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -7,6 +8,7 @@ const navItems = [
   { path: '/stats', icon: BarChart3, label: 'Stats', color: 'text-accent-purple' },
   { path: '/history', icon: History, label: 'Historique', color: 'text-accent-yellow' },
   { path: '/timer', icon: Timer, label: 'Timer', color: 'text-accent-green' },
+  { path: '/profile', icon: User, label: 'Profil', color: 'text-gray-100' },
 ];
 
 const BottomNav = () => {
@@ -18,7 +20,7 @@ const BottomNav = () => {
           to={item.path}
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors',
+              'flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors w-full h-full',
               isActive && item.color,
               isActive && 'font-bold'
             )

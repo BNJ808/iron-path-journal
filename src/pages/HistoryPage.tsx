@@ -1,4 +1,3 @@
-
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Button } from '@/components/ui/button';
 import { Accordion } from '@/components/ui/accordion';
@@ -19,21 +18,26 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
 import type { Workout } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const HistoryPage = () => {
-    const { workouts, clearHistory, deleteWorkout } = useWorkoutHistory();
+    const { workouts, clearHistory, deleteWorkout, isLoading } = useWorkoutHistory();
     const { startFromTemplate } = useCurrentWorkout();
     const navigate = useNavigate();
 
 
     const handleClearHistory = () => {
-        clearHistory();
-        toast.success("L'historique des séances a été effacé.");
+        clearHistory(undefined, {
+            onSuccess: () => toast.success("L'historique des séances a été effacé."),
+            onError: (error) => toast.error(`Erreur: ${error.message}`),
+        });
     }
 
     const handleDeleteWorkout = (workoutId: string) => {
-        deleteWorkout(workoutId);
-        toast.success("La séance a été supprimée.");
+        deleteWorkout(workoutId, {
+            onSuccess: () => toast.success("La séance a été supprimée."),
+            onError: (error) => toast.error(`Erreur: ${error.message}`),
+        });
     };
 
     const handleCopyWorkout = (workout: Workout) => {
@@ -42,9 +46,23 @@ const HistoryPage = () => {
         toast.info("Séance copiée. Prête à être commencée !");
     };
 
-    // On trie par date pour afficher les plus récents en premier
-    const sortedWorkouts = [...workouts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
+    if (isLoading) {
+        return (
+            <div className="p-4 space-y-4">
+                 <div className="flex justify-between items-center mb-2">
+                    <Skeleton className="h-8 w-32" />
+                    <Skeleton className="h-9 w-24" />
+                </div>
+                <Skeleton className="h-4 w-2/3" />
+                <div className="space-y-4 pt-4">
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+            </div>
+        );
+    }
+    
     return (
         <div className="p-4">
             <div className="flex justify-between items-center mb-6">
@@ -77,14 +95,14 @@ const HistoryPage = () => {
             
             <p className="text-gray-400 mt-2 mb-6">Retrouvez toutes vos séances passées.</p>
 
-            {sortedWorkouts.length === 0 ? (
+            {workouts.length === 0 ? (
                 <div className="text-center py-16">
                     <p className="text-gray-500">Aucun historique de séance pour le moment.</p>
                     <p className="text-sm text-gray-600 mt-2">Terminez une séance pour la voir apparaître ici.</p>
                 </div>
             ) : (
                 <Accordion type="multiple" className="space-y-4">
-                    {sortedWorkouts.map(workout => (
+                    {workouts.map(workout => (
                         <WorkoutHistoryCard 
                             key={workout.id} 
                             workout={workout} 

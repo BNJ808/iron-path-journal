@@ -16,7 +16,8 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: string;
+  id: string; // From Supabase DB (uuid)
+  user_id: string; // From Supabase auth.users.id
   date: string; // ISO string
   exercises: Exercise[];
   notes?: string;

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -5,21 +6,22 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { nanoid } from 'nanoid';
 import { EXERCISES_DATABASE } from '@/data/exercises';
-import type { Exercise, MuscleGroup, Workout } from '@/types';
+import type { MuscleGroup } from '@/types';
 import ExerciseCard from '@/components/ExerciseCard';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { toast } from 'sonner';
 import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
+import { useAuth } from '@/contexts/AuthContext';
 
 const WorkoutPage = () => {
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const today = new Date();
   const { addWorkout } = useWorkoutHistory();
+  const { user } = useAuth();
   const {
     exercises,
     notes: workoutNotes,
@@ -41,18 +43,26 @@ const WorkoutPage = () => {
       toast.error("Impossible de terminer une séance vide.");
       return;
     }
+    if (!user) {
+        toast.error("Vous devez être connecté pour sauvegarder une séance.");
+        return;
+    }
 
-    const workout: Workout = {
-      id: nanoid(),
+    const workout = {
       date: today.toISOString(),
       exercises: exercises,
       notes: workoutNotes,
     };
     
-    addWorkout(workout);
-    toast.success("Séance terminée et sauvegardée !");
-    
-    clearWorkout();
+    addWorkout(workout, {
+      onSuccess: () => {
+        toast.success("Séance terminée et sauvegardée !");
+        clearWorkout();
+      },
+      onError: (error) => {
+        toast.error(`Erreur lors de la sauvegarde: ${error.message}`);
+      }
+    });
   };
 
   const muscleGroups = Object.keys(EXERCISES_DATABASE) as MuscleGroup[];

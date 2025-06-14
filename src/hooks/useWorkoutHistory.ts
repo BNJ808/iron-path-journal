@@ -1,39 +1,70 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import type { Workout } from '@/types';
-
-const WORKOUT_HISTORY_KEY = 'workoutHistory';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useWorkoutHistory = () => {
-    const [workouts, setWorkouts] = useState<Workout[]>(() => {
-        try {
-            const savedWorkouts = window.localStorage.getItem(WORKOUT_HISTORY_KEY);
-            return savedWorkouts ? JSON.parse(savedWorkouts) : [];
-        } catch (error) {
-            console.error("Impossible de charger l'historique des séances depuis le localStorage", error);
-            return [];
-        }
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
+    const userId = user?.id;
+
+    const { data: workouts = [], isLoading } = useQuery({
+        queryKey: ['workouts', userId],
+        queryFn: async () => {
+            if (!userId) return [];
+            const { data, error } = await supabase
+                .from('workouts')
+                .select('*')
+                .eq('user_id', userId)
+                .order('date', { ascending: false });
+            if (error) throw new Error(error.message);
+            return data as Workout[];
+        },
+        enabled: !!userId,
     });
 
-    useEffect(() => {
-        try {
-            window.localStorage.setItem(WORKOUT_HISTORY_KEY, JSON.stringify(workouts));
-        } catch (error) {
-            console.error("Impossible de sauvegarder l'historique des séances dans le localStorage", error);
-        }
-    }, [workouts]);
+    const addWorkoutMutation = useMutation({
+        mutationFn: async (workout: Omit<Workout, 'id' | 'user_id'>) => {
+            if (!userId) throw new Error("User not authenticated");
+            const { data, error } = await supabase
+                .from('workouts')
+                .insert([{ ...workout, user_id: userId }])
+                .select();
+            if (error) throw new Error(error.message);
+            return data[0];
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
+        },
+    });
 
-    const addWorkout = useCallback((workout: Workout) => {
-        setWorkouts(prevWorkouts => [...prevWorkouts, workout]);
-    }, []);
+    const deleteWorkoutMutation = useMutation({
+        mutationFn: async (workoutId: string) => {
+            const { error } = await supabase.from('workouts').delete().eq('id', workoutId);
+            if (error) throw new Error(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
+        },
+    });
 
-    const deleteWorkout = useCallback((workoutId: string) => {
-        setWorkouts(prevWorkouts => prevWorkouts.filter(w => w.id !== workoutId));
-    }, []);
-    
-    const clearHistory = useCallback(() => {
-        setWorkouts([]);
-    }, []);
+    const clearHistoryMutation = useMutation({
+        mutationFn: async () => {
+            if (!userId) throw new Error("User not authenticated");
+            const { error } = await supabase.from('workouts').delete().eq('user_id', userId);
+            if (error) throw new Error(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
+        },
+    });
 
-    return { workouts, addWorkout, deleteWorkout, clearHistory };
+    return {
+        workouts,
+        isLoading,
+        addWorkout: addWorkoutMutation.mutate,
+        deleteWorkout: deleteWorkoutMutation.mutate,
+        clearHistory: clearHistoryMutation.mutate,
+    };
 };

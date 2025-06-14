@@ -10,6 +10,9 @@ import WorkoutPage from "./pages/WorkoutPage";
 import StatsPage from "./pages/StatsPage";
 import HistoryPage from "./pages/HistoryPage";
 import TimerPage from "./pages/TimerPage";
+import { AuthProvider } from "./contexts/AuthContext";
+import AuthPage from "./pages/AuthPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -19,16 +22,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Navigate to="/workout" replace />} />
-            <Route path="/workout" element={<WorkoutPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/timer" element={<TimerPage />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Navigate to="/workout" replace />} />
+              <Route path="/workout" element={<WorkoutPage />} />
+              <Route path="/stats" element={<StatsPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/timer" element={<TimerPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
