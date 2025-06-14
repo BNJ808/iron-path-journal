@@ -5,6 +5,7 @@ export interface ExerciseSet {
   id: string;
   reps: number | string;
   weight: number | string;
+  completed?: boolean;
 }
 
 export interface ExerciseLog {

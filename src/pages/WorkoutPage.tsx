@@ -1,3 +1,4 @@
+
 import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
@@ -28,15 +29,16 @@ const WorkoutPage = () => {
     const lastPerformances = await getLastPerformances([exercise.id]);
     const lastSets = lastPerformances[exercise.id];
 
-    const newSets = lastSets && lastSets.length > 0
-        ? lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight) }))
-        : [{ id: nanoid(), reps: '', weight: '' }];
+    const newSets: ExerciseSet[] = lastSets && lastSets.length > 0
+        ? lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight), completed: false }))
+        : [{ id: nanoid(), reps: '', weight: '', completed: false }];
 
     const newExerciseLog: ExerciseLog = {
       id: nanoid(),
       exerciseId: exercise.id,
       name: exercise.name,
       sets: newSets,
+      notes: '',
     };
 
     const updatedExercises = [...todayWorkout.exercises, newExerciseLog];
@@ -61,6 +63,15 @@ const WorkoutPage = () => {
       toast.error("Erreur à la mise à jour de l'exercice: " + error.message);
     }
   };
+
+  const handleUpdateWorkoutNotes = async (notes: string) => {
+    if (!todayWorkout) return;
+    try {
+        await updateWorkout({ workoutId: todayWorkout.id, notes });
+    } catch (error: any) {
+        toast.error("Erreur à la mise à jour des notes: " + error.message);
+    }
+  };
   
   const handleRemoveExercise = async (exerciseLogId: string) => {
       if (!todayWorkout) return;
@@ -78,20 +89,20 @@ const WorkoutPage = () => {
       
       const cleanedExercises = todayWorkout.exercises.map(ex => ({
           ...ex,
-          sets: ex.sets.map(s => ({...s, id: s.id, reps: Number(s.reps) || 0, weight: Number(s.weight) || 0}))
+          sets: ex.sets.map(s => ({...s, id: s.id, reps: Number(s.reps) || 0, weight: Number(s.weight) || 0, completed: !!s.completed}))
                      .filter(s => s.reps > 0 || s.weight > 0)
       })).filter(ex => ex.sets.length > 0);
 
       const performancesToUpdate = cleanedExercises.map(ex => ({
           exerciseId: ex.exerciseId,
-          sets: ex.sets as { id: string; reps: number; weight: number }[]
+          sets: ex.sets.map(({ id, reps, weight }) => ({ id, reps, weight }))
       }));
 
       try {
         if (performancesToUpdate.length > 0) {
-            await updateLastPerformances(performancesToUpdate);
+            await updateLastPerformances(performancesToUpdate as any);
         }
-        await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises, status: 'completed' });
+        await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises, notes: todayWorkout.notes, status: 'completed' });
         toast.success("Entraînement terminé et sauvegardé !");
       } catch (error: any) {
         toast.error("Erreur à la sauvegarde de l'entraînement: " + error.message);
@@ -110,7 +121,8 @@ const WorkoutPage = () => {
             id: s.id,
             reps: Number(s.reps) || 0,
             weight: Number(s.weight) || 0,
-        })).filter(s => s.reps > 0 || s.weight > 0)
+        })).filter(s => s.reps > 0 || s.weight > 0),
+        notes: ex.notes
     })).filter(ex => ex.sets.length > 0);
 
     if (templateExercises.length === 0) {
@@ -142,13 +154,13 @@ const WorkoutPage = () => {
         const newExercises = template.exercises.map(exercise => {
             const lastSets = lastPerformances[exercise.exerciseId];
             
-            let newSets;
+            let newSets: ExerciseSet[];
             if (lastSets && lastSets.length > 0) {
-                newSets = lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight) }));
+                newSets = lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight), completed: false }));
             } else if (exercise.sets.length > 0) {
-                newSets = exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight) }));
+                newSets = exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight), completed: false }));
             } else {
-                newSets = [{ id: nanoid(), reps: '', weight: '' }];
+                newSets = [{ id: nanoid(), reps: '', weight: '', completed: false }];
             }
 
             return {
@@ -195,6 +207,7 @@ const WorkoutPage = () => {
           onAddExercise={handleAddExercise}
           onUpdateExercise={handleUpdateExercise}
           onRemoveExercise={handleRemoveExercise}
+          onUpdateWorkoutNotes={handleUpdateWorkoutNotes}
           onSaveAsTemplate={handleSaveAsTemplate}
           onFinishWorkout={handleFinishWorkout}
           onCancelWorkout={handleCancelWorkout}

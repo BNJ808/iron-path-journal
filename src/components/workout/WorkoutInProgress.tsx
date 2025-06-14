@@ -3,7 +3,7 @@ import type { Workout, ExerciseLog } from '@/types';
 import { Button } from '@/components/ui/button';
 import { AddExerciseDialog } from '@/components/workout/AddExerciseDialog';
 import { ExerciseItem } from '@/components/workout/ExerciseItem';
-import { Save, Bookmark } from 'lucide-react';
+import { Save, Bookmark, StickyNote } from 'lucide-react';
 import { SaveTemplateDialog } from '@/components/workout/SaveTemplateDialog';
 import {
   AlertDialog,
@@ -16,12 +16,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Textarea } from '@/components/ui/textarea';
 
 interface WorkoutInProgressProps {
   workout: Workout;
   onAddExercise: (exercise: { id: string; name: string }) => void;
   onUpdateExercise: (updatedExercise: ExerciseLog) => void;
   onRemoveExercise: (exerciseLogId: string) => void;
+  onUpdateWorkoutNotes: (notes: string) => void;
   onSaveAsTemplate: (name: string) => void;
   onFinishWorkout: () => void;
   onCancelWorkout: () => void;
@@ -32,6 +34,7 @@ export const WorkoutInProgress = ({
   onAddExercise,
   onUpdateExercise,
   onRemoveExercise,
+  onUpdateWorkoutNotes,
   onSaveAsTemplate,
   onFinishWorkout,
   onCancelWorkout,
@@ -55,6 +58,23 @@ export const WorkoutInProgress = ({
 
       <AddExerciseDialog onAddExercise={onAddExercise} />
       
+      <div className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="workout-notes" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
+                <StickyNote className="h-4 w-4" />
+                Notes sur la séance
+            </label>
+            <Textarea
+                id="workout-notes"
+                placeholder="Comment vous sentez-vous ? Des remarques sur votre énergie, des douleurs..."
+                value={workout.notes || ''}
+                onChange={(e) => onUpdateWorkoutNotes(e.target.value)}
+                rows={3}
+                className="text-base"
+            />
+          </div>
+      </div>
+
       <div className="border-t border-border pt-4"></div>
 
       <div className="flex flex-col sm:flex-row gap-2">
