@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -8,12 +7,15 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { nanoid } from 'nanoid';
 import { EXERCISES_DATABASE } from '@/data/exercises';
-import type { Exercise, MuscleGroup } from '@/types';
+import type { Exercise, MuscleGroup, Workout } from '@/types';
 import ExerciseCard from '@/components/ExerciseCard';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 const WorkoutPage = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [workoutNotes, setWorkoutNotes] = useState('');
   const today = new Date();
 
   const addExercise = (exerciseName: string) => {
@@ -36,6 +38,28 @@ const WorkoutPage = () => {
     setExercises(prev =>
       prev.map(ex => (ex.id === updatedExercise.id ? updatedExercise : ex))
     );
+  };
+
+  const finishWorkout = () => {
+    if (exercises.length === 0) {
+      console.log("Impossible de terminer une séance vide.");
+      // Idéalement, on afficherait une notification toast ici.
+      return;
+    }
+
+    const workout: Workout = {
+      id: nanoid(),
+      date: today.toISOString(),
+      exercises: exercises,
+      notes: workoutNotes,
+    };
+    
+    console.log("Séance terminée:", workout);
+    // C'est ici qu'on sauvegardera la séance pour l'historique.
+    // Pour l'instant, on la journalise et on réinitialise l'état.
+    
+    setExercises([]);
+    setWorkoutNotes('');
   };
 
   const muscleGroups = Object.keys(EXERCISES_DATABASE) as MuscleGroup[];
@@ -94,6 +118,28 @@ const WorkoutPage = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      <div className="mt-6">
+        <Label htmlFor="workout-notes" className="text-lg font-semibold text-gray-300 mb-2 block">
+            Notes de la séance
+        </Label>
+        <Textarea
+            id="workout-notes"
+            value={workoutNotes}
+            onChange={(e) => setWorkoutNotes(e.target.value)}
+            placeholder="Ajouter des notes générales sur la séance (ex: niveau d'énergie, etc.)"
+            className="bg-gray-700/50 border-gray-600/50 min-h-[100px]"
+            rows={3}
+        />
+      </div>
+
+      <Button 
+        className="w-full mt-6 bg-accent-blue hover:bg-blue-600 text-white font-bold" 
+        onClick={finishWorkout} 
+        disabled={exercises.length === 0}
+      >
+        Terminer la séance
+      </Button>
     </div>
   );
 };

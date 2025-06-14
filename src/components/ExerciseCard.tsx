@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,8 @@ import { nanoid } from 'nanoid';
 import { ChevronDown, Plus, Trash2 } from 'lucide-react';
 import type { Exercise, ExerciseSet } from '@/types';
 import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -48,6 +49,10 @@ const ExerciseCard = ({ exercise, onUpdateExercise, onRemoveExercise }: Exercise
         if (exercise.sets.length <= 1) return;
         const updatedSets = exercise.sets.filter(set => set.id !== setId);
         onUpdateExercise({ ...exercise, sets: updatedSets });
+    };
+
+    const handleNoteChange = (note: string) => {
+        onUpdateExercise({ ...exercise, notes: note });
     };
 
     return (
@@ -109,6 +114,19 @@ const ExerciseCard = ({ exercise, onUpdateExercise, onRemoveExercise }: Exercise
                     <Button onClick={addSet} variant="outline" className="w-full mt-3">
                         <Plus className="mr-2 h-4 w-4" /> Ajouter une série
                     </Button>
+                    <div className="pt-2">
+                        <Label htmlFor={`notes-${exercise.id}`} className="text-sm font-medium text-gray-400 mb-2 block">
+                            Notes d'exercice
+                        </Label>
+                        <Textarea
+                            id={`notes-${exercise.id}`}
+                            placeholder="Ajouter des notes (ex: ressenti, technique...)"
+                            value={exercise.notes || ''}
+                            onChange={(e) => handleNoteChange(e.target.value)}
+                            className="bg-gray-700 border-gray-600 min-h-[60px]"
+                            rows={2}
+                        />
+                    </div>
                 </div>
             </CollapsibleContent>
         </Collapsible>
