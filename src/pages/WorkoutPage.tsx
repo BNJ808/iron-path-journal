@@ -1,4 +1,3 @@
-
 import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -163,7 +162,7 @@ const WorkoutPage = () => {
 
           <AddExerciseDialog onAddExercise={handleAddExercise} />
           
-          <div className="border-t border-gray-700 pt-4"></div>
+          <div className="border-t border-border pt-4"></div>
 
           <div className="flex flex-col sm:flex-row gap-2">
               <SaveTemplateDialog onSave={handleSaveAsTemplate}>

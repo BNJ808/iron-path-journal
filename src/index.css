@@ -29,7 +29,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 5.2% 16.1%;
+    --border: 240 3.7% 25%;
     --input: 240 5.2% 16.1%;
     --ring: 240 4.9% 83.9%;
 
@@ -51,6 +51,6 @@
   }
   /* Custom card style */
   .custom-card {
-    @apply bg-gray-700/50 border border-gray-600/50 rounded-lg;
+    @apply bg-gray-700/50 border rounded-lg;
   }
 }

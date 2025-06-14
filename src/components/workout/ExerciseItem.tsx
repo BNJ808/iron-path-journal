@@ -30,7 +30,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
   };
 
   return (
-    <div className="p-4 rounded-lg bg-secondary space-y-4">
+    <div className="p-4 rounded-lg bg-secondary space-y-4 border">
       <div className="flex justify-between items-center">
         <h3 className="font-bold text-lg">{exercise.name}</h3>
         <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)}>
