@@ -99,7 +99,7 @@ const ExerciseCard = ({ exercise, onUpdateExercise, onRemoveExercise }: Exercise
                             </div>
                             <div className="col-span-2 flex justify-center">
                                  <Checkbox
-                                    checked={set.isCompleted}
+                                    checked={!!set.isCompleted}
                                     onCheckedChange={(checked) => handleSetCompletedChange(set.id, !!checked)}
                                     className="h-6 w-6"
                                 />
