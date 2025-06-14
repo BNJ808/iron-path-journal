@@ -26,10 +26,14 @@ export const useWorkoutHistory = () => {
     const addWorkout = useCallback((workout: Workout) => {
         setWorkouts(prevWorkouts => [...prevWorkouts, workout]);
     }, []);
+
+    const deleteWorkout = useCallback((workoutId: string) => {
+        setWorkouts(prevWorkouts => prevWorkouts.filter(w => w.id !== workoutId));
+    }, []);
     
     const clearHistory = useCallback(() => {
         setWorkouts([]);
     }, []);
 
-    return { workouts, addWorkout, clearHistory };
+    return { workouts, addWorkout, deleteWorkout, clearHistory };
 };

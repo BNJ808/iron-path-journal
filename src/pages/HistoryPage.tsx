@@ -18,12 +18,17 @@ import {
 import { toast } from 'sonner';
 
 const HistoryPage = () => {
-    const { workouts, clearHistory } = useWorkoutHistory();
+    const { workouts, clearHistory, deleteWorkout } = useWorkoutHistory();
 
     const handleClearHistory = () => {
         clearHistory();
         toast.success("L'historique des séances a été effacé.");
     }
+
+    const handleDeleteWorkout = (workoutId: string) => {
+        deleteWorkout(workoutId);
+        toast.success("La séance a été supprimée.");
+    };
 
     // On trie par date pour afficher les plus récents en premier
     const sortedWorkouts = [...workouts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -68,7 +73,11 @@ const HistoryPage = () => {
             ) : (
                 <Accordion type="multiple" className="space-y-4">
                     {sortedWorkouts.map(workout => (
-                        <WorkoutHistoryCard key={workout.id} workout={workout} />
+                        <WorkoutHistoryCard 
+                            key={workout.id} 
+                            workout={workout} 
+                            onDelete={() => handleDeleteWorkout(workout.id)}
+                        />
                     ))}
                 </Accordion>
             )}

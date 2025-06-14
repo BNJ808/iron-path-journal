@@ -1,15 +1,27 @@
-
 import type { Workout } from '@/types';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { List, StickyNote } from 'lucide-react';
+import { List, StickyNote, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface WorkoutHistoryCardProps {
     workout: Workout;
+    onDelete: () => void;
 }
 
-const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
+const WorkoutHistoryCard = ({ workout, onDelete }: WorkoutHistoryCardProps) => {
     const workoutDate = new Date(workout.date);
 
     return (
@@ -54,6 +66,31 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
                                 </li>
                             ))}
                         </ul>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-end">
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive-outline" size="sm">
+                                    <Trash2 /> Supprimer
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Supprimer cette séance ?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Cette action est irréversible. Voulez-vous vraiment
+                                        supprimer cette séance de votre historique ?
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                    <AlertDialogAction onClick={onDelete}>
+                                        Oui, supprimer
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
             </AccordionContent>
