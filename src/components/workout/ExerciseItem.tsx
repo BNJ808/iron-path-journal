@@ -2,7 +2,7 @@
 import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ExerciseLog, ExerciseSet } from '@/hooks/useWorkouts';
+import { ExerciseLog, ExerciseSet } from '@/types';
 import { Trash2, Plus } from 'lucide-react';
 
 interface ExerciseItemProps {

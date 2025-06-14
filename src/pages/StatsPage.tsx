@@ -42,12 +42,15 @@ const StatsPage = () => {
                     return acc + exercise.sets.reduce((setAcc, set) => {
                         totalSets++;
                         
+                        const weight = Number(set.weight) || 0;
+                        const reps = Number(set.reps) || 0;
+
                         const currentPR = personalRecords[exercise.name] || 0;
-                        if (set.weight > currentPR) {
-                            personalRecords[exercise.name] = set.weight;
+                        if (weight > currentPR) {
+                            personalRecords[exercise.name] = weight;
                         }
 
-                        return setAcc + set.reps * set.weight;
+                        return setAcc + reps * weight;
                     }, 0);
                 }, 0);
 

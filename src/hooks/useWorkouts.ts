@@ -49,7 +49,7 @@ export const useWorkouts = () => {
                 .insert({
                     user_id: userId,
                     date: new Date().toISOString(),
-                    exercises: newWorkout?.exercises || [],
+                    exercises: newWorkout?.exercises as any || [],
                     notes: newWorkout?.notes,
                     status: 'in-progress',
                 })
@@ -73,7 +73,7 @@ export const useWorkouts = () => {
 
             const { data, error } = await supabase
                 .from('workouts')
-                .update(updateData)
+                .update(updateData as any)
                 .eq('id', workoutId)
                 .select()
                 .single();
