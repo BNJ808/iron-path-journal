@@ -14,34 +14,25 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { toast } from 'sonner';
+import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
 
 const WorkoutPage = () => {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const [workoutNotes, setWorkoutNotes] = useState('');
   const today = new Date();
   const { addWorkout } = useWorkoutHistory();
+  const {
+    exercises,
+    notes: workoutNotes,
+    addExercise: addExerciseToWorkout,
+    removeExercise,
+    updateExercise,
+    setNotes: setWorkoutNotes,
+    clearWorkout,
+  } = useCurrentWorkout();
 
   const addExercise = (exerciseName: string) => {
-    const newExercise: Exercise = {
-      id: nanoid(),
-      name: exerciseName,
-      sets: [
-        { id: nanoid(), reps: 0, weight: 0, isCompleted: false }
-      ],
-    };
-    setExercises(prev => [...prev, newExercise]);
+    addExerciseToWorkout(exerciseName);
     setSheetOpen(false);
-  };
-
-  const removeExercise = (exerciseId: string) => {
-    setExercises(prev => prev.filter(ex => ex.id !== exerciseId));
-  };
-
-  const updateExercise = (updatedExercise: Exercise) => {
-    setExercises(prev =>
-      prev.map(ex => (ex.id === updatedExercise.id ? updatedExercise : ex))
-    );
   };
 
   const finishWorkout = () => {
@@ -60,8 +51,7 @@ const WorkoutPage = () => {
     addWorkout(workout);
     toast.success("Séance terminée et sauvegardée !");
     
-    setExercises([]);
-    setWorkoutNotes('');
+    clearWorkout();
   };
 
   const muscleGroups = Object.keys(EXERCISES_DATABASE) as MuscleGroup[];
@@ -145,5 +135,3 @@ const WorkoutPage = () => {
     </div>
   );
 };
-
-export default WorkoutPage;

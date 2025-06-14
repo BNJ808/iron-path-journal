@@ -16,9 +16,15 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
+import type { Workout } from '@/types';
 
 const HistoryPage = () => {
     const { workouts, clearHistory, deleteWorkout } = useWorkoutHistory();
+    const { startFromTemplate } = useCurrentWorkout();
+    const navigate = useNavigate();
+
 
     const handleClearHistory = () => {
         clearHistory();
@@ -28,6 +34,12 @@ const HistoryPage = () => {
     const handleDeleteWorkout = (workoutId: string) => {
         deleteWorkout(workoutId);
         toast.success("La séance a été supprimée.");
+    };
+
+    const handleCopyWorkout = (workout: Workout) => {
+        startFromTemplate(workout);
+        navigate('/workout');
+        toast.info("Séance copiée. Prête à être commencée !");
     };
 
     // On trie par date pour afficher les plus récents en premier
@@ -77,6 +89,7 @@ const HistoryPage = () => {
                             key={workout.id} 
                             workout={workout} 
                             onDelete={() => handleDeleteWorkout(workout.id)}
+                            onCopy={() => handleCopyWorkout(workout)}
                         />
                     ))}
                 </Accordion>

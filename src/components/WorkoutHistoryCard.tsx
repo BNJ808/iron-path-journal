@@ -1,8 +1,9 @@
+
 import type { Workout } from '@/types';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { List, StickyNote, Trash2 } from 'lucide-react';
+import { Copy, List, StickyNote, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
@@ -19,9 +20,10 @@ import {
 interface WorkoutHistoryCardProps {
     workout: Workout;
     onDelete: () => void;
+    onCopy: () => void;
 }
 
-const WorkoutHistoryCard = ({ workout, onDelete }: WorkoutHistoryCardProps) => {
+const WorkoutHistoryCard = ({ workout, onDelete, onCopy }: WorkoutHistoryCardProps) => {
     const workoutDate = new Date(workout.date);
 
     return (
@@ -68,7 +70,10 @@ const WorkoutHistoryCard = ({ workout, onDelete }: WorkoutHistoryCardProps) => {
                         </ul>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-end">
+                    <div className="mt-6 pt-4 border-t border-gray-700/50 flex justify-end gap-2">
+                        <Button variant="outline" size="sm" onClick={onCopy}>
+                           <Copy /> Copier
+                        </Button>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive-outline" size="sm">
