@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -92,7 +91,7 @@ export const useWorkouts = () => {
         },
         onSuccess: (data) => {
             if (data.status === 'completed') {
-                queryClient.setQueryData(['workout', 'today', userId], null);
+                queryClient.removeQueries({ queryKey: ['workout', 'today', userId] });
                 queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
             } else {
                 queryClient.setQueryData(['workout', 'today', userId], data);
