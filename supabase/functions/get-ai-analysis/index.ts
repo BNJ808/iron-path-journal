@@ -2,7 +2,7 @@
 import 'https://deno.land/x/xhr@0.1.0/mod.ts'
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,8 +52,8 @@ async function handler(req: Request): Promise<Response> {
     return new Response(null, { headers: corsHeaders })
   }
 
-  if (!openAIApiKey) {
-    return new Response(JSON.stringify({ error: 'Missing OPENAI_API_KEY' }), {
+  if (!geminiApiKey) {
+    return new Response(JSON.stringify({ error: 'Missing GEMINI_API_KEY' }), {
       status: 200, // Always return 200 to pass detailed error in body
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -74,26 +74,30 @@ async function handler(req: Request): Promise<Response> {
       });
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`;
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are a friendly and knowledgeable AI fitness coach. You provide clear, concise, and encouraging advice in French.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
+        contents: [{
+            parts: [{ text: prompt }]
+        }],
+        systemInstruction: {
+            parts: { text: "You are a friendly and knowledgeable AI fitness coach. You provide clear, concise, and encouraging advice in French." }
+        },
+        generationConfig: {
+            temperature: 0.7,
+        }
       }),
     });
 
     if (!response.ok) {
         const errorBody = await response.json();
-        const errorMessage = `OpenAI API error: ${errorBody.error?.message || response.statusText}`;
-        console.error(errorMessage);
+        const errorMessage = `Gemini API error: ${errorBody.error?.message || response.statusText}`;
+        console.error(errorMessage, errorBody);
         return new Response(JSON.stringify({ error: errorMessage }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200, // Return 200 and pass error in body
@@ -101,7 +105,16 @@ async function handler(req: Request): Promise<Response> {
     }
 
     const completion = await response.json();
-    const analysis = completion.choices[0].message.content;
+    
+    if (!completion.candidates || completion.candidates.length === 0 || !completion.candidates[0].content?.parts[0]?.text) {
+        console.error('Invalid response from Gemini API:', completion);
+        return new Response(JSON.stringify({ error: 'Invalid or empty response from Gemini API.' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+        });
+    }
+
+    const analysis = completion.candidates[0].content.parts[0].text;
 
     return new Response(JSON.stringify({ analysis }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
