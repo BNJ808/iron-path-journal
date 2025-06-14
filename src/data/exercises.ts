@@ -34,8 +34,21 @@ export const EXERCISES_DATABASE = {
   },
 };
 
-const allExercises = Object.values(EXERCISES_DATABASE)
-  .flatMap(group => Object.values(group).flat())
-  .map(name => ({ id: nanoid(), name: name }));
+type Exercise = { id: string; name: string };
+export type ExerciseGroup = {
+    group: string;
+    exercises: Exercise[];
+};
+
+export const groupedExercises: ExerciseGroup[] = Object.entries(EXERCISES_DATABASE)
+  .map(([group, types]) => ({
+    group,
+    exercises: Object.values(types)
+      .flat()
+      .map(name => ({ id: nanoid(), name: name }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  }));
+
+const allExercises = groupedExercises.flatMap(g => g.exercises);
 
 export const exercises = allExercises.sort((a,b) => a.name.localeCompare(b.name));

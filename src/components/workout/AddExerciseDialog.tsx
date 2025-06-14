@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { exercises } from "@/data/exercises";
+import { groupedExercises } from "@/data/exercises";
 import { PlusCircle } from "lucide-react";
 
 interface AddExerciseDialogProps {
@@ -42,22 +43,27 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Choisir un exercice</DialogTitle>
+          <DialogDescription>
+            Recherchez un exercice ou parcourez les catégories.
+          </DialogDescription>
         </DialogHeader>
         <Command>
           <CommandInput placeholder="Rechercher un exercice..." />
           <CommandList>
             <CommandEmpty>Aucun exercice trouvé.</CommandEmpty>
-            <CommandGroup>
-              {exercises.map((exercise) => (
-                <CommandItem
-                  key={exercise.id}
-                  value={exercise.name}
-                  onSelect={() => handleSelect(exercise)}
-                >
-                  {exercise.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {groupedExercises.map((group) => (
+              <CommandGroup key={group.group} heading={group.group}>
+                {group.exercises.map((exercise) => (
+                  <CommandItem
+                    key={exercise.id}
+                    value={exercise.name}
+                    onSelect={() => handleSelect(exercise)}
+                  >
+                    {exercise.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
           </CommandList>
         </Command>
       </DialogContent>
