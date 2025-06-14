@@ -1,3 +1,4 @@
+
 import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -100,10 +101,25 @@ const WorkoutPage = () => {
         toast.error("Ajoutez des exercices avant d'enregistrer un modèle.");
         return;
     }
+    
+    const templateExercises = todayWorkout.exercises.map(ex => ({
+        ...ex,
+        sets: ex.sets.map(s => ({
+            id: s.id,
+            reps: Number(s.reps) || 0,
+            weight: Number(s.weight) || 0,
+        })).filter(s => s.reps > 0 || s.weight > 0)
+    })).filter(ex => ex.sets.length > 0);
+
+    if (templateExercises.length === 0) {
+        toast.info("Veuillez remplir des séries avant d'enregistrer un modèle.");
+        return;
+    }
+
     try {
         await createTemplate({
             name,
-            exercises: todayWorkout.exercises,
+            exercises: templateExercises,
             notes: todayWorkout.notes || ''
         });
         toast.success(`Modèle "${name}" enregistré !`);
@@ -124,7 +140,7 @@ const WorkoutPage = () => {
             name: exercise.name,
             notes: exercise.notes || '',
             sets: exercise.sets.length > 0 
-                ? exercise.sets.map(_ => ({ id: nanoid(), reps: '', weight: '' }))
+                ? exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: set.weight }))
                 : [{ id: nanoid(), reps: '', weight: '' }]
         }));
 
