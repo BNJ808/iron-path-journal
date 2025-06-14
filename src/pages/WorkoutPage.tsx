@@ -147,7 +147,7 @@ const WorkoutPage = () => {
       {todayWorkout ? (
         <div className="space-y-4">
           {todayWorkout.exercises.length === 0 ? (
-            <div className="text-center text-gray-400 py-8 px-4 rounded-lg bg-gray-800/50">
+            <div className="text-center text-muted-foreground py-8 px-4 rounded-lg bg-secondary">
               <p>Commencez par ajouter un exercice à votre séance.</p>
             </div>
           ) : (
