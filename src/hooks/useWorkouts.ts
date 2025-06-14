@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -91,10 +90,27 @@ export const useWorkouts = () => {
         },
     });
 
+    const deleteWorkoutMutation = useMutation({
+        mutationFn: async (workoutId: string) => {
+            if (!userId) throw new Error("User not authenticated");
+
+            const { error } = await supabase
+                .from('workouts')
+                .delete()
+                .eq('id', workoutId);
+            
+            if (error) throw error;
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(['workout', 'today', userId], null);
+        },
+    });
+
     return {
         todayWorkout,
         isLoadingWorkout,
         createWorkout: createWorkoutMutation.mutateAsync,
         updateWorkout: updateWorkoutMutation.mutateAsync,
+        deleteWorkout: deleteWorkoutMutation.mutateAsync,
     };
 };

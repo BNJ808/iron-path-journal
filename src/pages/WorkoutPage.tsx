@@ -9,9 +9,20 @@ import { Save, Bookmark, List } from 'lucide-react';
 import { useWorkoutTemplates, WorkoutTemplate } from '@/hooks/useWorkoutTemplates';
 import { SaveTemplateDialog } from '@/components/workout/SaveTemplateDialog';
 import { SelectTemplateDialog } from '@/components/workout/SelectTemplateDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const WorkoutPage = () => {
-  const { todayWorkout, isLoadingWorkout, createWorkout, updateWorkout } = useWorkouts();
+  const { todayWorkout, isLoadingWorkout, createWorkout, updateWorkout, deleteWorkout } = useWorkouts();
   const { templates, isLoadingTemplates, createTemplate } = useWorkoutTemplates();
 
   const handleStartWorkout = async () => {
@@ -127,6 +138,16 @@ const WorkoutPage = () => {
     }
   };
 
+  const handleCancelWorkout = async () => {
+    if (!todayWorkout) return;
+    try {
+      await deleteWorkout(todayWorkout.id);
+      toast.success("Entraînement annulé.");
+    } catch (error: any) {
+      toast.error("Erreur lors de l'annulation de l'entraînement: " + error.message);
+    }
+  };
+
 
   if (isLoadingWorkout) {
     return (
@@ -175,6 +196,30 @@ const WorkoutPage = () => {
                   <Save className="mr-2 h-4 w-4" />
                   Terminer et Sauvegarder
               </Button>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="link" className="text-destructive hover:text-destructive/90">
+                  Annuler l'entraînement en cours
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action ne peut pas être annulée. Cela supprimera définitivement votre entraînement en cours.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Retour</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleCancelWorkout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Oui, annuler
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
 
         </div>
