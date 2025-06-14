@@ -103,12 +103,12 @@ async function handler(req: Request): Promise<Response> {
     })
   } catch (error) {
     console.error('Error in get-ai-analysis function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    // Return the error message as plain text for easier debugging on the client
+    return new Response(error.message, {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'text/plain' },
     });
   }
 }
 
 serve(handler)
-
