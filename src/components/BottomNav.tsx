@@ -1,4 +1,3 @@
-
 import { NavLink } from 'react-router-dom';
 import { Dumbbell, BarChart3, History, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,7 +6,7 @@ const navItems = [
   { path: '/workout', icon: Dumbbell, label: 'Entraînement', color: 'text-accent-blue' },
   { path: '/stats', icon: BarChart3, label: 'Stats', color: 'text-accent-purple' },
   { path: '/history', icon: History, label: 'Historique', color: 'text-accent-yellow' },
-  { path: '/timer', icon: Timer, label: 'Timer', color: 'text-gray-400' },
+  { path: '/timer', icon: Timer, label: 'Timer', color: 'text-accent-green' },
 ];
 
 const BottomNav = () => {
