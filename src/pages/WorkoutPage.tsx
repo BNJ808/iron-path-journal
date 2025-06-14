@@ -30,7 +30,7 @@ const WorkoutPage = () => {
     const lastSets = lastPerformances[exercise.id];
 
     const newSets = lastSets && lastSets.length > 0
-        ? lastSets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight) }))
+        ? lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight) }))
         : [{ id: nanoid(), reps: '', weight: '' }];
 
     const newExerciseLog: ExerciseLog = {
