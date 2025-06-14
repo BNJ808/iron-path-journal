@@ -1,26 +1,10 @@
-
 import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AddExerciseDialog } from '@/components/workout/AddExerciseDialog';
-import { ExerciseItem } from '@/components/workout/ExerciseItem';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
-import { Save, Bookmark, List } from 'lucide-react';
-import { useWorkoutTemplates, WorkoutTemplate } from '@/hooks/useWorkoutTemplates';
-import { SaveTemplateDialog } from '@/components/workout/SaveTemplateDialog';
-import { SelectTemplateDialog } from '@/components/workout/SelectTemplateDialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { useWorkoutTemplates, type WorkoutTemplate } from '@/hooks/useWorkoutTemplates';
+import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
+import { StartWorkout } from '@/components/workout/StartWorkout';
+import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
 
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout, createWorkout, updateWorkout, deleteWorkout } = useWorkouts();
@@ -140,7 +124,7 @@ const WorkoutPage = () => {
             name: exercise.name,
             notes: exercise.notes || '',
             sets: exercise.sets.length > 0 
-                ? exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: set.weight }))
+                ? exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight) }))
                 : [{ id: nanoid(), reps: '', weight: '' }]
         }));
 
@@ -166,14 +150,7 @@ const WorkoutPage = () => {
 
 
   if (isLoadingWorkout) {
-    return (
-      <div className="p-4 space-y-4 max-w-2xl mx-auto">
-        <Skeleton className="h-8 w-1/2 mb-4" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-40 w-full" />
-      </div>
-    );
+    return <WorkoutLoadingSkeleton />;
   }
   
   return (
@@ -181,77 +158,22 @@ const WorkoutPage = () => {
       <h1 className="text-2xl font-bold text-gray-100">Entraînement du jour</h1>
       
       {todayWorkout ? (
-        <div className="space-y-4">
-          {todayWorkout.exercises.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8 px-4 rounded-lg bg-secondary">
-              <p>Commencez par ajouter un exercice à votre séance.</p>
-            </div>
-          ) : (
-            todayWorkout.exercises.map(ex => (
-              <ExerciseItem 
-                key={ex.id} 
-                exercise={ex} 
-                onUpdate={handleUpdateExercise}
-                onRemove={handleRemoveExercise}
-              />
-            ))
-          )}
-
-          <AddExerciseDialog onAddExercise={handleAddExercise} />
-          
-          <div className="border-t border-border pt-4"></div>
-
-          <div className="flex flex-col sm:flex-row gap-2">
-              <SaveTemplateDialog onSave={handleSaveAsTemplate}>
-                  <Button variant="outline" className="w-full" disabled={todayWorkout.exercises.length === 0}>
-                      <Bookmark className="mr-2 h-4 w-4" />
-                      Enregistrer en modèle
-                  </Button>
-              </SaveTemplateDialog>
-              <Button onClick={handleFinishWorkout} disabled={!todayWorkout || todayWorkout.exercises.length === 0} className="w-full bg-accent-blue hover:bg-accent-blue/90">
-                  <Save className="mr-2 h-4 w-4" />
-                  Terminer et Sauvegarder
-              </Button>
-          </div>
-          
-          <div className="mt-8 text-center">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="link" className="text-destructive hover:text-destructive/90">
-                  Annuler l'entraînement en cours
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Cette action ne peut pas être annulée. Cela supprimera définitivement votre entraînement en cours.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Retour</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleCancelWorkout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                    Oui, annuler
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-
-        </div>
+        <WorkoutInProgress
+          workout={todayWorkout}
+          onAddExercise={handleAddExercise}
+          onUpdateExercise={handleUpdateExercise}
+          onRemoveExercise={handleRemoveExercise}
+          onSaveAsTemplate={handleSaveAsTemplate}
+          onFinishWorkout={handleFinishWorkout}
+          onCancelWorkout={handleCancelWorkout}
+        />
       ) : (
-        <div className="text-center py-10 space-y-4">
-          <p className="text-gray-400 mb-4">Aucun entraînement en cours pour aujourd'hui.</p>
-          <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <Button onClick={handleStartWorkout}>Démarrer un entraînement vide</Button>
-            <SelectTemplateDialog templates={templates} onSelectTemplate={handleStartFromTemplate}>
-                <Button variant="secondary" disabled={isLoadingTemplates || templates.length === 0}>
-                    <List className="mr-2 h-4 w-4" />
-                    Démarrer depuis un modèle
-                </Button>
-            </SelectTemplateDialog>
-          </div>
-        </div>
+        <StartWorkout
+          onStartWorkout={handleStartWorkout}
+          onStartFromTemplate={handleStartFromTemplate}
+          templates={templates}
+          isLoadingTemplates={isLoadingTemplates}
+        />
       )}
     </div>
   );
