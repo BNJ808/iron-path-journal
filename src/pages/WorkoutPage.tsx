@@ -1,7 +1,9 @@
+
 import { useWorkouts, ExerciseLog } from '@/hooks/useWorkouts';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
 import { useWorkoutTemplates, type WorkoutTemplate } from '@/hooks/useWorkoutTemplates';
+import { useExerciseLastPerformance } from '@/hooks/useExerciseLastPerformance';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
 import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
@@ -9,6 +11,7 @@ import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkele
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout, createWorkout, updateWorkout, deleteWorkout } = useWorkouts();
   const { templates, isLoadingTemplates, createTemplate } = useWorkoutTemplates();
+  const { getLastPerformances, updateLastPerformances } = useExerciseLastPerformance();
 
   const handleStartWorkout = async () => {
     try {
@@ -22,11 +25,18 @@ const WorkoutPage = () => {
   const handleAddExercise = async (exercise: { id: string; name: string }) => {
     if (!todayWorkout) return;
 
+    const lastPerformances = await getLastPerformances([exercise.id]);
+    const lastSets = lastPerformances[exercise.id];
+
+    const newSets = lastSets && lastSets.length > 0
+        ? lastSets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight) }))
+        : [{ id: nanoid(), reps: '', weight: '' }];
+
     const newExerciseLog: ExerciseLog = {
       id: nanoid(),
       exerciseId: exercise.id,
       name: exercise.name,
-      sets: [{ id: nanoid(), reps: '', weight: '' }],
+      sets: newSets,
     };
 
     const updatedExercises = [...todayWorkout.exercises, newExerciseLog];
@@ -68,11 +78,19 @@ const WorkoutPage = () => {
       
       const cleanedExercises = todayWorkout.exercises.map(ex => ({
           ...ex,
-          sets: ex.sets.map(s => ({...s, reps: Number(s.reps) || 0, weight: Number(s.weight) || 0}))
+          sets: ex.sets.map(s => ({...s, id: s.id, reps: Number(s.reps) || 0, weight: Number(s.weight) || 0}))
                      .filter(s => s.reps > 0 || s.weight > 0)
       })).filter(ex => ex.sets.length > 0);
 
+      const performancesToUpdate = cleanedExercises.map(ex => ({
+          exerciseId: ex.exerciseId,
+          sets: ex.sets as ExerciseSet[]
+      }));
+
       try {
+        if (performancesToUpdate.length > 0) {
+            await updateLastPerformances(performancesToUpdate);
+        }
         await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises, status: 'completed' });
         toast.success("Entraînement terminé et sauvegardé !");
       } catch (error: any) {
