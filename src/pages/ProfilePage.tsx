@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUploader } from '@/components/AvatarUploader';
+import { WeightTracker } from '@/components/profile/WeightTracker';
 
 const profileFormSchema = z.object({
     username: z.string()
@@ -122,6 +122,11 @@ const ProfilePage = () => {
                 </Form>
                 
                 <div className="border-t border-gray-700"></div>
+
+                <WeightTracker />
+                
+                <div className="border-t border-gray-700"></div>
+
 
                 <Button onClick={handleLogout} variant="destructive" className="w-full">
                     <LogOut />
