@@ -7,6 +7,7 @@ import { useExerciseLastPerformance } from '@/hooks/useExerciseLastPerformance';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
 import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
+import type { ExerciseSet } from '@/types';
 
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout, createWorkout, updateWorkout, deleteWorkout } = useWorkouts();
@@ -84,7 +85,7 @@ const WorkoutPage = () => {
 
       const performancesToUpdate = cleanedExercises.map(ex => ({
           exerciseId: ex.exerciseId,
-          sets: ex.sets as ExerciseSet[]
+          sets: ex.sets as { id: string; reps: number; weight: number }[]
       }));
 
       try {
