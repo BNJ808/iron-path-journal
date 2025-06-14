@@ -36,6 +36,7 @@ export type Database = {
           exercises: Json
           id: string
           notes: string | null
+          status: string
           user_id: string
         }
         Insert: {
@@ -43,6 +44,7 @@ export type Database = {
           exercises: Json
           id?: string
           notes?: string | null
+          status?: string
           user_id: string
         }
         Update: {
@@ -50,6 +52,7 @@ export type Database = {
           exercises?: Json
           id?: string
           notes?: string | null
+          status?: string
           user_id?: string
         }
         Relationships: []

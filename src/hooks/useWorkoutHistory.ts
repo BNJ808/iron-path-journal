@@ -17,6 +17,7 @@ export const useWorkoutHistory = () => {
                 .from('workouts')
                 .select('*')
                 .eq('user_id', userId)
+                .eq('status', 'completed')
                 .order('date', { ascending: false });
             if (error) throw new Error(error.message);
             // FIX: Cast to unknown first to align Supabase's JSON type with our local Workout type.

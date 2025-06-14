@@ -74,7 +74,7 @@ const WorkoutPage = () => {
       })).filter(ex => ex.sets.length > 0);
 
       try {
-        await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises });
+        await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises, status: 'completed' });
         toast.success("Entraînement terminé et sauvegardé !");
       } catch (error: any) {
         toast.error("Erreur à la sauvegarde de l'entraînement: " + error.message);

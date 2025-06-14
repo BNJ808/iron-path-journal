@@ -21,6 +21,7 @@ export interface Workout {
   date: string; // ISO string
   exercises: Exercise[];
   notes?: string;
+  status: string;
 }
 
 export type MuscleGroup = keyof typeof EXERCISES_DATABASE;

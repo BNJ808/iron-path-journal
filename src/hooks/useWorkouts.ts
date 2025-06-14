@@ -32,6 +32,7 @@ export const useWorkouts = () => {
                 .from('workouts')
                 .select('*')
                 .eq('user_id', userId)
+                .eq('status', 'in-progress')
                 .gte('date', today.toISOString())
                 .lt('date', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString())
                 .order('date', { ascending: false })
@@ -59,6 +60,7 @@ export const useWorkouts = () => {
                     date: new Date().toISOString(),
                     exercises: newWorkout?.exercises || [],
                     notes: newWorkout?.notes,
+                    status: 'in-progress',
                 })
                 .select()
                 .single();
@@ -68,12 +70,12 @@ export const useWorkouts = () => {
         },
         onSuccess: (data) => {
             queryClient.setQueryData(['workout', 'today', userId], data);
-            queryClient.invalidateQueries({ queryKey: ['workouts', 'history'] });
+            queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
         },
     });
 
     const updateWorkoutMutation = useMutation({
-        mutationFn: async (updatedWorkout: { workoutId: string; exercises?: ExerciseLog[], notes?: string }) => {
+        mutationFn: async (updatedWorkout: { workoutId: string; exercises?: ExerciseLog[], notes?: string, status?: string }) => {
             if (!userId) throw new Error("User not authenticated");
 
             const { workoutId, ...updateData } = updatedWorkout;
@@ -89,7 +91,12 @@ export const useWorkouts = () => {
             return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] };
         },
         onSuccess: (data) => {
-            queryClient.setQueryData(['workout', 'today', userId], data);
+            if (data.status === 'completed') {
+                queryClient.setQueryData(['workout', 'today', userId], null);
+                queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
+            } else {
+                queryClient.setQueryData(['workout', 'today', userId], data);
+            }
         },
     });
 
