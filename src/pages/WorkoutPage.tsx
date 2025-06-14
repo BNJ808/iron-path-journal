@@ -17,6 +17,7 @@ import { useCurrentWorkout } from '@/hooks/useCurrentWorkout';
 
 const WorkoutPage = () => {
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const today = new Date();
   const { addWorkout } = useWorkoutHistory();
   const {
@@ -32,6 +33,7 @@ const WorkoutPage = () => {
   const addExercise = (exerciseName: string) => {
     addExerciseToWorkout(exerciseName);
     setSheetOpen(false);
+    setSearchTerm('');
   };
 
   const finishWorkout = () => {
@@ -54,6 +56,13 @@ const WorkoutPage = () => {
   };
 
   const muscleGroups = Object.keys(EXERCISES_DATABASE) as MuscleGroup[];
+
+  const filteredExercisesByGroup = muscleGroups.map(group => {
+    const exercisesInGroup = Object.values(EXERCISES_DATABASE[group]).flat();
+    const filtered = exercisesInGroup.filter(name => name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return { group, exercises: filtered };
+  }).filter(g => g.exercises.length > 0);
+
 
   return (
     <div className="p-4">
@@ -89,22 +98,41 @@ const WorkoutPage = () => {
           <SheetHeader>
             <SheetTitle>Choisir un exercice</SheetTitle>
           </SheetHeader>
+          <div className="px-3 pt-2 pb-4">
+            <input
+              type="text"
+              placeholder="Rechercher un exercice..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-accent-blue focus:border-accent-blue outline-none"
+            />
+          </div>
           <div className="overflow-y-auto flex-grow pr-3">
-            <Accordion type="single" collapsible className="w-full">
-              {muscleGroups.map((group) => (
-                <AccordionItem value={group} key={group}>
-                  <AccordionTrigger>{group}</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-col items-start">
-                      {Object.values(EXERCISES_DATABASE[group]).flat().map(exName => (
-                         <Button key={exName} variant="link" className="text-left justify-start w-full p-2 h-auto text-base text-foreground" onClick={() => addExercise(exName)}>
-                           {exName}
-                         </Button>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+            <Accordion 
+              type="single" 
+              collapsible 
+              className="w-full"
+              // Ouvre le premier groupe si la recherche donne des résultats
+              value={searchTerm && filteredExercisesByGroup.length > 0 ? filteredExercisesByGroup[0].group : undefined}
+            >
+              {filteredExercisesByGroup.length > 0 ? (
+                filteredExercisesByGroup.map(({ group, exercises }) => (
+                  <AccordionItem value={group} key={group}>
+                    <AccordionTrigger>{group}</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-col items-start">
+                        {exercises.map(exName => (
+                           <Button key={exName} variant="link" className="text-left justify-start w-full p-2 h-auto text-base text-foreground" onClick={() => addExercise(exName)}>
+                             {exName}
+                           </Button>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))
+              ) : (
+                <p className="text-center text-gray-500 py-6">Aucun exercice ne correspond à votre recherche.</p>
+              )}
             </Accordion>
           </div>
         </SheetContent>
