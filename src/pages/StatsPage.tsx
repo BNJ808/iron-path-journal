@@ -1,4 +1,3 @@
-
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { Dumbbell, Repeat, TrendingUp, BarChart as BarChartIcon, Trophy } from '
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 
 const chartConfig = {
   volume: {
@@ -140,6 +140,12 @@ const StatsPage = () => {
                             </ChartContainer>
                         </CardContent>
                     </Card>
+
+                    <AiAnalysisCard 
+                        title="Analyse et Conseils IA"
+                        type="general"
+                        data={stats}
+                    />
 
                     {Object.keys(stats.personalRecords).length > 0 && (
                         <Card>

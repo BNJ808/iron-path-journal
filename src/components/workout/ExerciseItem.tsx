@@ -3,7 +3,8 @@ import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ExerciseLog, ExerciseSet } from '@/types';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Lightbulb } from 'lucide-react';
+import { AiExerciseAnalysisDialog } from './AiExerciseAnalysisDialog';
 
 interface ExerciseItemProps {
   exercise: ExerciseLog;
@@ -33,9 +34,12 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
     <div className="p-4 rounded-lg bg-secondary space-y-4 border">
       <div className="flex justify-between items-center">
         <h3 className="font-bold text-lg">{exercise.name}</h3>
-        <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)}>
-          <Trash2 className="text-destructive" />
-        </Button>
+        <div className="flex items-center">
+            <AiExerciseAnalysisDialog exerciseId={exercise.exerciseId} exerciseName={exercise.name} />
+            <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)}>
+              <Trash2 className="text-destructive" />
+            </Button>
+        </div>
       </div>
 
       <div className="space-y-2">
