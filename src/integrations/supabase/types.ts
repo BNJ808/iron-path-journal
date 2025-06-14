@@ -30,6 +30,33 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_templates: {
+        Row: {
+          created_at: string
+          exercises: Json
+          id: string
+          name: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exercises: Json
+          id?: string
+          name: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exercises?: Json
+          id?: string
+          name?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       workouts: {
         Row: {
           date: string

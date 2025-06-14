@@ -2,20 +2,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tables } from '@/integrations/supabase/types';
 import { startOfToday } from 'date-fns';
+import { Workout, ExerciseLog } from '@/types';
 
-export type ExerciseSet = { id: string; reps: number | string; weight: number | string };
-export type ExerciseLog = {
-    id: string; // unique id for the log entry
-    exerciseId: string; // from data/exercises.ts
-    name: string;
-    sets: ExerciseSet[];
-    notes?: string;
-};
-export type Workout = Omit<Tables<'workouts'>, 'exercises'> & {
-    exercises: ExerciseLog[];
-};
+export { type ExerciseLog };
 
 export const useWorkouts = () => {
     const { user } = useAuth();
@@ -43,7 +33,7 @@ export const useWorkouts = () => {
             if (error) throw error;
             
             if (data) {
-                return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] };
+                return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] } as Workout;
             }
             return null;
         },
@@ -67,7 +57,7 @@ export const useWorkouts = () => {
                 .single();
 
             if (error) throw error;
-            return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] };
+            return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] } as Workout;
         },
         onSuccess: (data) => {
             queryClient.setQueryData(['workout', 'today', userId], data);
@@ -89,7 +79,7 @@ export const useWorkouts = () => {
                 .single();
             
             if (error) throw error;
-            return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] };
+            return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] } as Workout;
         },
         onSuccess: (data) => {
             if (data.status === 'completed') {
