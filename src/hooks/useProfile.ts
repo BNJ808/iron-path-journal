@@ -30,10 +30,11 @@ export const useProfile = () => {
 
     const updateProfileMutation = useMutation({
         mutationFn: async (updatedProfile: Partial<Profile> & { id: string }) => {
+            const { id, ...updateData } = updatedProfile;
             const { error, data } = await supabase
                 .from('profiles')
-                .update({ username: updatedProfile.username, updated_at: new Date().toISOString() })
-                .eq('id', updatedProfile.id)
+                .update({ ...updateData, updated_at: new Date().toISOString() })
+                .eq('id', id)
                 .select()
                 .single();
 
@@ -48,9 +49,43 @@ export const useProfile = () => {
         },
     });
 
+    const uploadAvatar = async (file: File) => {
+        if (!user) throw new Error("User not authenticated.");
+
+        if (profile?.avatar_url) {
+            const pathSegments = profile.avatar_url.split('/avatars/');
+            if (pathSegments.length > 1) {
+                const oldAvatarPath = pathSegments[1];
+                await supabase.storage.from('avatars').remove([oldAvatarPath]);
+            }
+        }
+    
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+    
+        const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file);
+    
+        if (uploadError) {
+            throw uploadError;
+        }
+    
+        const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+    
+        if (!publicUrl) {
+            throw new Error("Could not get public URL for avatar.");
+        }
+        
+        return updateProfileMutation.mutateAsync({ id: user.id, avatar_url: publicUrl });
+    };
+
     return {
         profile,
         isLoading,
         updateProfile: updateProfileMutation.mutateAsync,
+        uploadAvatar,
     };
 };

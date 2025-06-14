@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AvatarUploader } from '@/components/AvatarUploader';
 
 const profileFormSchema = z.object({
     username: z.string()
@@ -26,7 +27,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 const ProfilePage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { profile, isLoading: isLoadingProfile, updateProfile } = useProfile();
+    const { profile, isLoading: isLoadingProfile, updateProfile, uploadAvatar } = useProfile();
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileFormSchema),
@@ -68,15 +69,34 @@ const ProfilePage = () => {
         }
     };
 
+    const handleAvatarUpload = async (file: File) => {
+        if (!uploadAvatar) return;
+        return uploadAvatar(file);
+    };
+
     const isLoading = !user || isLoadingProfile;
 
     return (
         <div className="p-4 max-w-md mx-auto">
             <h1 className="text-2xl font-bold text-gray-100 mb-6">Profil</h1>
             <div className="space-y-6 bg-gray-800/50 p-6 rounded-lg">
-                <div className="flex flex-col mb-4">
-                    <span className="text-sm text-gray-400">Email</span>
-                    {isLoading ? <Skeleton className="h-7 w-48 mt-1" /> : <span className="font-semibold text-lg">{user.email}</span>}
+                <div className="flex flex-col items-center space-y-4">
+                    <AvatarUploader
+                        avatarUrl={profile?.avatar_url}
+                        username={profile?.username}
+                        onUpload={handleAvatarUpload}
+                        isLoading={isLoading}
+                    />
+                    <div className="text-center">
+                        {isLoading ? (
+                            <Skeleton className="h-6 w-40" />
+                        ) : (
+                            <>
+                                <p className="text-sm text-gray-400">Email</p>
+                                <p className="font-semibold text-lg">{user.email}</p>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 <Form {...form}>
