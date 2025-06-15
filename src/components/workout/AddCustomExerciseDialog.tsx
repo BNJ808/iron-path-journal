@@ -47,6 +47,7 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      group: undefined,
     },
   });
 
