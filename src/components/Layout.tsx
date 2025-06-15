@@ -20,23 +20,20 @@ const Layout = () => {
     }
   }, [location.pathname]);
 
-  // Gérer l'ouverture/fermeture du timer avec une transition fluide
-  const handleTimerOpenChange = (open: boolean) => {
-    setIsTimerOpen(open);
-    if (!open && location.pathname === '/timer') {
-      // Transition fluide vers la dernière page
-      navigate(lastPath, { replace: true });
-    }
-  };
-
-  // Intercepter la navigation vers /timer pour ouvrir le dialog immédiatement
+  // Intercepter immédiatement la navigation vers /timer
   useEffect(() => {
     if (location.pathname === '/timer') {
+      // Ouvrir le dialog immédiatement
       setIsTimerOpen(true);
-      // Naviguer immédiatement vers la dernière page sans afficher TimerPage
+      // Rediriger immédiatement vers la dernière page pour éviter l'affichage de TimerPage
       navigate(lastPath, { replace: true });
     }
   }, [location.pathname, navigate, lastPath]);
+
+  // Gérer l'ouverture/fermeture du timer
+  const handleTimerOpenChange = (open: boolean) => {
+    setIsTimerOpen(open);
+  };
 
   useEffect(() => {
     if (!loading && !user) {

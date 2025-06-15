@@ -8,7 +8,6 @@ import Layout from "./components/Layout";
 import WorkoutPage from "./pages/WorkoutPage";
 import StatsPage from "./pages/StatsPage";
 import HistoryPage from "./pages/HistoryPage";
-import TimerPage from "./pages/TimerPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -34,8 +33,8 @@ const App = () => (
               <Route path="/workout" element={<WorkoutPage />} />
               <Route path="/stats" element={<StatsPage />} />
               <Route path="/history" element={<HistoryPage />} />
-              <Route path="/timer" element={<TimerPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              {/* Route /timer supprimée - gérée par le dialog dans Layout */}
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
