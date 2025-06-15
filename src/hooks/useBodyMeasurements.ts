@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -48,9 +47,29 @@ export const useBodyMeasurements = () => {
         },
     });
 
+    const deleteMeasurementMutation = useMutation({
+        mutationFn: async (measurementId: string) => {
+            if (!userId) throw new Error('User not authenticated');
+
+            const { error } = await supabase
+                .from('body_measurements')
+                .delete()
+                .eq('id', measurementId)
+                .eq('user_id', userId);
+
+            if (error) {
+                throw error;
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['bodyMeasurements', userId] });
+        },
+    });
+
     return {
         measurements,
         isLoading,
         addMeasurement: addMeasurementMutation.mutateAsync,
+        deleteMeasurement: deleteMeasurementMutation.mutateAsync,
     };
 };

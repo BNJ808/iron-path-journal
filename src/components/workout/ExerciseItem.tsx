@@ -4,10 +4,9 @@ import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ExerciseLog, ExerciseSet } from '@/types';
-import { Trash2, Plus, MessageSquare, Star } from 'lucide-react';
+import { Trash2, Plus, MessageSquare, Star, X, Check } from 'lucide-react';
 import { AiExerciseAnalysisDialog } from './AiExerciseAnalysisDialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useFavoriteExercises } from '@/hooks/useFavoriteExercises';
 
 interface ExerciseItemProps {
@@ -105,17 +104,22 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             <Button variant="ghost" size="icon" onClick={() => removeSet(set.id)} className="justify-self-center" aria-label="Remove set">
               <Trash2 size={16} className="text-destructive" />
             </Button>
-            <Checkbox
-                checked={!!set.completed}
-                onCheckedChange={(checked) => handleSetChange(set.id, 'completed', !!checked)}
-                className="justify-self-center border-2 data-[state=checked]:bg-accent-green data-[state=checked]:border-accent-green"
-                aria-label={`Mark set ${index + 1} as completed`}
-            />
+            <button
+                onClick={() => handleSetChange(set.id, 'completed', !set.completed)}
+                aria-label={`Mark set ${index + 1} as ${set.completed ? 'not completed' : 'completed'}`}
+                className={`justify-self-center flex items-center justify-center h-6 w-6 rounded-sm border-2 transition-colors
+                    ${set.completed
+                        ? 'bg-accent-green border-accent-green text-primary-foreground'
+                        : 'bg-destructive border-destructive text-destructive-foreground hover:bg-destructive/90'
+                    }`}
+            >
+                {set.completed ? <Check size={16} /> : <X size={16} />}
+            </button>
           </div>
         ))}
       </div>
 
-      <Button onClick={addSet} variant="outline" className="w-full">
+      <Button onClick={addSet} variant="outline" className="w-full hover:bg-background hover:brightness-110">
         <Plus size={16} />
         Ajouter une série
       </Button>

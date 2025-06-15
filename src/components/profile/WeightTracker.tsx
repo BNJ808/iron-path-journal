@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const weightFormSchema = z.object({
@@ -24,7 +24,7 @@ const weightFormSchema = z.object({
 type WeightFormValues = z.infer<typeof weightFormSchema>;
 
 export const WeightTracker = () => {
-    const { measurements, isLoading, addMeasurement } = useBodyMeasurements();
+    const { measurements, isLoading, addMeasurement, deleteMeasurement } = useBodyMeasurements();
 
     const form = useForm<WeightFormValues>({
         resolver: zodResolver(weightFormSchema),
@@ -44,6 +44,15 @@ export const WeightTracker = () => {
             });
         } catch (error: any) {
              toast.error("Erreur lors de l'enregistrement: " + error.message);
+        }
+    };
+
+    const handleDelete = async (measurementId: string) => {
+        try {
+            await deleteMeasurement(measurementId);
+            toast.success("Poids supprimé !");
+        } catch (error: any) {
+            toast.error("Erreur lors de la suppression: " + error.message);
         }
     };
 
@@ -131,8 +140,13 @@ export const WeightTracker = () => {
                         <ul className="space-y-2 max-h-48 overflow-y-auto">
                             {measurements.map((m) => (
                                 <li key={m.id} className="flex justify-between items-center p-2 bg-gray-700/50 rounded-md">
-                                    <span className="text-sm text-gray-300">{format(new Date(m.date + 'T00:00:00'), "d MMMM yyyy", { locale: fr })}</span>
-                                    <span className="font-bold text-gray-100">{m.weight} kg</span>
+                                    <div>
+                                        <span className="text-sm text-gray-300">{format(new Date(m.date + 'T00:00:00'), "d MMMM yyyy", { locale: fr })}</span>
+                                        <span className="font-bold text-gray-100 ml-4">{m.weight} kg</span>
+                                    </div>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)} className="h-8 w-8 hover:bg-destructive/20">
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                    </Button>
                                 </li>
                             ))}
                         </ul>
