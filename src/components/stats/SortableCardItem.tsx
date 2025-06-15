@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
 interface SortableCardItemProps {
@@ -20,7 +19,7 @@ export function SortableCardItem({ id, children }: SortableCardItemProps) {
   } = useSortable({ id });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 10 : 'auto',
