@@ -8,6 +8,7 @@ import { Trash2, Plus, MessageSquare, Star, X, Check } from 'lucide-react';
 import { AiExerciseAnalysisDialog } from './AiExerciseAnalysisDialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useFavoriteExercises } from '@/hooks/useFavoriteExercises';
+import { cn } from '@/lib/utils';
 
 interface ExerciseItemProps {
   exercise: ExerciseLog;
@@ -47,21 +48,21 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
   };
 
   return (
-    <div className="p-4 rounded-lg bg-secondary space-y-4 border">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
+    <div className="p-4 rounded-lg bg-secondary/60 backdrop-blur-sm space-y-4 border border-border/30 shadow-lg">
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex items-center gap-1 flex-shrink min-w-0">
+            <Button variant="ghost" size="icon" className="-ml-2" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
                 <Star className={`h-5 w-5 transition-colors ${isFavorite(exercise.exerciseId) ? 'text-accent-yellow fill-accent-yellow' : 'text-gray-400 hover:text-accent-yellow'}`} />
             </Button>
-            <h3 className="font-bold text-lg text-accent-blue">{exercise.name}</h3>
+            <h3 className="font-bold text-lg text-accent-blue truncate">{exercise.name}</h3>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center flex-shrink-0">
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
-                <MessageSquare className="h-5 w-5" />
+                <MessageSquare className="h-5 w-5 text-muted-foreground hover:text-foreground" />
             </Button>
             <AiExerciseAnalysisDialog exerciseId={exercise.exerciseId} exerciseName={exercise.name} />
             <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)} aria-label="Remove exercise">
-              <Trash2 className="text-destructive" />
+              <Trash2 className="text-destructive/80 hover:text-destructive" />
             </Button>
         </div>
       </div>
@@ -71,56 +72,61 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             placeholder="Notes sur l'exercice (sensation, technique...)"
             value={exercise.notes || ''}
             onChange={handleNoteChange}
-            className="mt-2 text-base"
+            className="mt-2 text-base bg-background/50"
         />
       )}
 
 
-      <div className="space-y-2">
-        <div className="grid grid-cols-5 gap-2 items-center text-sm text-muted-foreground px-1">
-          <span>Set</span>
-          <span>Poids (kg)</span>
-          <span>Reps</span>
+      <div className="space-y-3">
+        <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center text-sm text-muted-foreground font-medium">
+          <span className="text-center">#</span>
+          <span className="text-center">Poids</span>
+          <span className="text-center">Reps</span>
           <span />
           <span className="text-center">Fait</span>
         </div>
         {exercise.sets.map((set, index) => (
-          <div key={set.id} className="grid grid-cols-5 gap-2 items-center">
-            <span className="font-bold text-center">{index + 1}</span>
+          <div key={set.id} className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center">
+            <span className="font-bold text-center text-muted-foreground">{index + 1}</span>
             <Input
               type="number"
               value={set.weight}
               onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
-              placeholder="0"
-              className="text-base"
+              placeholder="-"
+              className="text-base text-center bg-transparent border-border/50 focus:border-primary"
             />
             <Input
               type="number"
               value={set.reps}
               onChange={(e) => handleSetChange(set.id, 'reps', e.target.value)}
-              placeholder="0"
-              className="text-base"
+              placeholder="-"
+              className="text-base text-center bg-transparent border-border/50 focus:border-primary"
             />
-            <Button variant="ghost" size="icon" onClick={() => removeSet(set.id)} className="justify-self-center" aria-label="Remove set">
-              <Trash2 size={16} className="text-destructive" />
-            </Button>
-            <button
-                onClick={() => handleSetChange(set.id, 'completed', !set.completed)}
-                aria-label={`Mark set ${index + 1} as ${set.completed ? 'not completed' : 'completed'}`}
-                className={`justify-self-center flex items-center justify-center h-6 w-6 rounded-sm border-2 transition-colors
-                    ${set.completed
-                        ? 'bg-accent-green border-accent-green text-primary-foreground'
-                        : 'bg-destructive border-destructive text-destructive-foreground hover:bg-destructive/90'
-                    }`}
-            >
-                {set.completed ? <Check size={16} /> : <X size={16} />}
-            </button>
+            <div className="flex justify-center">
+              <Button variant="ghost" onClick={() => removeSet(set.id)} className="h-8 w-8 p-0" aria-label="Remove set">
+                <Trash2 size={16} className="text-destructive/70 hover:text-destructive" />
+              </Button>
+            </div>
+            <div className="flex justify-center">
+              <button
+                  onClick={() => handleSetChange(set.id, 'completed', !set.completed)}
+                  aria-label={`Mark set ${index + 1} as ${set.completed ? 'not completed' : 'completed'}`}
+                  className={cn(
+                      'flex items-center justify-center h-8 w-8 rounded-lg border-2 transition-all',
+                      set.completed
+                          ? 'bg-accent-green border-accent-green text-black'
+                          : 'bg-transparent border-muted-foreground/50 text-muted-foreground/50 hover:border-accent-red hover:text-accent-red'
+                  )}
+              >
+                  {set.completed ? <Check size={18} /> : <X size={16} />}
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
-      <Button onClick={addSet} variant="outline" className="w-full hover:bg-background hover:brightness-110">
-        <Plus size={16} />
+      <Button onClick={addSet} variant="outline" className="w-full border-dashed hover:border-solid hover:border-primary/70 text-muted-foreground hover:text-primary-foreground">
+        <Plus size={16} className="mr-2" />
         Ajouter une série
       </Button>
     </div>
