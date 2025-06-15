@@ -4,23 +4,23 @@ import { useWorkoutTemplates } from '@/hooks/useWorkoutTemplates';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
 import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
-import { useWorkoutActions } from '@/hooks/useWorkoutActions';
+import { useWorkoutLifecycle } from '@/hooks/useWorkoutLifecycle';
+import { useCurrentWorkoutActions } from '@/hooks/useCurrentWorkoutActions';
+import { useWorkoutTemplateActions } from '@/hooks/useWorkoutTemplateActions';
 import { Dumbbell } from 'lucide-react';
 
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout } = useWorkouts();
   const { templates, isLoadingTemplates, updateTemplate, deleteTemplate, createTemplate } = useWorkoutTemplates();
+  const { handleStartWorkout, handleFinishWorkout, handleCancelWorkout } = useWorkoutLifecycle();
   const {
-    handleStartWorkout,
     handleAddExercise,
     handleUpdateExercise,
     handleRemoveExercise,
     handleUpdateWorkoutNotes,
-    handleSaveAsTemplate,
-    handleFinishWorkout,
-    handleCancelWorkout,
-    handleStartFromTemplate,
-  } = useWorkoutActions();
+  } = useCurrentWorkoutActions();
+  const { handleSaveAsTemplate, handleStartFromTemplate } = useWorkoutTemplateActions();
+
 
   const handleUpdateTemplate = async (id: string, name: string, exercises: ExerciseLog[]) => {
     await updateTemplate({ id, name, exercises });
