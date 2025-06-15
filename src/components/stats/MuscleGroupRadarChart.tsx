@@ -16,7 +16,7 @@ interface MuscleGroupRadarChartProps {
 const chartConfig = {
     sets: {
       label: "Séries",
-      color: "hsl(var(--foreground))",
+      color: "hsl(var(--primary-foreground))",
     },
 };
 
@@ -65,13 +65,13 @@ export const MuscleGroupRadarChart = ({ data, maxSets, timePeriod, onTimePeriodC
                             cursor={false}
                             content={<ChartTooltipContent indicator="line" />}
                         />
-                        <PolarGrid stroke="hsl(var(--foreground) / 0.2)" />
+                        <PolarGrid stroke="hsl(var(--foreground))" />
                         <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
                         <PolarRadiusAxis angle={30} domain={[0, maxSets > 0 ? maxSets : 1]} tick={false} axisLine={false} />
                         <Radar
                             dataKey="sets"
                             fill="var(--color-sets)"
-                            fillOpacity={0.4}
+                            fillOpacity={0.6}
                             stroke="var(--color-sets)"
                         />
                     </RechartsRadarChart>
