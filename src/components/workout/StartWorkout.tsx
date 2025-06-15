@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { List, Pencil, Trash2, PlusCircle } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
@@ -93,7 +94,7 @@ export const StartWorkout = ({ onStartWorkout, onStartFromTemplate, templates, i
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Créer un nouveau modèle
                   </Button>
-                CreateTemplateDialog>
+                </CreateTemplateDialog>
             </div>
           </>
         )}
