@@ -17,10 +17,13 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { groupedExercises } from "@/data/exercises";
+import { groupedExercises as baseGroupedExercises } from "@/data/exercises";
 import { PlusCircle, Star } from "lucide-react";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
 import { useFavoriteExercises } from "@/hooks/useFavoriteExercises";
+import useCustomExercises from "@/hooks/useCustomExercises";
+import { AddCustomExerciseDialog } from "./AddCustomExerciseDialog";
+import { toast } from "sonner";
 
 interface AddExerciseDialogProps {
   onAddExercise: (exercise: { id: string; name: string }) => void;
@@ -30,6 +33,24 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
   const [open, setOpen] = useState(false);
   const { workouts } = useWorkoutHistory();
   const { isFavorite, toggleFavorite } = useFavoriteExercises();
+  const { customExercises, addCustomExercise } = useCustomExercises();
+
+  const groupedExercises = useMemo(() => {
+    const allExercises = JSON.parse(JSON.stringify(baseGroupedExercises));
+
+    customExercises.forEach(customEx => {
+      let group = allExercises.find((g: { group: string; }) => g.group === customEx.group);
+      if (!group) {
+        group = { group: customEx.group, exercises: [] };
+        allExercises.push(group);
+      }
+      if (!group.exercises.some((ex: { name: string; }) => ex.name.toLowerCase() === customEx.name.toLowerCase())) {
+        group.exercises.push({ id: customEx.id, name: customEx.name });
+      }
+    });
+
+    return allExercises;
+  }, [customExercises]);
 
   const exerciseFrequencies = useMemo(() => {
     const frequencies = new Map<string, number>();
@@ -44,7 +65,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
   }, [workouts]);
 
   const sortedGroupedExercises = useMemo(() => {
-    return groupedExercises.map(group => ({
+    return groupedExercises.map((group: any) => ({
       ...group,
       exercises: [...group.exercises].sort((a, b) => {
         const aIsFavorite = isFavorite(a.id);
@@ -61,11 +82,16 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
         return a.name.localeCompare(b.name);
       })
     }));
-  }, [exerciseFrequencies, isFavorite]);
+  }, [groupedExercises, exerciseFrequencies, isFavorite]);
 
   const handleSelect = (exercise: { id: string; name: string }) => {
     onAddExercise(exercise);
     setOpen(false);
+  };
+
+  const handleExerciseCreated = (exercise: { id: string; name: string }) => {
+    // The toast is now handled in the useCustomExercises hook.
+    // The list updates automatically.
   };
 
   return (
@@ -85,6 +111,17 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
         </DialogHeader>
         <Command>
           <CommandInput placeholder="Rechercher un exercice..." />
+          <div className="p-2 border-b">
+            <AddCustomExerciseDialog 
+              addCustomExercise={addCustomExercise} 
+              onExerciseCreated={handleExerciseCreated}
+            >
+              <Button variant="outline" className="w-full">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Créer un exercice personnalisé
+              </Button>
+            </AddCustomExerciseDialog>
+          </div>
           <CommandList>
             <CommandEmpty>Aucun exercice trouvé.</CommandEmpty>
             {sortedGroupedExercises.map((group) => (
