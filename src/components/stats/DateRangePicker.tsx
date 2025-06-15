@@ -24,40 +24,82 @@ export function DateRangePicker({
   date,
   onDateChange,
 }: DateRangePickerProps) {
+  const handleFromDateChange = (day: Date | undefined) => {
+    // If user clears the from date, we should probably clear the to date as well or handle it.
+    // For now, just updating from date. If 'to' is before new 'from', it might be an issue.
+    // The disabled prop on the calendar should prevent this.
+    // Let's also ensure `to` is not before `from`.
+    if (day && date?.to && day > date.to) {
+        onDateChange({ from: day, to: day })
+    } else {
+        onDateChange({ from: day, to: date?.to })
+    }
+  }
+
+  const handleToDateChange = (day: Date | undefined) => {
+    onDateChange({ from: date?.from, to: day })
+  }
+
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("grid gap-2 sm:flex sm:items-center sm:gap-4", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            id="date"
+            id="date-from"
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal md:w-[300px]",
-              !date && "text-muted-foreground"
+              "w-full justify-start text-left font-normal md:w-[240px]",
+              !date?.from && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
-              date.to ? (
-                <>
-                  {format(date.from, "dd LLL, y", { locale: fr })} -{" "}
-                  {format(date.to, "dd LLL, y", { locale: fr })}
-                </>
-              ) : (
-                format(date.from, "dd LLL, y", { locale: fr })
-              )
+              format(date.from, "dd LLL, y", { locale: fr })
             ) : (
-              <span>Choisissez une plage de dates</span>
+              <span>Date de début</span>
             )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             initialFocus
-            mode="range"
-            selected={date}
-            onSelect={onDateChange}
-            numberOfMonths={2}
+            mode="single"
+            selected={date?.from}
+            onSelect={handleFromDateChange}
+            disabled={{ after: date?.to }}
+            numberOfMonths={1}
+          />
+        </PopoverContent>
+      </Popover>
+      
+      <span className="self-center hidden sm:inline-block">-</span>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            id="date-to"
+            variant={"outline"}
+            className={cn(
+              "w-full justify-start text-left font-normal md:w-[240px]",
+              !date?.to && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date?.to ? (
+              format(date.to, "dd LLL, y", { locale: fr })
+            ) : (
+              <span>Date de fin</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            initialFocus
+            mode="single"
+            selected={date?.to}
+            onSelect={handleToDateChange}
+            disabled={{ before: date?.from }}
+            numberOfMonths={1}
           />
         </PopoverContent>
       </Popover>
