@@ -61,7 +61,7 @@ export const WorkoutInProgress = ({
       <div className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="workout-notes" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
-                <StickyNote className="h-4 w-4" />
+                <StickyNote className="h-4 w-4 text-accent-yellow" />
                 Notes sur la séance
             </label>
             <Textarea
@@ -80,7 +80,7 @@ export const WorkoutInProgress = ({
       <div className="flex flex-col sm:flex-row gap-2">
           <SaveTemplateDialog onSave={onSaveAsTemplate}>
               <Button variant="outline" className="w-full" disabled={workout.exercises.length === 0}>
-                  <Bookmark className="mr-2 h-4 w-4" />
+                  <Bookmark className="mr-2 h-4 w-4 text-accent-purple" />
                   Enregistrer en modèle
               </Button>
           </SaveTemplateDialog>
