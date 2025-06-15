@@ -1,6 +1,4 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Hexagon } from 'lucide-react';
 import { PolarGrid, PolarAngleAxis, Radar, RadarChart as RechartsRadarChart, PolarRadiusAxis } from 'recharts';
@@ -9,8 +7,6 @@ import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
 interface MuscleGroupRadarChartProps {
     data: { subject: string; sets: number }[];
     maxSets: number;
-    timePeriod: string;
-    onTimePeriodChange: (value: string) => void;
 }
 
 const chartConfig = {
@@ -38,7 +34,7 @@ const renderColorfulTick = (props: any) => {
     );
 };
 
-export const MuscleGroupRadarChart = ({ data, maxSets, timePeriod, onTimePeriodChange }: MuscleGroupRadarChartProps) => {
+export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartProps) => {
     return (
         <Card>
             <CardHeader className="items-center pb-0">
@@ -46,17 +42,7 @@ export const MuscleGroupRadarChart = ({ data, maxSets, timePeriod, onTimePeriodC
                     <Hexagon className="h-5 w-5 text-accent-cyan" />
                     Distribution par Groupe Musculaire
                 </CardTitle>
-                <CardDescription>Nombre de séries par groupe musculaire</CardDescription>
-                <Tabs value={timePeriod} onValueChange={onTimePeriodChange} className="pt-2">
-                    <TabsList>
-                        <TabsTrigger value="1w">1S</TabsTrigger>
-                        <TabsTrigger value="1m">1M</TabsTrigger>
-                        <TabsTrigger value="3m">3M</TabsTrigger>
-                        <TabsTrigger value="6m">6M</TabsTrigger>
-                        <TabsTrigger value="1y">1A</TabsTrigger>
-                        <TabsTrigger value="all">Tout</TabsTrigger>
-                    </TabsList>
-                </Tabs>
+                <CardDescription>Nombre de séries par groupe musculaire sur la période sélectionnée</CardDescription>
             </CardHeader>
             <CardContent className="pb-0">
                 <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">

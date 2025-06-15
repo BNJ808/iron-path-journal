@@ -1,9 +1,10 @@
+
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
-import { BarChart3, Hexagon } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { useMemo, useState, useRef } from 'react';
-import { format, subWeeks, subMonths, subYears } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { StatCards } from '@/components/stats/StatCards';
 import { VolumeChart } from '@/components/stats/VolumeChart';
@@ -12,6 +13,8 @@ import { PersonalRecords } from '@/components/stats/PersonalRecords';
 import { useExerciseDatabase } from '@/hooks/useExerciseDatabase';
 import { EXERCISES_DATABASE } from '@/data/exercises';
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
+import { DateRangePicker } from '@/components/stats/DateRangePicker';
+import { DateRange } from 'react-day-picker';
 
 interface PersonalRecord {
     weight: number;
@@ -22,11 +25,27 @@ const StatsPage = () => {
     const { workouts, isLoading } = useWorkoutHistory();
     const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
     const exerciseProgressCardRef = useRef<HTMLDivElement>(null);
-    const [timePeriod, setTimePeriod] = useState('1m');
+    const [dateRange, setDateRange] = useState<DateRange | undefined>({
+        from: subDays(new Date(), 29),
+        to: new Date(),
+    });
     const { allGroupedExercises } = useExerciseDatabase();
 
+    const filteredWorkouts = useMemo(() => {
+        if (!workouts) return [];
+        if (!dateRange?.from) return [];
+
+        const fromDate = startOfDay(dateRange.from);
+        const toDate = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
+        
+        return workouts.filter(w => {
+            const workoutDate = new Date(w.date);
+            return workoutDate >= fromDate && workoutDate <= toDate;
+        });
+    }, [workouts, dateRange]);
+
     const stats = useMemo(() => {
-        if (!workouts || workouts.length === 0) {
+        if (!workouts) {
             return {
                 totalWorkouts: 0,
                 totalVolume: 0,
@@ -36,24 +55,40 @@ const StatsPage = () => {
             };
         }
 
+        const personalRecords: { [key: string]: PersonalRecord } = {};
+        workouts.forEach(workout => {
+            workout.exercises.forEach(exercise => {
+                exercise.sets.forEach(set => {
+                    const weight = Number(set.weight) || 0;
+                    const reps = Number(set.reps) || 0;
+                    const currentPR = personalRecords[exercise.name] || { weight: 0, reps: 0 };
+                    if (weight > currentPR.weight) {
+                        personalRecords[exercise.name] = { weight, reps };
+                    }
+                });
+            });
+        });
+
+        if (!filteredWorkouts || filteredWorkouts.length === 0) {
+            return {
+                totalWorkouts: 0,
+                totalVolume: 0,
+                totalSets: 0,
+                chartData: [],
+                personalRecords: personalRecords,
+            };
+        }
+
         let totalVolume = 0;
         let totalSets = 0;
-        const personalRecords: { [key: string]: PersonalRecord } = {};
 
-        const chartData = workouts
+        const chartData = filteredWorkouts
             .map(workout => {
                 const workoutVolume = workout.exercises.reduce((acc, exercise) => {
                     return acc + exercise.sets.reduce((setAcc, set) => {
                         totalSets++;
-                        
                         const weight = Number(set.weight) || 0;
                         const reps = Number(set.reps) || 0;
-
-                        const currentPR = personalRecords[exercise.name] || { weight: 0, reps: 0 };
-                        if (weight > currentPR.weight) {
-                            personalRecords[exercise.name] = { weight, reps };
-                        }
-
                         return setAcc + reps * weight;
                     }, 0);
                 }, 0);
@@ -68,13 +103,13 @@ const StatsPage = () => {
             .reverse();
 
         return {
-            totalWorkouts: workouts.length,
+            totalWorkouts: filteredWorkouts.length,
             totalVolume: Math.round(totalVolume),
             totalSets,
             chartData,
             personalRecords,
         };
-    }, [workouts]);
+    }, [workouts, filteredWorkouts]);
     
     const exerciseToGroupMap = useMemo(() => {
         const map = new Map<string, string>();
@@ -88,25 +123,9 @@ const StatsPage = () => {
     }, [allGroupedExercises]);
 
     const muscleGroupStats = useMemo(() => {
-        if (!workouts || !exerciseToGroupMap.size) {
+        if (!filteredWorkouts || !exerciseToGroupMap.size) {
             return { chartData: [], maxSets: 0 };
         }
-        const now = new Date();
-        let startDate: Date | null = null;
-        
-        switch (timePeriod) {
-            case '1w': startDate = subWeeks(now, 1); break;
-            case '1m': startDate = subMonths(now, 1); break;
-            case '3m': startDate = subMonths(now, 3); break;
-            case '6m': startDate = subMonths(now, 6); break;
-            case '1y': startDate = subYears(now, 1); break;
-            case 'all': startDate = null; break;
-            default: startDate = subMonths(now, 1);
-        }
-        
-        const filteredWorkouts = startDate 
-            ? workouts.filter(w => new Date(w.date) >= startDate!)
-            : workouts;
 
         const initialSetsByGroup = Object.fromEntries(
             Object.keys(EXERCISES_DATABASE).map(group => [group, 0])
@@ -130,7 +149,7 @@ const StatsPage = () => {
         const maxSets = Math.max(...chartData.map(d => d.sets));
         
         return { chartData, maxSets: Math.max(10, maxSets) };
-    }, [workouts, timePeriod, exerciseToGroupMap]);
+    }, [filteredWorkouts, exerciseToGroupMap]);
 
     const uniqueExercises = useMemo(() => {
         if (!workouts) return [];
@@ -209,10 +228,14 @@ const StatsPage = () => {
             </div>
             <p className="text-gray-400 mt-2 mb-6">Visualisez vos progrès et vos performances.</p>
 
+            <div className="mb-6">
+                <DateRangePicker date={dateRange} onDateChange={setDateRange} />
+            </div>
+
             {workouts.length === 0 ? (
                 <div className="text-center py-16">
-                    <p className="text-gray-500">Aucune statistique disponible pour le moment.</p>
-                    <p className="text-sm text-gray-600 mt-2">Terminez une séance pour voir vos statistiques ici.</p>
+                    <p className="text-gray-500">Aucune statistique disponible pour la période sélectionnée.</p>
+                    <p className="text-sm text-gray-600 mt-2">Terminez une séance pour voir vos statistiques ici, ou changez la plage de dates.</p>
                 </div>
             ) : (
                 <div className="space-y-6">
@@ -227,8 +250,6 @@ const StatsPage = () => {
                     <MuscleGroupRadarChart
                         data={muscleGroupStats.chartData}
                         maxSets={muscleGroupStats.maxSets}
-                        timePeriod={timePeriod}
-                        onTimePeriodChange={setTimePeriod}
                     />
 
                     <ExerciseProgress
@@ -242,7 +263,7 @@ const StatsPage = () => {
                     <AiAnalysisCard 
                         title="Analyse et Conseils IA"
                         type="general"
-                        data={stats}
+                        data={{...stats, workouts: filteredWorkouts}}
                     />
 
                     <PersonalRecords
