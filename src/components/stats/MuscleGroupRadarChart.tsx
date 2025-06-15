@@ -4,6 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Hexagon } from 'lucide-react';
 import { PolarGrid, PolarAngleAxis, Radar, RadarChart as RechartsRadarChart, PolarRadiusAxis } from 'recharts';
+import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
 
 interface MuscleGroupRadarChartProps {
     data: { subject: string; sets: number }[];
@@ -17,6 +18,24 @@ const chartConfig = {
       label: "Séries",
       color: "hsl(var(--chart-1))",
     },
+};
+
+const renderColorfulTick = (props: any) => {
+    const { payload, x, y, textAnchor, ...rest } = props;
+    const color = MUSCLE_GROUP_COLORS_HEX[payload.value] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+    return (
+        <text
+            {...rest}
+            x={x}
+            y={y}
+            textAnchor={textAnchor}
+            dominantBaseline="central"
+            fill={color}
+            fontSize={12}
+        >
+            {payload.value}
+        </text>
+    );
 };
 
 export const MuscleGroupRadarChart = ({ data, maxSets, timePeriod, onTimePeriodChange }: MuscleGroupRadarChartProps) => {
@@ -46,8 +65,8 @@ export const MuscleGroupRadarChart = ({ data, maxSets, timePeriod, onTimePeriodC
                             cursor={false}
                             content={<ChartTooltipContent indicator="line" />}
                         />
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="subject" />
+                        <PolarGrid stroke="hsl(var(--foreground) / 0.2)" />
+                        <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
                         <PolarRadiusAxis angle={30} domain={[0, maxSets > 0 ? maxSets : 1]} tick={false} axisLine={false} />
                         <Radar
                             dataKey="sets"

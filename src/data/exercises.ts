@@ -54,6 +54,16 @@ export const MUSCLE_GROUP_COLORS: Record<string, string> = {
   'Autres': 'text-gray-400',
 };
 
+export const MUSCLE_GROUP_COLORS_HEX: Record<string, string> = {
+  'Pectoraux': '#f87171', // text-red-400
+  'Dorsaux': '#60a5fa', // text-blue-400
+  'Épaules': '#c084fc', // text-purple-400
+  'Jambes': '#fb923c', // text-orange-400
+  'Biceps': '#f472b6', // text-pink-400
+  'Triceps': '#2dd4bf', // text-teal-400
+  'Autres': '#9ca3af', // text-gray-400
+};
+
 type Exercise = { id: string; name: string };
 export type ExerciseGroup = {
     group: string;
