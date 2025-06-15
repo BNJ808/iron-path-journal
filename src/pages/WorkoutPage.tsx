@@ -1,4 +1,3 @@
-
 import { useWorkouts, type ExerciseLog } from '@/hooks/useWorkouts';
 import { useWorkoutTemplates } from '@/hooks/useWorkoutTemplates';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
@@ -8,9 +7,10 @@ import { useWorkoutLifecycle } from '@/hooks/useWorkoutLifecycle';
 import { useCurrentWorkoutActions } from '@/hooks/useCurrentWorkoutActions';
 import { useWorkoutTemplateActions } from '@/hooks/useWorkoutTemplateActions';
 import { Dumbbell } from 'lucide-react';
+import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts';
 
 const WorkoutPage = () => {
-  const { todayWorkout, isLoadingWorkout } = useWorkouts();
+  const { todayWorkout, isLoadingWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
   const { templates, isLoadingTemplates, updateTemplate, deleteTemplate, createTemplate } = useWorkoutTemplates();
   const { handleStartWorkout, handleFinishWorkout, handleCancelWorkout } = useWorkoutLifecycle();
   const {

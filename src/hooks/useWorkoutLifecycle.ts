@@ -1,10 +1,10 @@
 
-import { useWorkouts } from '@/hooks/useWorkouts';
+import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts'; // Changer l'import
 import { useExerciseLastPerformance } from '@/hooks/useExerciseLastPerformance';
 import { toast } from 'sonner';
 
 export const useWorkoutLifecycle = () => {
-  const { todayWorkout, createWorkout, updateWorkout, deleteWorkout } = useWorkouts();
+  const { todayWorkout, createWorkout, updateWorkout, deleteWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
   const { updateLastPerformances } = useExerciseLastPerformance();
 
   const handleStartWorkout = async () => {

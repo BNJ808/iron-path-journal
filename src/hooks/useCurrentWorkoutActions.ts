@@ -1,12 +1,12 @@
 
-import { useWorkouts, type ExerciseLog } from '@/hooks/useWorkouts';
+import { useOfflineWorkouts, type ExerciseLog } from '@/hooks/useOfflineWorkouts'; // Changer l'import
 import { useExerciseLastPerformance } from '@/hooks/useExerciseLastPerformance';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
 import type { ExerciseSet } from '@/types';
 
 export const useCurrentWorkoutActions = () => {
-  const { todayWorkout, updateWorkout } = useWorkouts();
+  const { todayWorkout, updateWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
   const { getLastPerformances } = useExerciseLastPerformance();
 
   const handleAddExercise = async (exercise: { id: string; name: string }) => {

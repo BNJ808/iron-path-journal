@@ -1,48 +1,27 @@
 
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import BottomNav from './BottomNav';
-import { useAuth } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
-import { TimerDialog } from './timer/TimerDialog';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Outlet } from 'react-router-dom';
+import { BottomNav } from './BottomNav';
+import { OfflineIndicator } from './OfflineIndicator';
 
 const Layout = () => {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-  const [isTimerOpen, setIsTimerOpen] = useState(false);
-
-  const handleTimerClick = () => {
-    setIsTimerOpen(true);
-  };
-
-  const handleTimerOpenChange = (open: boolean) => {
-    setIsTimerOpen(open);
-  };
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth', { replace: true });
-    }
-  }, [user, loading, navigate]);
-
-  if (loading || !user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <p>Chargement...</p>
-      </div>
-    );
-  }
-
   return (
-    <TooltipProvider>
-      <div className="min-h-screen bg-background text-foreground flex flex-col">
-        <main className="flex-grow pb-20 transition-opacity duration-200">
-          <Outlet />
-        </main>
-        <BottomNav onTimerClick={handleTimerClick} />
-        <TimerDialog open={isTimerOpen} onOpenChange={handleTimerOpenChange} />
-      </div>
-    </TooltipProvider>
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Header avec indicateur hors ligne */}
+      <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-2 flex justify-between items-center">
+          <h1 className="text-lg font-semibold">FitTracker</h1>
+          <OfflineIndicator />
+        </div>
+      </header>
+      
+      {/* Contenu principal */}
+      <main className="flex-1 pb-20">
+        <Outlet />
+      </main>
+      
+      {/* Navigation du bas */}
+      <BottomNav />
+    </div>
   );
 };
 
