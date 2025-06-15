@@ -1,7 +1,7 @@
 
 import type { Workout } from '@/types';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { format, formatDistanceStrict } from 'date-fns';
+import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Clock, Copy, List, StickyNote, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,9 +27,11 @@ const WorkoutHistoryCard = ({ workout, onDelete, onCopy }: WorkoutHistoryCardPro
     const workoutDate = new Date(workout.date);
     const workoutEndDate = workout.ended_at ? new Date(workout.ended_at) : null;
 
-    const duration = workoutEndDate
-        ? formatDistanceStrict(workoutEndDate, workoutDate, { locale: fr, unit: 'minute' })
+    const durationInMinutes = workoutEndDate
+        ? differenceInMinutes(workoutEndDate, workoutDate)
         : null;
+
+    const duration = durationInMinutes !== null ? `${durationInMinutes} min` : null;
 
     return (
         <AccordionItem value={workout.id} className="app-card border-b-0">
