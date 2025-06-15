@@ -108,7 +108,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             <Checkbox
                 checked={!!set.completed}
                 onCheckedChange={(checked) => handleSetChange(set.id, 'completed', !!checked)}
-                className="justify-self-center data-[state=checked]:bg-accent-green data-[state=checked]:border-accent-green"
+                className="justify-self-center border-2 data-[state=checked]:bg-accent-green data-[state=checked]:border-accent-green"
                 aria-label={`Mark set ${index + 1} as completed`}
             />
           </div>

@@ -26,7 +26,7 @@
     --accent: 222 28% 32%; /* slightly darker slate-700 for hover */
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 60%; /* Brighter red */
     --destructive-foreground: 210 40% 98%;
 
     --border: 222 22% 35%; /* slate-600 */
@@ -39,7 +39,7 @@
     --accent-blue: 217 91% 60%; /* blue-500 from image */
     --accent-purple: 262 83% 58%; /* violet-500 from image */
     --accent-yellow: 48 96% 50%; /* amber-400 */
-    --accent-green: 142.1 70.6% 45.3%; /* A nice green from image */
+    --accent-green: 142.1 50% 55%; /* Softer green */
   }
 }
 

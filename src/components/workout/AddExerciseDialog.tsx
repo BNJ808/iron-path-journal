@@ -71,7 +71,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full bg-accent-blue hover:bg-accent-blue/90 text-primary-foreground">
+        <Button className="w-full bg-accent-blue hover:bg-accent-blue/80 text-primary-foreground">
           <PlusCircle />
           Ajouter un exercice
         </Button>
