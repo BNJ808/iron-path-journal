@@ -6,6 +6,8 @@ import { BarChart3 } from 'lucide-react';
 import { useMemo, useState, useRef } from 'react';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { StatCards } from '@/components/stats/StatCards';
 import { VolumeChart } from '@/components/stats/VolumeChart';
 import { ExerciseProgress } from '@/components/stats/ExerciseProgress';
@@ -15,6 +17,7 @@ import { EXERCISES_DATABASE } from '@/data/exercises';
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { DateRange } from 'react-day-picker';
+import { SortableCardItem } from '@/components/stats/SortableCardItem';
 
 interface PersonalRecord {
     weight: number;
@@ -29,7 +32,53 @@ const StatsPage = () => {
         from: subDays(new Date(), 29),
         to: new Date(),
     });
-    const { allGroupedExercises } = useExerciseDatabase();
+
+    const defaultCardOrder = useMemo(() => ['stats', 'volume', 'muscle', 'progress', 'ai', 'records'], []);
+
+    const [cardOrder, setCardOrder] = useState<string[]>(() => {
+        try {
+            const savedOrder = localStorage.getItem('statsCardOrder');
+            if (savedOrder) {
+                const parsedOrder = JSON.parse(savedOrder) as string[];
+                const filteredOrder = parsedOrder.filter(id => defaultCardOrder.includes(id));
+                const newCards = defaultCardOrder.filter(id => !filteredOrder.includes(id));
+                const finalOrder = [...filteredOrder, ...newCards];
+
+                if (finalOrder.length === defaultCardOrder.length) {
+                    return finalOrder;
+                }
+            }
+        } catch (error) {
+            console.error("Failed to parse card order from localStorage", error);
+        }
+        return defaultCardOrder;
+    });
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setCardOrder((items) => {
+                const oldIndex = items.indexOf(active.id as string);
+                const newIndex = items.indexOf(over.id as string);
+                if (oldIndex === -1 || newIndex === -1) return items;
+                const newOrder = arrayMove(items, oldIndex, newIndex);
+                try {
+                    localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
+                } catch (error) {
+                    console.error("Failed to save card order to localStorage", error);
+                }
+                return newOrder;
+            });
+        }
+    };
 
     const filteredWorkouts = useMemo(() => {
         if (!workouts) return [];
@@ -199,6 +248,45 @@ const StatsPage = () => {
         exerciseProgressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
+    const cardComponents: Record<string, React.ReactNode> = useMemo(() => ({
+        stats: (
+            <StatCards
+                totalWorkouts={stats.totalWorkouts}
+                totalVolume={stats.totalVolume}
+                totalSets={stats.totalSets}
+            />
+        ),
+        volume: <VolumeChart chartData={stats.chartData} />,
+        muscle: (
+            <MuscleGroupRadarChart
+                data={muscleGroupStats.chartData}
+                maxSets={muscleGroupStats.maxSets}
+            />
+        ),
+        progress: (
+            <ExerciseProgress
+                ref={exerciseProgressCardRef}
+                uniqueExercises={uniqueExercises}
+                selectedExerciseName={selectedExerciseName}
+                onSelectedExerciseChange={setSelectedExerciseName}
+                selectedExerciseData={selectedExerciseData}
+            />
+        ),
+        ai: (
+            <AiAnalysisCard
+                title="Analyse et Conseils IA"
+                type="general"
+                data={{ ...stats, workouts: filteredWorkouts }}
+            />
+        ),
+        records: (
+            <PersonalRecords
+                personalRecords={stats.personalRecords}
+                onViewProgression={handleViewProgression}
+            />
+        ),
+    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, filteredWorkouts, handleViewProgression]);
+
     if (isLoading) {
         return (
             <div className="p-4 space-y-6">
@@ -232,45 +320,27 @@ const StatsPage = () => {
                 <DateRangePicker date={dateRange} onDateChange={setDateRange} />
             </div>
 
-            {workouts.length === 0 ? (
+            {filteredWorkouts.length === 0 ? (
                 <div className="text-center py-16">
                     <p className="text-gray-500">Aucune statistique disponible pour la période sélectionnée.</p>
                     <p className="text-sm text-gray-600 mt-2">Terminez une séance pour voir vos statistiques ici, ou changez la plage de dates.</p>
                 </div>
             ) : (
-                <div className="space-y-6">
-                    <StatCards 
-                        totalWorkouts={stats.totalWorkouts} 
-                        totalVolume={stats.totalVolume} 
-                        totalSets={stats.totalSets} 
-                    />
-
-                    <VolumeChart chartData={stats.chartData} />
-
-                    <MuscleGroupRadarChart
-                        data={muscleGroupStats.chartData}
-                        maxSets={muscleGroupStats.maxSets}
-                    />
-
-                    <ExerciseProgress
-                        ref={exerciseProgressCardRef}
-                        uniqueExercises={uniqueExercises}
-                        selectedExerciseName={selectedExerciseName}
-                        onSelectedExerciseChange={setSelectedExerciseName}
-                        selectedExerciseData={selectedExerciseData}
-                    />
-
-                    <AiAnalysisCard 
-                        title="Analyse et Conseils IA"
-                        type="general"
-                        data={{...stats, workouts: filteredWorkouts}}
-                    />
-
-                    <PersonalRecords
-                        personalRecords={stats.personalRecords}
-                        onViewProgression={handleViewProgression}
-                    />
-                </div>
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
+                        <div className="space-y-6">
+                            {cardOrder.map((id) => (
+                                <SortableCardItem key={id} id={id}>
+                                    {cardComponents[id]}
+                                </SortableCardItem>
+                            ))}
+                        </div>
+                    </SortableContext>
+                </DndContext>
             )}
         </div>
     );
