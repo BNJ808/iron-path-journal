@@ -55,11 +55,11 @@ export const useWorkoutTemplates = () => {
     });
 
     const updateTemplateMutation = useMutation({
-        mutationFn: async ({ id, name }: { id: string; name: string }) => {
+        mutationFn: async ({ id, name, exercises }: { id: string; name: string; exercises: ExerciseLog[] }) => {
             if (!userId) throw new Error("User not authenticated");
             const { data, error } = await supabase
                 .from('workout_templates')
-                .update({ name })
+                .update({ name, exercises: exercises as any })
                 .eq('id', id)
                 .select()
                 .single();
