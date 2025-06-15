@@ -172,12 +172,12 @@ const StatsPage = () => {
     }, [allGroupedExercises]);
 
     const muscleGroupStats = useMemo(() => {
-        if (!filteredWorkouts || !exerciseToGroupMap.size) {
+        if (!filteredWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
             return { chartData: [], maxSets: 0 };
         }
 
         const initialSetsByGroup = Object.fromEntries(
-            Object.keys(EXERCISES_DATABASE).map(group => [group, 0])
+            allGroupedExercises.map(groupData => [groupData.group, 0])
         );
 
         const setsByGroup = filteredWorkouts.reduce((acc, workout) => {
@@ -198,7 +198,7 @@ const StatsPage = () => {
         const maxSets = Math.max(...chartData.map(d => d.sets));
         
         return { chartData, maxSets: Math.max(10, maxSets) };
-    }, [filteredWorkouts, exerciseToGroupMap]);
+    }, [filteredWorkouts, exerciseToGroupMap, allGroupedExercises]);
 
     const uniqueExercises = useMemo(() => {
         if (!workouts) return [];
@@ -285,7 +285,7 @@ const StatsPage = () => {
                 onViewProgression={handleViewProgression}
             />
         ),
-    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, filteredWorkouts, handleViewProgression, allGroupedExercises]);
+    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, filteredWorkouts, handleViewProgression]);
 
     if (isLoading) {
         return (
