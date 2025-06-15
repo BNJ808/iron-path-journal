@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,6 +34,8 @@ const formSchema = z.object({
   }),
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 interface AddCustomExerciseDialogProps {
   children: React.ReactNode;
   onExerciseCreated: (exercise: { id: string; name: string }) => void;
@@ -43,7 +44,7 @@ interface AddCustomExerciseDialogProps {
 
 export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustomExercise }: AddCustomExerciseDialogProps) => {
   const [open, setOpen] = useState(false);
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
@@ -53,9 +54,14 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // At this point, `values` is guaranteed by Zod to be valid.
-    const newExercise = addCustomExercise(values);
+  function onSubmit(values: FormData) {
+    // Création explicite de l'objet avec les types corrects
+    const exerciseData = {
+      name: values.name,
+      group: values.group
+    };
+    
+    const newExercise = addCustomExercise(exerciseData);
     if(newExercise) {
         onExerciseCreated(newExercise);
     }
