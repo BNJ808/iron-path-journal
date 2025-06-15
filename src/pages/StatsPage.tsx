@@ -1,4 +1,3 @@
-
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,11 +5,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, LineChart, L
 import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import StatCard from '@/components/StatCard';
 import { Dumbbell, Repeat, TrendingUp, BarChart as BarChartIcon, Trophy, LineChart as LineChartIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
 
 const chartConfig = {
   volume: {
@@ -33,7 +33,8 @@ const barColors = ["hsl(var(--accent-purple))", "hsl(var(--accent-blue))", "hsl(
 
 const StatsPage = () => {
     const { workouts, isLoading } = useWorkoutHistory();
-    const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
+    const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
+    const exerciseProgressCardRef = useRef<HTMLDivElement>(null);
 
     const stats = useMemo(() => {
         if (!workouts || workouts.length === 0) {
@@ -91,26 +92,28 @@ const StatsPage = () => {
         const exercisesMap = new Map<string, { name: string }>();
         workouts.forEach(workout => {
             workout.exercises.forEach(exercise => {
-                if (!exercisesMap.has(exercise.exerciseId)) {
-                    exercisesMap.set(exercise.exerciseId, { name: exercise.name });
+                if (!exercisesMap.has(exercise.name)) {
+                    exercisesMap.set(exercise.name, { name: exercise.name });
                 }
             });
         });
-        return Array.from(exercisesMap, ([id, { name }]) => ({ id, name }))
+        return Array.from(exercisesMap.values())
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [workouts]);
 
     const selectedExerciseData = useMemo(() => {
-        if (!selectedExerciseId || !workouts) return null;
+        if (!selectedExerciseName || !workouts) return null;
 
         const history = workouts
             .map(workout => {
-                const exerciseLog = workout.exercises.find(ex => ex.exerciseId === selectedExerciseId);
-                if (!exerciseLog) return null;
+                const exerciseLogs = workout.exercises.filter(ex => ex.name === selectedExerciseName);
+                if (exerciseLogs.length === 0) return null;
 
-                const volume = exerciseLog.sets.reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0);
-                const maxWeight = Math.max(0, ...exerciseLog.sets.map(set => Number(set.weight) || 0));
+                const volume = exerciseLogs.reduce((totalVol, log) => 
+                    totalVol + log.sets.reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0), 0);
                 
+                const maxWeight = Math.max(0, ...exerciseLogs.flatMap(log => log.sets.map(set => Number(set.weight) || 0)));
+
                 return {
                     date: workout.date,
                     displayDate: format(new Date(workout.date), 'd MMM', { locale: fr }),
@@ -120,14 +123,17 @@ const StatsPage = () => {
             })
             .filter((item): item is NonNullable<typeof item> => item !== null)
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-        const exerciseName = uniqueExercises.find(ex => ex.id === selectedExerciseId)?.name || '';
         
         return {
-            name: exerciseName,
+            name: selectedExerciseName,
             history: history,
         };
-    }, [selectedExerciseId, workouts, uniqueExercises]);
+    }, [selectedExerciseName, workouts]);
+
+    const handleViewProgression = (exerciseName: string) => {
+        setSelectedExerciseName(exerciseName);
+        exerciseProgressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
 
     if (isLoading) {
         return (
@@ -198,7 +204,7 @@ const StatsPage = () => {
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card ref={exerciseProgressCardRef}>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <LineChartIcon className="h-5 w-5 text-accent-purple" />
@@ -206,13 +212,13 @@ const StatsPage = () => {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <Select onValueChange={setSelectedExerciseId} value={selectedExerciseId ?? undefined}>
+                            <Select onValueChange={setSelectedExerciseName} value={selectedExerciseName ?? undefined}>
                                 <SelectTrigger className="w-full sm:w-[280px]">
                                     <SelectValue placeholder="Sélectionnez un exercice" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {uniqueExercises.map(ex => (
-                                        <SelectItem key={ex.id} value={ex.id}>{ex.name}</SelectItem>
+                                        <SelectItem key={ex.name} value={ex.name}>{ex.name}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -230,7 +236,7 @@ const StatsPage = () => {
                                         <Line yAxisId="right" type="monotone" dataKey="maxWeight" stroke={exerciseChartConfig.maxWeight.color} name="Poids Max (kg)" dot={false} />
                                     </LineChart>
                                 </ChartContainer>
-                            ) : selectedExerciseId ? (
+                            ) : selectedExerciseName ? (
                                 <div className="text-center text-muted-foreground pt-8">
                                     <p>Pas de données pour cet exercice.</p>
                                 </div>
@@ -259,7 +265,12 @@ const StatsPage = () => {
                                         .map(([exercise, pr]) => (
                                             <li key={exercise} className="flex justify-between items-center text-sm">
                                                 <span>{exercise}</span>
-                                                <span className="font-bold">{pr} kg</span>
+                                                <div className="flex items-center gap-2">
+                                                  <span className="font-bold">{pr} kg</span>
+                                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewProgression(exercise)}>
+                                                      <LineChartIcon className="h-4 w-4" />
+                                                  </Button>
+                                                </div>
                                             </li>
                                     ))}
                                 </ul>
