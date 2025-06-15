@@ -47,7 +47,7 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      group: undefined,
+      group: '' as z.infer<typeof formSchema>['group'], // Initialize group with a value to satisfy types
     },
   });
 
