@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useCallback } from 'react';
 
 export const useFavoriteExercises = () => {
     const { user } = useAuth();
@@ -59,17 +60,17 @@ export const useFavoriteExercises = () => {
         }
     });
 
-    const isFavorite = (exerciseId: string) => {
+    const isFavorite = useCallback((exerciseId: string) => {
         return favoriteExercises?.includes(exerciseId) ?? false;
-    };
+    }, [favoriteExercises]);
 
-    const toggleFavorite = (exerciseId: string) => {
+    const toggleFavorite = useCallback((exerciseId: string) => {
         if (isFavorite(exerciseId)) {
             removeFavoriteMutation.mutate(exerciseId);
         } else {
             addFavoriteMutation.mutate(exerciseId);
         }
-    };
+    }, [isFavorite, addFavoriteMutation, removeFavoriteMutation]);
 
     return {
         favoriteExercises: favoriteExercises || [],

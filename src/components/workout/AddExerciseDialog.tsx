@@ -18,8 +18,9 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { groupedExercises } from "@/data/exercises";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Star } from "lucide-react";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
+import { useFavoriteExercises } from "@/hooks/useFavoriteExercises";
 
 interface AddExerciseDialogProps {
   onAddExercise: (exercise: { id: string; name: string }) => void;
@@ -28,6 +29,7 @@ interface AddExerciseDialogProps {
 export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => {
   const [open, setOpen] = useState(false);
   const { workouts } = useWorkoutHistory();
+  const { isFavorite } = useFavoriteExercises();
 
   const exerciseFrequencies = useMemo(() => {
     const frequencies = new Map<string, number>();
@@ -45,6 +47,12 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
     return groupedExercises.map(group => ({
       ...group,
       exercises: [...group.exercises].sort((a, b) => {
+        const aIsFavorite = isFavorite(a.id);
+        const bIsFavorite = isFavorite(b.id);
+        if (aIsFavorite !== bIsFavorite) {
+            return bIsFavorite ? 1 : -1;
+        }
+
         const freqA = exerciseFrequencies.get(a.id) || 0;
         const freqB = exerciseFrequencies.get(b.id) || 0;
         if (freqB !== freqA) {
@@ -53,7 +61,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
         return a.name.localeCompare(b.name);
       })
     }));
-  }, [exerciseFrequencies]);
+  }, [exerciseFrequencies, isFavorite]);
 
   const handleSelect = (exercise: { id: string; name: string }) => {
     onAddExercise(exercise);
@@ -72,7 +80,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
         <DialogHeader>
           <DialogTitle>Choisir un exercice</DialogTitle>
           <DialogDescription>
-            Recherchez un exercice ou parcourez les catégories. Les exercices les plus fréquents apparaissent en premier.
+            Recherchez un exercice ou parcourez les catégories. Les exercices favoris et les plus fréquents apparaissent en premier.
           </DialogDescription>
         </DialogHeader>
         <Command>
@@ -88,7 +96,12 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
                     value={exercise.name}
                     onSelect={() => handleSelect(exercise)}
                   >
-                    {exercise.name}
+                    <div className="flex items-center justify-between w-full">
+                      <span>{exercise.name}</span>
+                      {isFavorite(exercise.id) && (
+                        <Star className="h-4 w-4 text-accent-yellow fill-accent-yellow ml-2 flex-shrink-0" />
+                      )}
+                    </div>
                   </CommandItem>
                 ))}
               </CommandGroup>
