@@ -20,6 +20,7 @@ export interface Workout {
   id: string; // From Supabase DB (uuid)
   user_id: string; // From Supabase auth.users.id
   date: string; // ISO string
+  ended_at?: string | null; // ISO string, when the workout was completed
   exercises: ExerciseLog[];
   notes?: string;
   status: string; // 'in-progress' | 'completed'

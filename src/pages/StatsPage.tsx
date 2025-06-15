@@ -1,3 +1,4 @@
+
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
@@ -17,6 +18,8 @@ import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { DateRange } from 'react-day-picker';
 import { SortableCardItem } from '@/components/stats/SortableCardItem';
 import { Toggle } from '@/components/ui/toggle';
+import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
+import { calculateEstimated1RM } from '@/utils/calculations';
 
 interface PersonalRecord {
     weight: number;
@@ -34,7 +37,7 @@ const StatsPage = () => {
     });
     const [isDndEnabled, setIsDndEnabled] = useState(false);
 
-    const defaultCardOrder = useMemo(() => ['stats', 'volume', 'muscle', 'progress', 'ai', 'records'], []);
+    const defaultCardOrder = useMemo(() => ['stats', 'oneRepMax', 'volume', 'muscle', 'progress', 'records', 'ai'], []);
 
     const [cardOrder, setCardOrder] = useState<string[]>(() => {
         try {
@@ -100,7 +103,7 @@ const StatsPage = () => {
                 totalWorkouts: 0,
                 totalVolume: 0,
                 totalSets: 0,
-                chartData: [],
+                averageDuration: 0,
                 personalRecords: {},
             };
         }
@@ -125,42 +128,44 @@ const StatsPage = () => {
                 totalWorkouts: 0,
                 totalVolume: 0,
                 totalSets: 0,
-                chartData: [],
+                averageDuration: 0,
                 personalRecords: personalRecords,
             };
         }
 
         let totalVolume = 0;
         let totalSets = 0;
+        let totalDuration = 0;
+        let workoutsWithDuration = 0;
 
-        const chartData = filteredWorkouts
-            .map(workout => {
-                const workoutVolume = workout.exercises.reduce((acc, exercise) => {
-                    return acc + exercise.sets.reduce((setAcc, set) => {
-                        if (set.completed) {
-                            totalSets++;
-                            const weight = Number(set.weight) || 0;
-                            const reps = Number(set.reps) || 0;
-                            return setAcc + reps * weight;
-                        }
-                        return setAcc;
-                    }, 0);
-                }, 0);
+        filteredWorkouts.forEach(workout => {
+            if (workout.ended_at && workout.date) {
+                const duration = new Date(workout.ended_at).getTime() - new Date(workout.date).getTime();
+                if (duration > 0) {
+                    totalDuration += duration;
+                    workoutsWithDuration++;
+                }
+            }
 
-                totalVolume += workoutVolume;
-
-                return {
-                    date: format(new Date(workout.date), 'd MMM', { locale: fr }),
-                    volume: Math.round(workoutVolume),
-                };
-            })
-            .reverse();
+            workout.exercises.forEach(exercise => {
+                exercise.sets.forEach(set => {
+                    if (set.completed) {
+                        totalSets++;
+                        const weight = Number(set.weight) || 0;
+                        const reps = Number(set.reps) || 0;
+                        totalVolume += reps * weight;
+                    }
+                });
+            });
+        });
+        
+        const averageDuration = workoutsWithDuration > 0 ? (totalDuration / workoutsWithDuration) / (1000 * 60) : 0; // in minutes
 
         return {
             totalWorkouts: filteredWorkouts.length,
             totalVolume: Math.round(totalVolume),
             totalSets,
-            chartData,
+            averageDuration,
             personalRecords,
         };
     }, [workouts, filteredWorkouts]);
@@ -175,6 +180,37 @@ const StatsPage = () => {
         });
         return map;
     }, [allGroupedExercises]);
+    
+    const volumeByMuscleGroup = useMemo(() => {
+        if (!filteredWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
+            return [];
+        }
+
+        const initialVolumeByGroup = Object.fromEntries(
+            allGroupedExercises.map(groupData => [groupData.group, 0])
+        );
+
+        const volumeByGroup = filteredWorkouts.reduce((acc, workout) => {
+            workout.exercises.forEach(exercise => {
+                const group = exerciseToGroupMap.get(exercise.name);
+                if (group && acc.hasOwnProperty(group)) {
+                    const exerciseVolume = exercise.sets.reduce((vol, set) => {
+                        if (set.completed) {
+                            return vol + (Number(set.weight) || 0) * (Number(set.reps) || 0);
+                        }
+                        return vol;
+                    }, 0);
+                    acc[group] += exerciseVolume;
+                }
+            });
+            return acc;
+        }, { ...initialVolumeByGroup });
+
+        return Object.entries(volumeByGroup)
+            .map(([group, volume]) => ({ group, volume: Math.round(volume) }))
+            .sort((a, b) => b.volume - a.volume);
+
+    }, [filteredWorkouts, exerciseToGroupMap, allGroupedExercises]);
 
     const muscleGroupStats = useMemo(() => {
         if (!filteredWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
@@ -204,6 +240,35 @@ const StatsPage = () => {
         
         return { chartData, maxSets: Math.max(10, maxSets) };
     }, [filteredWorkouts, exerciseToGroupMap, allGroupedExercises]);
+
+    const estimated1RMs = useMemo(() => {
+        if (!workouts) return [];
+
+        const records = new Map<string, number>();
+
+        workouts.forEach(workout => {
+            workout.exercises.forEach(exercise => {
+                exercise.sets.forEach(set => {
+                    if (set.completed) {
+                        const weight = Number(set.weight);
+                        const reps = Number(set.reps);
+                        if (weight > 0 && reps > 0) {
+                            const est1RM = calculateEstimated1RM(weight, reps);
+                            const currentMax = records.get(exercise.name) || 0;
+                            if (est1RM > currentMax) {
+                                records.set(exercise.name, est1RM);
+                            }
+                        }
+                    }
+                });
+            });
+        });
+
+        return Array.from(records.entries())
+            .map(([exerciseName, estimated1RM]) => ({ exerciseName, estimated1RM }))
+            .sort((a, b) => b.estimated1RM - a.estimated1RM);
+
+    }, [workouts]);
 
     const uniqueExercises = useMemo(() => {
         if (!workouts) return [];
@@ -259,9 +324,10 @@ const StatsPage = () => {
                 totalWorkouts={stats.totalWorkouts}
                 totalVolume={stats.totalVolume}
                 totalSets={stats.totalSets}
+                averageDuration={stats.averageDuration}
             />
         ),
-        volume: <VolumeChart chartData={stats.chartData} />,
+        volume: <VolumeChart chartData={volumeByMuscleGroup} />,
         muscle: (
             <MuscleGroupRadarChart
                 data={muscleGroupStats.chartData}
@@ -291,7 +357,13 @@ const StatsPage = () => {
                 onViewProgression={handleViewProgression}
             />
         ),
-    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, workouts, dateRange, handleViewProgression]);
+        oneRepMax: (
+            <EstimatedOneRepMax
+                records={estimated1RMs}
+                onViewProgression={handleViewProgression}
+            />
+        )
+    }), [stats, volumeByMuscleGroup, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, workouts, dateRange, handleViewProgression, estimated1RMs]);
 
     if (isLoading) {
         return (

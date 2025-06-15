@@ -65,7 +65,7 @@ export const useWorkouts = () => {
     });
 
     const updateWorkoutMutation = useMutation({
-        mutationFn: async (updatedWorkout: { workoutId: string; exercises?: ExerciseLog[], notes?: string, status?: string }) => {
+        mutationFn: async (updatedWorkout: { workoutId: string; exercises?: ExerciseLog[], notes?: string, status?: string, ended_at?: string | null }) => {
             if (!userId) throw new Error("User not authenticated");
 
             const { workoutId, ...updateData } = updatedWorkout;

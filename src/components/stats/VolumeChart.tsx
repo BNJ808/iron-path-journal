@@ -1,50 +1,56 @@
 
-    import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-    import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
-    import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
-    import { BarChart as BarChartIcon } from 'lucide-react';
-    
-    const chartConfig = {
-      volume: {
-        label: "Volume",
-      },
-    } satisfies ChartConfig;
-    
-    const barColors = ["hsl(var(--accent-purple))", "hsl(var(--accent-blue))", "hsl(var(--accent-yellow))"];
-    
-    interface VolumeChartProps {
-        chartData: { date: string; volume: number }[];
-    }
-    
-    export const VolumeChart = ({ chartData }: VolumeChartProps) => (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                    <BarChartIcon className="h-5 w-5 text-accent-purple" />
-                    Volume par séance (kg)
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                    <BarChart accessibilityLayer data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                        <CartesianGrid vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
-                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={10} minTickGap={10} fontSize={12} />
-                        <YAxis tickLine={false} axisLine={false} tickMargin={10} width={80} fontSize={12} />
-                        <Tooltip
-                            cursor={false}
-                            content={<ChartTooltipContent 
-                                indicator="dot"
-                                hideLabel
-                            />} 
-                        />
-                        <Bar dataKey="volume" radius={4}>
-                            {chartData.map((_entry, index) => (
-                                <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
-    );
-    
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+import { BarChart as BarChartIcon } from 'lucide-react';
+import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
+
+const chartConfig = {
+  volume: {
+    label: "Volume (kg)",
+  },
+} satisfies ChartConfig;
+
+interface VolumeChartProps {
+    chartData: { group: string; volume: number }[];
+}
+
+export const VolumeChart = ({ chartData }: VolumeChartProps) => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+                <BarChartIcon className="h-5 w-5 text-accent-purple" />
+                Volume par groupe musculaire (kg)
+            </CardTitle>
+        </CardHeader>
+        <CardContent>
+            <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                    <CartesianGrid horizontal={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
+                    <XAxis type="number" hide />
+                    <YAxis 
+                        dataKey="group" 
+                        type="category" 
+                        tickLine={false} 
+                        axisLine={false} 
+                        tickMargin={5} 
+                        width={80} 
+                        fontSize={12} 
+                        tick={{ fill: 'hsl(var(--foreground))' }}
+                    />
+                    <Tooltip
+                        cursor={false}
+                        content={<ChartTooltipContent 
+                            indicator="dot"
+                        />} 
+                    />
+                    <Bar dataKey="volume" layout="vertical" radius={4}>
+                        {chartData.map((entry) => (
+                            <Cell key={`cell-${entry.group}`} fill={MUSCLE_GROUP_COLORS_HEX[entry.group as keyof typeof MUSCLE_GROUP_COLORS_HEX] || '#8884d8'} />
+                        ))}
+                    </Bar>
+                </BarChart>
+            </ChartContainer>
+        </CardContent>
+    </Card>
+);
