@@ -158,7 +158,7 @@ export const useWorkoutActions = () => {
             if (lastSets && lastSets.length > 0) {
                 newSets = lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight), completed: false }));
             } else if (exercise.sets.length > 0) {
-                newSets = exercise.sets.map(set => ({ id: nanoid(), reps: '', weight: String(set.weight), completed: false }));
+                newSets = exercise.sets.map(set => ({ id: nanoid(), reps: String(set.reps || ''), weight: String(set.weight), completed: false }));
             } else {
                 newSets = [{ id: nanoid(), reps: '', weight: '', completed: false }];
             }
