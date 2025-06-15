@@ -60,7 +60,7 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
         onExerciseCreated(newExercise);
     }
     setOpen(false);
-    form.reset({ name: '' });
+    form.reset();
   }
 
   return (
