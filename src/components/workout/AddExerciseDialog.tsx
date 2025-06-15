@@ -81,7 +81,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
             <CommandEmpty>Aucun exercice trouvé.</CommandEmpty>
             {sortedGroupedExercises.map((group) => (
               <CommandGroup key={group.group}>
-                <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-purple">{group.group}</div>
+                <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-yellow">{group.group}</div>
                 {group.exercises.map((exercise) => (
                   <CommandItem
                     key={exercise.id}
