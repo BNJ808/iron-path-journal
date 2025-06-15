@@ -82,8 +82,8 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
           <span className="text-center">#</span>
           <span className="text-center">Poids</span>
           <span className="text-center">Reps</span>
-          <span />
           <span className="text-center">Fait</span>
+          <span />
         </div>
         {exercise.sets.map((set, index) => (
           <div key={set.id} className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center">
@@ -103,11 +103,6 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
               className="text-base text-center bg-transparent border-border/50 focus:border-primary"
             />
             <div className="flex justify-center">
-              <Button variant="ghost" onClick={() => removeSet(set.id)} className="h-8 w-8 p-0" aria-label="Remove set">
-                <Trash2 size={16} className="text-destructive/70 hover:text-destructive" />
-              </Button>
-            </div>
-            <div className="flex justify-center">
               <button
                   onClick={() => handleSetChange(set.id, 'completed', !set.completed)}
                   aria-label={`Mark set ${index + 1} as ${set.completed ? 'not completed' : 'completed'}`}
@@ -120,6 +115,11 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
               >
                   {set.completed ? <Check size={18} /> : <X size={16} />}
               </button>
+            </div>
+            <div className="flex justify-center">
+              <Button variant="ghost" onClick={() => removeSet(set.id)} className="h-8 w-8 p-0" aria-label="Remove set">
+                <Trash2 size={16} className="text-destructive/70 hover:text-destructive" />
+              </Button>
             </div>
           </div>
         ))}
