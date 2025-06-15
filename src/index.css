@@ -7,7 +7,7 @@
   :root {
     --background: 222 47% 11%; /* slate-900 */
     --foreground: 210 40% 98%; /* slate-50 */
-    --card: 222 47% 16%; /* Slightly lighter than background for better contrast */
+    --card: 222 47% 20%; /* Plus clair que background pour meilleur contraste */
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
@@ -19,7 +19,7 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84% 60%; /* Brighter red */
     --destructive-foreground: 210 40% 98%;
-    --border: 222 22% 28%; /* Darker border for better consistency */
+    --border: 222 22% 35%; /* Bordure plus marquée et plus claire */
     --input: 222 28% 28%; /* slate-700 */
     --radius: 0.5rem;
     
@@ -93,11 +93,11 @@
   
   /* Unified card styles for consistency across the app */
   .app-card {
-    @apply bg-card border border-border rounded-lg shadow-sm;
+    @apply bg-card border-2 border-border rounded-lg shadow-lg;
   }
   
   .app-card-content {
-    @apply bg-card/80 border border-border/50 rounded-md;
+    @apply bg-card/90 border-2 border-border/70 rounded-md;
   }
   
   /* Legacy custom-card class now uses unified styles */
