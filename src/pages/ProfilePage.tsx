@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUploader } from '@/components/AvatarUploader';
 import { WeightTracker } from '@/components/profile/WeightTracker';
+import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
 
 const profileFormSchema = z.object({
     username: z.string()
@@ -23,6 +24,7 @@ const profileFormSchema = z.object({
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -42,6 +44,7 @@ const ProfilePage = () => {
             form.reset({ username: profile.username });
         }
     }, [profile, form]);
+
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
@@ -73,6 +76,7 @@ const ProfilePage = () => {
         if (!uploadAvatar) return;
         return uploadAvatar(file);
     };
+
 
     const isLoading = !user || isLoadingProfile;
 
@@ -124,6 +128,10 @@ const ProfilePage = () => {
                     </form>
                 </Form>
                 
+                <div className="border-t border-gray-700"></div>
+
+                <ThemeSwitcher />
+
                 <div className="border-t border-gray-700"></div>
 
                 <WeightTracker />

@@ -7,32 +7,20 @@
   :root {
     --background: 222 47% 11%; /* slate-900 */
     --foreground: 210 40% 98%; /* slate-50 */
-
     --card: 222 47% 18%; /* slate-800 */
     --card-foreground: 210 40% 98%;
-
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 262 83% 58%; /* violet-500 from image */
-    --primary-foreground: 210 40% 98%;
-
     --secondary: 222 28% 28%; /* slate-700 */
     --secondary-foreground: 210 40% 98%;
-
     --muted: 222 28% 28%; /* slate-700 */
     --muted-foreground: 220 14% 65%; /* slate-400 */
-
     --accent: 222 28% 32%; /* slightly darker slate-700 for hover */
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 84% 60%; /* Brighter red */
     --destructive-foreground: 210 40% 98%;
-
     --border: 222 22% 35%; /* slate-600 */
     --input: 222 28% 28%; /* slate-700 */
-    --ring: 217 91% 60%; /* blue-500, same as accent-blue */
-
     --radius: 0.5rem;
     
     /* Custom accent colors */
@@ -40,6 +28,53 @@
     --accent-purple: 262 83% 58%; /* violet-500 from image */
     --accent-yellow: 48 96% 50%; /* amber-400 */
     --accent-green: 142.1 50% 55%; /* Softer green */
+    
+    /* Default theme (violet) */
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 262 83% 58%;
+  }
+
+  .violet {
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 262 83% 58%;
+  }
+
+  .blue {
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 217 91% 60%;
+  }
+
+  .green {
+    --primary: 142 76% 36%;
+    --primary-foreground: 142 76% 96%;
+    --ring: 142 76% 36%;
+  }
+
+  .yellow {
+    --primary: 48 96% 50%;
+    --primary-foreground: 48 96% 10%;
+    --ring: 48 96% 50%;
+  }
+  
+  .orange {
+    --primary: 25 95% 53%;
+    --primary-foreground: 25 95% 13%;
+    --ring: 25 95% 53%;
+  }
+  
+  .red {
+    --primary: 0 84% 60%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 0 84% 60%;
+  }
+  
+  .rose {
+    --primary: 340 82% 57%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 340 82% 57%;
   }
 }
 
