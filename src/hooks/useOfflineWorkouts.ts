@@ -1,4 +1,3 @@
-
 import { useWorkouts as useOriginalWorkouts } from './useWorkouts';
 import { useOfflineStorage } from './useOfflineStorage';
 import { useNetworkStatus } from './useNetworkStatus';
@@ -6,6 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
 import type { Workout, ExerciseLog } from '@/types';
+
+// Export the type for other files to use
+export type { ExerciseLog } from '@/types';
 
 export const useOfflineWorkouts = () => {
   const originalHook = useOriginalWorkouts();

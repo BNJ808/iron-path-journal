@@ -1,5 +1,5 @@
 
-import { Wifi, WifiOff, Sync, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, RotateCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
@@ -17,8 +17,8 @@ export const OfflineIndicator = () => {
       <div className={cn(
         "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
         isOnline 
-          ? "bg-accent-green/20 text-accent-green" 
-          : "bg-accent-red/20 text-accent-red"
+          ? "bg-green-500/20 text-green-400" 
+          : "bg-red-500/20 text-red-400"
       )}>
         {isOnline ? (
           <>
@@ -35,7 +35,7 @@ export const OfflineIndicator = () => {
 
       {/* Badge pour données en attente */}
       {showPendingBadge && (
-        <Badge variant="outline" className="flex items-center gap-1 text-accent-yellow border-accent-yellow">
+        <Badge variant="outline" className="flex items-center gap-1 text-yellow-400 border-yellow-400">
           <AlertCircle className="h-3 w-3" />
           En attente de sync
         </Badge>
@@ -49,7 +49,7 @@ export const OfflineIndicator = () => {
           onClick={forcSync}
           className="flex items-center gap-1 h-7 px-2"
         >
-          <Sync className="h-3 w-3" />
+          <RotateCw className="h-3 w-3" />
           Synchroniser
         </Button>
       )}

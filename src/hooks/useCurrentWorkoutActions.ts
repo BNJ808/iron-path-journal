@@ -1,9 +1,8 @@
-
-import { useOfflineWorkouts, type ExerciseLog } from '@/hooks/useOfflineWorkouts'; // Changer l'import
+import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts';
 import { useExerciseLastPerformance } from '@/hooks/useExerciseLastPerformance';
 import { toast } from 'sonner';
 import { nanoid } from 'nanoid';
-import type { ExerciseSet } from '@/types';
+import type { ExerciseSet, ExerciseLog } from '@/types';
 
 export const useCurrentWorkoutActions = () => {
   const { todayWorkout, updateWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
