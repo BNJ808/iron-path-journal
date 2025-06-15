@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, RotateCcw } from 'lucide-react';
@@ -98,7 +97,7 @@ export const TimerView = () => {
             variant={duration === value ? 'default' : 'outline'}
             onClick={() => handleSetDuration(value)}
             className={cn(
-              duration === value && 'bg-accent-green hover:bg-green-600 text-white border-accent-green'
+              duration === value && 'bg-accent-green hover:bg-green-600 text-black border-accent-green'
             )}
           >
             {label}
