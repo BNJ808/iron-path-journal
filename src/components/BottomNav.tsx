@@ -13,14 +13,14 @@ const navItems = [
 
 const BottomNav = () => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700 flex justify-evenly items-center">
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700 flex items-center">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
           to={item.path}
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors w-full h-full',
+              'flex flex-1 flex-col items-center justify-center text-gray-400 hover:text-white transition-colors h-full',
               isActive && item.color,
               isActive && 'font-bold'
             )
