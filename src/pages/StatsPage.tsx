@@ -13,7 +13,6 @@ import { VolumeChart } from '@/components/stats/VolumeChart';
 import { ExerciseProgress } from '@/components/stats/ExerciseProgress';
 import { PersonalRecords } from '@/components/stats/PersonalRecords';
 import { useExerciseDatabase } from '@/hooks/useExerciseDatabase';
-import { EXERCISES_DATABASE } from '@/data/exercises';
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { DateRange } from 'react-day-picker';
@@ -26,6 +25,7 @@ interface PersonalRecord {
 
 const StatsPage = () => {
     const { workouts, isLoading } = useWorkoutHistory();
+    const { allGroupedExercises } = useExerciseDatabase();
     const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
     const exerciseProgressCardRef = useRef<HTMLDivElement>(null);
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -285,7 +285,7 @@ const StatsPage = () => {
                 onViewProgression={handleViewProgression}
             />
         ),
-    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, filteredWorkouts, handleViewProgression]);
+    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, filteredWorkouts, handleViewProgression, allGroupedExercises]);
 
     if (isLoading) {
         return (
