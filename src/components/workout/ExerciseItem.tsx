@@ -52,13 +52,13 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
       <div className="flex justify-between items-center gap-4">
         <div className="flex items-center gap-1 flex-shrink min-w-0">
             <Button variant="ghost" size="icon" className="-ml-2" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
-                <Star className={`h-5 w-5 transition-colors ${isFavorite(exercise.exerciseId) ? 'text-accent-yellow fill-accent-yellow' : 'text-gray-400 hover:text-accent-yellow'}`} />
+                <Star className={`h-5 w-5 transition-colors ${isFavorite(exercise.exerciseId) ? 'text-accent-yellow fill-accent-yellow' : 'text-foreground/60 hover:text-accent-yellow'}`} />
             </Button>
             <h3 className="font-bold text-lg text-accent-blue truncate">{exercise.name}</h3>
         </div>
         <div className="flex items-center flex-shrink-0">
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
-                <MessageSquare className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+                <MessageSquare className="h-5 w-5 text-foreground/80 hover:text-foreground" />
             </Button>
             <AiExerciseAnalysisDialog exerciseId={exercise.exerciseId} exerciseName={exercise.name} />
             <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)} aria-label="Remove exercise">
@@ -78,7 +78,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
 
 
       <div className="space-y-3">
-        <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center text-sm text-muted-foreground font-medium">
+        <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center text-sm text-foreground font-medium">
           <span className="text-center">#</span>
           <span className="text-center">Poids</span>
           <span className="text-center">Reps</span>
@@ -87,7 +87,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
         </div>
         {exercise.sets.map((set, index) => (
           <div key={set.id} className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center">
-            <span className="font-bold text-center text-muted-foreground">{index + 1}</span>
+            <span className="font-bold text-center text-foreground">{index + 1}</span>
             <Input
               type="number"
               value={set.weight}
@@ -115,7 +115,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
                       'flex items-center justify-center h-8 w-8 rounded-lg border-2 transition-all',
                       set.completed
                           ? 'bg-accent-green border-accent-green text-black'
-                          : 'bg-transparent border-muted-foreground/50 text-muted-foreground/50 hover:border-accent-red hover:text-accent-red'
+                          : 'bg-transparent border-foreground/30 text-foreground/50 hover:border-accent-red hover:text-accent-red'
                   )}
               >
                   {set.completed ? <Check size={18} /> : <X size={16} />}
@@ -125,7 +125,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
         ))}
       </div>
 
-      <Button onClick={addSet} variant="outline" className="w-full border-dashed hover:border-solid hover:border-primary/70 text-muted-foreground hover:text-primary-foreground">
+      <Button onClick={addSet} variant="outline" className="w-full border-dashed hover:border-solid hover:border-primary/70 text-foreground/80 hover:text-primary-foreground">
         <Plus size={16} className="mr-2" />
         Ajouter une série
       </Button>
