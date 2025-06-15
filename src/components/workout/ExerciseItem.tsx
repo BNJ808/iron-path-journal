@@ -4,10 +4,11 @@ import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ExerciseLog, ExerciseSet } from '@/types';
-import { Trash2, Plus, MessageSquare } from 'lucide-react';
+import { Trash2, Plus, MessageSquare, Star } from 'lucide-react';
 import { AiExerciseAnalysisDialog } from './AiExerciseAnalysisDialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useFavoriteExercises } from '@/hooks/useFavoriteExercises';
 
 interface ExerciseItemProps {
   exercise: ExerciseLog;
@@ -17,6 +18,7 @@ interface ExerciseItemProps {
 
 export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps) => {
   const [showNotes, setShowNotes] = useState(!!exercise.notes);
+  const { isFavorite, toggleFavorite } = useFavoriteExercises();
 
   const handleSetChange = (setId: string, field: 'reps' | 'weight' | 'completed', value: string | boolean) => {
     const updatedSets = exercise.sets.map((set) =>
@@ -48,7 +50,12 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
   return (
     <div className="p-4 rounded-lg bg-secondary space-y-4 border">
       <div className="flex justify-between items-center">
-        <h3 className="font-bold text-lg text-accent-blue">{exercise.name}</h3>
+        <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
+                <Star className={`h-5 w-5 transition-colors ${isFavorite(exercise.exerciseId) ? 'text-accent-yellow fill-accent-yellow' : 'text-gray-400 hover:text-accent-yellow'}`} />
+            </Button>
+            <h3 className="font-bold text-lg text-accent-blue">{exercise.name}</h3>
+        </div>
         <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
                 <MessageSquare className="h-5 w-5" />
