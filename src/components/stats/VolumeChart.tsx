@@ -2,8 +2,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
-import { BarChart as BarChartIcon } from 'lucide-react';
+import { BarChart as BarChartIcon, ChevronsUpDown } from 'lucide-react';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const chartConfig = {
   volume: {
@@ -16,41 +17,50 @@ interface VolumeChartProps {
 }
 
 export const VolumeChart = ({ chartData }: VolumeChartProps) => (
-    <Card>
-        <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-                <BarChartIcon className="h-5 w-5 text-accent-purple" />
-                Volume par groupe musculaire (kg)
-            </CardTitle>
-        </CardHeader>
-        <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-                    <CartesianGrid horizontal={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
-                    <XAxis type="number" hide />
-                    <YAxis 
-                        dataKey="group" 
-                        type="category" 
-                        tickLine={false} 
-                        axisLine={false} 
-                        tickMargin={5} 
-                        width={80} 
-                        fontSize={12} 
-                        tick={{ fill: 'hsl(var(--foreground))' }}
-                    />
-                    <Tooltip
-                        cursor={false}
-                        content={<ChartTooltipContent 
-                            indicator="dot"
-                        />} 
-                    />
-                    <Bar dataKey="volume" layout="vertical" radius={4}>
-                        {chartData.map((entry) => (
-                            <Cell key={`cell-${entry.group}`} fill={MUSCLE_GROUP_COLORS_HEX[entry.group as keyof typeof MUSCLE_GROUP_COLORS_HEX] || '#8884d8'} />
-                        ))}
-                    </Bar>
-                </BarChart>
-            </ChartContainer>
-        </CardContent>
-    </Card>
+    <Collapsible defaultOpen={false}>
+        <Card>
+            <CollapsibleTrigger asChild>
+                <CardHeader className="cursor-pointer">
+                    <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <BarChartIcon className="h-5 w-5 text-accent-purple" />
+                            Volume par groupe musculaire (kg)
+                        </CardTitle>
+                        <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    </div>
+                </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <CardContent>
+                    <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                        <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                            <CartesianGrid horizontal={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
+                            <XAxis type="number" hide />
+                            <YAxis 
+                                dataKey="group" 
+                                type="category" 
+                                tickLine={false} 
+                                axisLine={false} 
+                                tickMargin={5} 
+                                width={80} 
+                                fontSize={12} 
+                                tick={{ fill: 'hsl(var(--foreground))' }}
+                            />
+                            <Tooltip
+                                cursor={false}
+                                content={<ChartTooltipContent 
+                                    indicator="dot"
+                                />} 
+                            />
+                            <Bar dataKey="volume" layout="vertical" radius={4}>
+                                {chartData.map((entry) => (
+                                    <Cell key={`cell-${entry.group}`} fill={MUSCLE_GROUP_COLORS_HEX[entry.group as keyof typeof MUSCLE_GROUP_COLORS_HEX] || '#8884d8'} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ChartContainer>
+                </CardContent>
+            </CollapsibleContent>
+        </Card>
+    </Collapsible>
 );
