@@ -1,7 +1,7 @@
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Button } from '@/components/ui/button';
 import { Accordion } from '@/components/ui/accordion';
-import { Trash2 } from 'lucide-react';
+import { Trash2, History } from 'lucide-react';
 import WorkoutHistoryCard from '@/components/WorkoutHistoryCard';
 import {
     AlertDialog,
@@ -98,7 +98,10 @@ const HistoryPage = () => {
     return (
         <div className="p-4">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-accent-yellow">Historique</h1>
+                <div className="flex items-center gap-2">
+                    <History className="h-6 w-6 text-accent-yellow" />
+                    <h1 className="text-2xl font-bold text-foreground">Historique</h1>
+                </div>
                 {workouts.length > 0 && (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
