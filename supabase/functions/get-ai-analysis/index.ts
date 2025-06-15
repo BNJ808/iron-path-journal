@@ -10,22 +10,25 @@ const corsHeaders = {
 }
 
 function createGeneralPrompt(stats: any) {
+  const periodDescription = stats.periodDescription || 'la période sélectionnée';
+
   return `
-    Analyze the following user workout statistics and provide personalized advice.
-    The user is looking for insights to improve their training, break plateaus, and stay motivated.
-    The response should be in French, encouraging, and actionable. Structure it with markdown.
+    Analysez les statistiques d'entraînement de l'utilisateur suivantes pour ${periodDescription} et fournissez des conseils personnalisés et approfondis.
+    L'utilisateur cherche à comprendre ses performances, à identifier des points d'amélioration, à briser des plateaux et à rester motivé.
+    La réponse doit être en Français, structurée avec markdown, encourageante, et proposer des actions concrètes.
 
-    User Stats:
-    - Total workouts: ${stats.totalWorkouts}
-    - Total volume (kg): ${stats.totalVolume}
-    - Total sets: ${stats.totalSets}
-    - Personal Records (Max Weight in kg): ${JSON.stringify(stats.personalRecords, null, 2)}
-    - Volume per workout (last ${stats.chartData.length} sessions): ${JSON.stringify(stats.chartData, null, 2)}
+    Statistiques de l'utilisateur pour ${periodDescription}:
+    - Total des entraînements: ${stats.totalWorkouts}
+    - Volume total (kg): ${stats.totalVolume}
+    - Total des séries: ${stats.totalSets}
+    - Records Personnels (Poids max en kg, sur toute la période): ${JSON.stringify(stats.personalRecords, null, 2)}
+    - Volume par entraînement (sessions de la période): ${JSON.stringify(stats.chartData, null, 2)}
 
-    Provide analysis on:
-    1.  **Consistency and Volume**: Comment on the number of workouts and volume progression.
-    2.  **Strength Gains**: Look at the personal records. Are they balanced? Suggest areas for improvement.
-    3.  **Actionable Advice**: Give 2-3 clear, concrete tips for the user's next steps. For example, suggest specific rep/set schemes, exercises to add, or recovery tips.
+    Fournir une analyse approfondie sur:
+    1.  **Consistance et Volume**: Commentez la fréquence des entraînements et la progression du volume sur la période. Est-ce régulier ? Y a-t-il une surcharge progressive visible ?
+    2.  **Gains en Force**: Analysez les records personnels. Sont-ils équilibrés ? Suggérez des domaines d'amélioration en vous basant sur les records.
+    3.  **Analyse de la Période**: En regardant les données de la période, quelles sont les tendances ? Y a-t-il des signes de fatigue (baisse de volume) ou de stagnation ?
+    4.  **Conseils Actionnables**: Donnez 3 conseils clairs et détaillés pour les prochaines étapes. Par exemple, suggérez des schémas de répétitions/séries spécifiques, des exercices à ajouter pour équilibrer, des stratégies de récupération, ou comment ajuster l'intensité/volume.
     `
 }
 
@@ -130,4 +133,3 @@ async function handler(req: Request): Promise<Response> {
 }
 
 serve(handler)
-

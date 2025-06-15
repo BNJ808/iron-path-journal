@@ -2,7 +2,7 @@ import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import { BarChart3, Move } from 'lucide-react';
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
@@ -244,10 +244,10 @@ const StatsPage = () => {
         };
     }, [selectedExerciseName, workouts]);
 
-    const handleViewProgression = (exerciseName: string) => {
+    const handleViewProgression = useCallback((exerciseName: string) => {
         setSelectedExerciseName(exerciseName);
         exerciseProgressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
+    }, []);
 
     const cardComponents: Record<string, React.ReactNode> = useMemo(() => ({
         stats: (
@@ -277,7 +277,8 @@ const StatsPage = () => {
             <AiAnalysisCard
                 title="Analyse et Conseils IA"
                 type="general"
-                data={{ ...stats, workouts: filteredWorkouts }}
+                workouts={workouts}
+                currentDateRange={dateRange}
             />
         ),
         records: (
@@ -286,7 +287,7 @@ const StatsPage = () => {
                 onViewProgression={handleViewProgression}
             />
         ),
-    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, filteredWorkouts, handleViewProgression]);
+    }), [stats, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, workouts, dateRange, handleViewProgression]);
 
     if (isLoading) {
         return (
