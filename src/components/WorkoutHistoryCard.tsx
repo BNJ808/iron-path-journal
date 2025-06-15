@@ -1,9 +1,9 @@
 
 import type { Workout } from '@/types';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { format } from 'date-fns';
+import { format, formatDistanceStrict } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Copy, List, StickyNote, Trash2 } from 'lucide-react';
+import { Clock, Copy, List, StickyNote, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
@@ -25,17 +25,30 @@ interface WorkoutHistoryCardProps {
 
 const WorkoutHistoryCard = ({ workout, onDelete, onCopy }: WorkoutHistoryCardProps) => {
     const workoutDate = new Date(workout.date);
+    const workoutEndDate = workout.ended_at ? new Date(workout.ended_at) : null;
+
+    const duration = workoutEndDate
+        ? formatDistanceStrict(workoutEndDate, workoutDate, { locale: fr, unit: 'minute' })
+        : null;
 
     return (
         <AccordionItem value={workout.id} className="app-card border-b-0">
              <AccordionTrigger className="p-4 hover:no-underline">
-                <div className="flex flex-col text-left">
-                    <span className="font-bold capitalize text-base">
-                        {format(workoutDate, "eeee d MMMM", { locale: fr })}
-                    </span>
-                    <span className="text-sm text-gray-400">
-                        {format(workoutDate, "yyyy, HH:mm", { locale: fr })}
-                    </span>
+                <div className="flex justify-between items-center w-full">
+                    <div className="flex flex-col text-left">
+                        <span className="font-bold capitalize text-base">
+                            {format(workoutDate, "eeee d MMMM yyyy", { locale: fr })}
+                        </span>
+                        <span className="text-sm text-gray-400">
+                            Début : {format(workoutDate, "HH:mm", { locale: fr })}
+                        </span>
+                    </div>
+                     {duration && (
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-gray-400 pr-2">
+                            <Clock className="h-4 w-4" />
+                            <span>{duration}</span>
+                        </div>
+                    )}
                 </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
