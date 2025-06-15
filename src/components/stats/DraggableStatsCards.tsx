@@ -69,18 +69,16 @@ export const DraggableStatsCards = ({
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            onCardOrderChange((items) => {
-                const oldIndex = items.indexOf(active.id as string);
-                const newIndex = items.indexOf(over.id as string);
-                if (oldIndex === -1 || newIndex === -1) return items;
-                const newOrder = arrayMove(items, oldIndex, newIndex);
-                try {
-                    localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
-                } catch (error) {
-                    console.error("Failed to save card order to localStorage", error);
-                }
-                return newOrder;
-            });
+            const oldIndex = cardOrder.indexOf(active.id as string);
+            const newIndex = cardOrder.indexOf(over.id as string);
+            if (oldIndex === -1 || newIndex === -1) return;
+            const newOrder = arrayMove(cardOrder, oldIndex, newIndex);
+            try {
+                localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
+            } catch (error) {
+                console.error("Failed to save card order to localStorage", error);
+            }
+            onCardOrderChange(newOrder);
         }
     };
 
