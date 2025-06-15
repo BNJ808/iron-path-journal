@@ -13,6 +13,8 @@ export const themes = [
     { name: "Rose", value: "rose", colorClass: "bg-accent-rose" },
 ];
 
+const themeValues = themes.map((t) => t.value);
+
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+  return <NextThemesProvider {...props} themes={themeValues}>{children}</NextThemesProvider>
 }
