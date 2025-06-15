@@ -78,23 +78,30 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
 
 
       <div className="space-y-3">
-        <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center text-sm text-foreground font-medium">
+        <div className="grid grid-cols-[2rem_1fr_auto_1fr_2.5rem_2.5rem] gap-x-2 items-center text-sm text-foreground font-medium px-1">
           <span className="text-center">#</span>
           <span className="text-center">Poids</span>
+          <span />
           <span className="text-center">Reps</span>
           <span className="text-center">Fait</span>
           <span />
         </div>
         {exercise.sets.map((set, index) => (
-          <div key={set.id} className="grid grid-cols-[2rem_1fr_1fr_2.5rem_2.5rem] gap-x-3 items-center">
+          <div key={set.id} className="grid grid-cols-[2rem_1fr_auto_1fr_2.5rem_2.5rem] gap-x-2 items-center">
             <span className="font-bold text-center text-foreground">{index + 1}</span>
-            <Input
-              type="number"
-              value={set.weight}
-              onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
-              placeholder="-"
-              className="text-base text-center bg-transparent border-border/50 focus:border-primary"
-            />
+            <div className="relative">
+                <Input
+                  type="number"
+                  value={set.weight}
+                  onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
+                  placeholder="-"
+                  className="text-base text-center bg-transparent border-border/50 focus:border-primary pr-7"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-foreground/60 pointer-events-none">kg</span>
+            </div>
+            
+            <span className="text-foreground/80 font-semibold">x</span>
+
             <Input
               type="number"
               value={set.reps}
