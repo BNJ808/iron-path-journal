@@ -4,6 +4,7 @@ import BottomNav from './BottomNav';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { TimerDialog } from './timer/TimerDialog';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -53,13 +54,15 @@ const Layout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <main className="flex-grow pb-20">
-        <Outlet />
-      </main>
-      <BottomNav />
-      <TimerDialog open={isTimerOpen} onOpenChange={handleTimerOpenChange} />
-    </div>
+    <TooltipProvider>
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
+        <main className="flex-grow pb-20">
+          <Outlet />
+        </main>
+        <BottomNav />
+        <TimerDialog open={isTimerOpen} onOpenChange={handleTimerOpenChange} />
+      </div>
+    </TooltipProvider>
   );
 };
 

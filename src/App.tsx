@@ -1,7 +1,6 @@
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
@@ -19,24 +18,22 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AuthProvider>
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route element={<Layout />}>
-              <Route path="/" element={<Navigate to="/workout" replace />} />
-              <Route path="/workout" element={<WorkoutPage />} />
-              <Route path="/stats" element={<StatsPage />} />
-              <Route path="/history" element={<HistoryPage />} />
-              <Route path="/timer" element={<TimerPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <AuthProvider>
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Navigate to="/workout" replace />} />
+            <Route path="/workout" element={<WorkoutPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/timer" element={<TimerPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>
 );
