@@ -1,5 +1,4 @@
 
-```tsx
 import { useMemo } from 'react';
 import type { Workout, ExerciseLog } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -177,4 +176,3 @@ export const WorkoutInProgress = ({
     </div>
   );
 };
-```
