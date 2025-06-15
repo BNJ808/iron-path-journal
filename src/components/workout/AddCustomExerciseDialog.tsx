@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -47,7 +46,6 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      group: '' as z.infer<typeof formSchema>['group'], // Initialize group with a value to satisfy types
     },
   });
 
@@ -56,8 +54,8 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
     if(newExercise) {
         onExerciseCreated(newExercise);
     }
-    form.reset();
     setOpen(false);
+    form.reset();
   }
 
   return (
