@@ -11,6 +11,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const weightFormSchema = z.object({
     weight: z.coerce.number().positive({ message: "Le poids doit être un nombre positif." }),
@@ -51,12 +55,12 @@ export const WeightTracker = () => {
             <CardContent className="space-y-4">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="flex gap-4 items-end">
+                        <div className="flex flex-col sm:flex-row gap-4 items-start">
                              <FormField
                                 control={form.control}
                                 name="weight"
                                 render={({ field }) => (
-                                    <FormItem className="flex-grow">
+                                    <FormItem className="flex-grow w-full sm:w-auto">
                                         <FormLabel>Poids (kg)</FormLabel>
                                         <FormControl>
                                             <Input type="number" step="0.1" placeholder="70.5" {...field} value={field.value ?? ''} />
@@ -69,11 +73,41 @@ export const WeightTracker = () => {
                                 control={form.control}
                                 name="date"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex flex-col flex-grow w-full sm:w-auto">
                                         <FormLabel>Date</FormLabel>
-                                        <FormControl>
-                                            <Input type="date" {...field} />
-                                        </FormControl>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "justify-start text-left font-normal w-full",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                        {field.value ? (
+                                                            format(new Date(field.value + 'T00:00:00'), "d MMMM yyyy", { locale: fr })
+                                                        ) : (
+                                                            <span>Choisissez une date</span>
+                                                        )}
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value ? new Date(field.value + 'T00:00:00') : undefined}
+                                                    onSelect={(date) => {
+                                                        field.onChange(date ? format(date, 'yyyy-MM-dd') : '')
+                                                    }}
+                                                    disabled={(date) =>
+                                                        date > new Date() || date < new Date("1900-01-01")
+                                                    }
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
                                         <FormMessage />
                                     </FormItem>
                                 )}

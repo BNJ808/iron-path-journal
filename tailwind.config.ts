@@ -47,6 +47,7 @@ const config = {
           purple: "hsl(var(--accent-purple))",
           blue: "hsl(var(--accent-blue))",
           yellow: "hsl(var(--accent-yellow))",
+          green: "hsl(var(--accent-green))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

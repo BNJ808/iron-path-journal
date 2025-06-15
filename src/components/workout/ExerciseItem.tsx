@@ -42,7 +42,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
   return (
     <div className="p-4 rounded-lg bg-secondary space-y-4 border">
       <div className="flex justify-between items-center">
-        <h3 className="font-bold text-lg">{exercise.name}</h3>
+        <h3 className="font-bold text-lg text-accent-blue">{exercise.name}</h3>
         <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
                 <MessageSquare className="h-5 w-5" />
@@ -90,12 +90,12 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
               className="text-base"
             />
             <Button variant="ghost" size="icon" onClick={() => removeSet(set.id)} className="justify-self-center" aria-label="Remove set">
-              <Trash2 size={16} />
+              <Trash2 size={16} className="text-destructive" />
             </Button>
             <Checkbox
                 checked={!!set.completed}
                 onCheckedChange={(checked) => handleSetChange(set.id, 'completed', !!checked)}
-                className="justify-self-center"
+                className="justify-self-center data-[state=checked]:bg-accent-green data-[state=checked]:border-accent-green"
                 aria-label={`Mark set ${index + 1} as completed`}
             />
           </div>
