@@ -38,7 +38,13 @@ export const useWorkoutLifecycle = () => {
         if (performancesToUpdate.length > 0) {
             await updateLastPerformances(performancesToUpdate as any);
         }
-        await updateWorkout({ workoutId: todayWorkout.id, exercises: cleanedExercises, notes: todayWorkout.notes, status: 'completed' });
+        await updateWorkout({ 
+            workoutId: todayWorkout.id, 
+            exercises: cleanedExercises, 
+            notes: todayWorkout.notes, 
+            status: 'completed',
+            ended_at: new Date().toISOString()
+        });
         toast.success("Entraînement terminé et sauvegardé !");
       } catch (error: any) {
         toast.error("Erreur à la sauvegarde de l'entraînement: " + error.message);
