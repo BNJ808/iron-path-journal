@@ -20,7 +20,8 @@ export const useWorkoutHistory = () => {
                 .eq('status', 'completed')
                 .order('date', { ascending: false });
             if (error) throw new Error(error.message);
-            // FIX: Cast to unknown first to align Supabase's JSON type with our local Workout type.
+            // Les types générés par Supabase utilisent un type `Json` générique pour les colonnes JSON.
+            // Nous convertissons le résultat vers notre type `Workout` plus spécifique.
             return data as unknown as Workout[];
         },
         enabled: !!userId,
@@ -31,7 +32,9 @@ export const useWorkoutHistory = () => {
             if (!userId) throw new Error("User not authenticated");
             const { data, error } = await supabase
                 .from('workouts')
-                // FIX: Cast the inserted object to `any` to match Supabase's expectation for the JSON column.
+                // La propriété `exercises` de notre objet `workout` est un tableau typé,
+                // compatible avec le type `Json` de Supabase. Nous utilisons `as any`
+                // pour aligner les types en raison des limitations d'inférence de TypeScript.
                 .insert([{ ...workout, user_id: userId }] as any)
                 .select();
             if (error) throw new Error(error.message);

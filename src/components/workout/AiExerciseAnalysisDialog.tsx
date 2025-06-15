@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,7 +31,7 @@ export const AiExerciseAnalysisDialog = ({ exerciseId, exerciseName }: AiExercis
           sets: exerciseLog.sets.map(s => ({ reps: s.reps, weight: s.weight })),
         };
       })
-      .filter((item): item is { date: string; sets: { reps: any; weight: any }[] } => item !== null)
+      .filter((item): item is { date: string; sets: { reps: string | number; weight: string | number }[] } => item !== null)
       .reverse()
       .slice(0, 10);
   }, [workouts, exerciseId]);
@@ -106,4 +105,3 @@ export const AiExerciseAnalysisDialog = ({ exerciseId, exerciseName }: AiExercis
     </Dialog>
   );
 };
-
