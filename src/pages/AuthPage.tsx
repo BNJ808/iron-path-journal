@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 
 const AuthPage = () => {
     const [email, setEmail] = useState('');
@@ -30,6 +31,19 @@ const AuthPage = () => {
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        const passwordSchema = z.string()
+            .min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." })
+            .regex(/[a-z]/, { message: "Le mot de passe doit contenir au moins une lettre minuscule."})
+            .regex(/[A-Z]/, { message: "Le mot de passe doit contenir au moins une lettre majuscule."})
+            .regex(/[0-9]/, { message: "Le mot de passe doit contenir au moins un chiffre."});
+
+        const result = passwordSchema.safeParse(password);
+        if (!result.success) {
+            result.error.errors.forEach(error => toast.error(error.message));
+            return;
+        }
+        
         setLoading(true);
         const { error } = await supabase.auth.signUp({
             email,
