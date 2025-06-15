@@ -1,3 +1,5 @@
+
+import { useMemo } from 'react';
 import type { Workout, ExerciseLog } from '@/types';
 import { Button } from '@/components/ui/button';
 import { AddExerciseDialog } from '@/components/workout/AddExerciseDialog';
@@ -16,6 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Textarea } from '@/components/ui/textarea';
+import { useExerciseDatabase } from '@/hooks/useExerciseDatabase';
 
 interface WorkoutInProgressProps {
   workout: Workout;
@@ -38,6 +41,20 @@ export const WorkoutInProgress = ({
   onFinishWorkout,
   onCancelWorkout,
 }: WorkoutInProgressProps) => {
+  const { getGroupForExercise } = useExerciseDatabase();
+
+  const groupedWorkoutExercises = useMemo(() => {
+    const groups: Record<string, ExerciseLog[]> = {};
+    workout.exercises.forEach(exercise => {
+      const groupName = getGroupForExercise(exercise.exerciseId) || 'Autres';
+      if (!groups[groupName]) {
+        groups[groupName] = [];
+      }
+      groups[groupName].push(exercise);
+    });
+    return Object.entries(groups).sort(([groupA], [groupB]) => groupA.localeCompare(groupB));
+  }, [workout.exercises, getGroupForExercise]);
+
   return (
     <div className="space-y-4">
       {workout.exercises.length === 0 ? (
@@ -45,14 +62,23 @@ export const WorkoutInProgress = ({
           <p>Commencez par ajouter un exercice à votre séance.</p>
         </div>
       ) : (
-        workout.exercises.map(ex => (
-          <ExerciseItem 
-            key={ex.id} 
-            exercise={ex} 
-            onUpdate={onUpdateExercise}
-            onRemove={onRemoveExercise}
-          />
-        ))
+        <div className="space-y-6">
+          {groupedWorkoutExercises.map(([groupName, exercises]) => (
+            <div key={groupName}>
+              <h3 className="text-lg font-semibold uppercase text-accent-yellow tracking-wider mb-3">{groupName}</h3>
+              <div className="space-y-4">
+                {exercises.map(ex => (
+                  <ExerciseItem 
+                    key={ex.id} 
+                    exercise={ex} 
+                    onUpdate={onUpdateExercise}
+                    onRemove={onRemoveExercise}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       <AddExerciseDialog onAddExercise={onAddExercise} />

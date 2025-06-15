@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import {
   Dialog,
@@ -17,11 +16,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { groupedExercises as baseGroupedExercises } from "@/data/exercises";
 import { PlusCircle, Star } from "lucide-react";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
 import { useFavoriteExercises } from "@/hooks/useFavoriteExercises";
 import useCustomExercises from "@/hooks/useCustomExercises";
+import { useExerciseDatabase } from "@/hooks/useExerciseDatabase";
 import { AddCustomExerciseDialog } from "./AddCustomExerciseDialog";
 import { toast } from "sonner";
 
@@ -33,24 +32,8 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
   const [open, setOpen] = useState(false);
   const { workouts } = useWorkoutHistory();
   const { isFavorite, toggleFavorite } = useFavoriteExercises();
-  const { customExercises, addCustomExercise } = useCustomExercises();
-
-  const groupedExercises = useMemo(() => {
-    const allExercises = JSON.parse(JSON.stringify(baseGroupedExercises));
-
-    customExercises.forEach(customEx => {
-      let group = allExercises.find((g: { group: string; }) => g.group === customEx.group);
-      if (!group) {
-        group = { group: customEx.group, exercises: [] };
-        allExercises.push(group);
-      }
-      if (!group.exercises.some((ex: { name: string; }) => ex.name.toLowerCase() === customEx.name.toLowerCase())) {
-        group.exercises.push({ id: customEx.id, name: customEx.name });
-      }
-    });
-
-    return allExercises;
-  }, [customExercises]);
+  const { addCustomExercise } = useCustomExercises();
+  const { allGroupedExercises: groupedExercises } = useExerciseDatabase();
 
   const exerciseFrequencies = useMemo(() => {
     const frequencies = new Map<string, number>();

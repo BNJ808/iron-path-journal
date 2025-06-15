@@ -1,6 +1,16 @@
 
 import { nanoid } from "nanoid";
 
+const slugify = (str: string) =>
+  str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 export const EXERCISES_DATABASE = {
   Pectoraux: {
     base: ['Développé couché avec barre', 'Développé couché avec haltères', 'Développé incliné avec haltères', 'Dips'],
@@ -45,7 +55,7 @@ export const groupedExercises: ExerciseGroup[] = Object.entries(EXERCISES_DATABA
     group,
     exercises: Object.values(types)
       .flat()
-      .map(name => ({ id: nanoid(), name: name }))
+      .map(name => ({ id: slugify(name), name: name }))
       .sort((a, b) => a.name.localeCompare(b.name)),
   }));
 
