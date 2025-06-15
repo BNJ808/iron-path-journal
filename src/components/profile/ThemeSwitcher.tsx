@@ -29,6 +29,7 @@ export function ThemeSwitcher() {
                 {themes.map((t) => (
                 <SelectItem key={t.value} value={t.value}>
                     <div className="flex items-center gap-2">
+                        <div className={`w-4 h-4 rounded-full ${t.colorClass}`} />
                         {t.name}
                     </div>
                 </SelectItem>

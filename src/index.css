@@ -27,7 +27,10 @@
     --accent-blue: 217 91% 60%; /* blue-500 from image */
     --accent-purple: 262 83% 58%; /* violet-500 from image */
     --accent-yellow: 48 96% 50%; /* amber-400 */
-    --accent-green: 142.1 50% 55%; /* Softer green */
+    --accent-green: 142 76% 36%; /* Aligned with green theme */
+    --accent-orange: 25 95% 53%;
+    --accent-red: 0 84% 60%;
+    --accent-rose: 340 82% 57%;
     
     /* Default theme (violet) */
     --primary: 262 83% 58%;
@@ -35,6 +38,7 @@
     --ring: 262 83% 58%;
   }
 
+  /* ... keep existing code (theme color classes) */
   .violet {
     --primary: 262 83% 58%;
     --primary-foreground: 210 40% 98%;
@@ -79,6 +83,7 @@
 }
 
 @layer base {
+  /* ... keep existing code (base styles) */
   * {
     @apply border-border;
   }
