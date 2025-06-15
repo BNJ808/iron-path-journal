@@ -1,4 +1,5 @@
 
+```tsx
 import { useMemo } from 'react';
 import type { Workout, ExerciseLog } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -56,6 +57,14 @@ export const WorkoutInProgress = ({
     return Object.entries(groups).sort(([groupA], [groupB]) => groupA.localeCompare(groupB));
   }, [workout.exercises, getGroupForExercise]);
 
+  const hasUncompletedSets = useMemo(() => {
+    if (!workout || !workout.exercises) return false;
+    // Une série non complétée a des données mais n'est pas marquée comme terminée.
+    return workout.exercises.some(ex =>
+      ex.sets.some(s => !s.completed && (String(s.reps).trim() || String(s.weight).trim()))
+    );
+  }, [workout]);
+
   return (
     <div className="space-y-4">
       {workout.exercises.length === 0 ? (
@@ -110,10 +119,36 @@ export const WorkoutInProgress = ({
                   Enregistrer en modèle
               </Button>
           </SaveTemplateDialog>
-          <Button onClick={onFinishWorkout} disabled={workout.exercises.length === 0} className="w-full">
-              <Save className="mr-2 h-4 w-4" />
-              Terminer et Sauvegarder
-          </Button>
+          
+          {hasUncompletedSets ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button disabled={workout.exercises.length === 0} className="w-full">
+                  <Save className="mr-2 h-4 w-4" />
+                  Terminer et Sauvegarder
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Terminer l'entraînement ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Une ou plusieurs séries n'ont pas été marquées comme faites. Elles n'influenceront pas vos records ou statistiques. Voulez-vous continuer ?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Retour</AlertDialogCancel>
+                  <AlertDialogAction onClick={onFinishWorkout}>
+                    Oui, terminer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button onClick={onFinishWorkout} disabled={workout.exercises.length === 0} className="w-full">
+                <Save className="mr-2 h-4 w-4" />
+                Terminer et Sauvegarder
+            </Button>
+          )}
       </div>
       
       <div className="mt-8 text-center">
@@ -142,3 +177,4 @@ export const WorkoutInProgress = ({
     </div>
   );
 };
+```
