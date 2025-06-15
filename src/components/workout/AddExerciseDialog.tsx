@@ -29,7 +29,7 @@ interface AddExerciseDialogProps {
 export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => {
   const [open, setOpen] = useState(false);
   const { workouts } = useWorkoutHistory();
-  const { isFavorite } = useFavoriteExercises();
+  const { isFavorite, toggleFavorite } = useFavoriteExercises();
 
   const exerciseFrequencies = useMemo(() => {
     const frequencies = new Map<string, number>();
@@ -98,9 +98,16 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
                   >
                     <div className="flex items-center justify-between w-full">
                       <span>{exercise.name}</span>
-                      {isFavorite(exercise.id) && (
-                        <Star className="h-4 w-4 text-accent-yellow fill-accent-yellow ml-2 flex-shrink-0" />
-                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(exercise.id);
+                        }}
+                        className="p-1 -m-1 rounded-full hover:bg-accent"
+                        aria-label={isFavorite(exercise.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                      >
+                        <Star className={`h-4 w-4 text-accent-yellow transition-colors ${isFavorite(exercise.id) ? 'fill-accent-yellow' : 'fill-transparent'}`} />
+                      </button>
                     </div>
                   </CommandItem>
                 ))}
