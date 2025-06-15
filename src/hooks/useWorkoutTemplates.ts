@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ExerciseLog } from '@/types';
 import { toast } from 'sonner';
 
+export type { ExerciseLog };
+
 export interface WorkoutTemplate {
     id: string;
     user_id: string;

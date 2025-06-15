@@ -1,8 +1,8 @@
 
 import { Button } from '@/components/ui/button';
 import { List, Pencil, Trash2 } from 'lucide-react';
-import type { WorkoutTemplate } from '@/hooks/useWorkoutTemplates';
-import { RenameTemplateDialog } from './RenameTemplateDialog';
+import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
+import { EditTemplateDialog } from './EditTemplateDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ interface StartWorkoutProps {
   onStartFromTemplate: (template: WorkoutTemplate) => void;
   templates: WorkoutTemplate[];
   isLoadingTemplates: boolean;
-  onUpdateTemplate: (id: string, name: string) => void;
+  onUpdateTemplate: (id: string, name: string, exercises: ExerciseLog[]) => void;
   onDeleteTemplate: (id: string) => void;
 }
 
@@ -51,11 +51,11 @@ export const StartWorkout = ({ onStartWorkout, onStartFromTemplate, templates, i
                 >
                   {template.name}
                 </Button>
-                <RenameTemplateDialog template={template} onRename={onUpdateTemplate}>
-                  <Button variant="ghost" size="icon" aria-label="Renommer le modèle">
+                <EditTemplateDialog template={template} onUpdate={onUpdateTemplate}>
+                  <Button variant="ghost" size="icon" aria-label="Modifier le modèle">
                     <Pencil className="h-4 w-4" />
                   </Button>
-                </RenameTemplateDialog>
+                </EditTemplateDialog>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/90" aria-label="Supprimer le modèle">

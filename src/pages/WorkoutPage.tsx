@@ -1,5 +1,4 @@
-
-import { useWorkouts } from '@/hooks/useWorkouts';
+import { useWorkouts, type ExerciseLog } from '@/hooks/useWorkouts';
 import { useWorkoutTemplates } from '@/hooks/useWorkoutTemplates';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
@@ -22,8 +21,8 @@ const WorkoutPage = () => {
     handleStartFromTemplate,
   } = useWorkoutActions();
 
-  const handleUpdateTemplate = async (id: string, name: string) => {
-    await updateTemplate({ id, name });
+  const handleUpdateTemplate = async (id: string, name: string, exercises: ExerciseLog[]) => {
+    await updateTemplate({ id, name, exercises });
   };
 
   if (isLoadingWorkout) {
