@@ -1,3 +1,4 @@
+
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -86,7 +87,7 @@ const ProfilePage = () => {
                 <User className="h-6 w-6 text-gray-100" />
                 <h1 className="text-2xl font-bold text-gray-100">Profil</h1>
             </div>
-            <div className="space-y-6 bg-gray-800/50 p-4 sm:p-6 rounded-lg">
+            <div className="space-y-6 app-card p-4 sm:p-6">
                 <div className="flex flex-col items-center space-y-4">
                     <AvatarUploader
                         avatarUrl={profile?.avatar_url}
@@ -128,15 +129,15 @@ const ProfilePage = () => {
                     </form>
                 </Form>
                 
-                <div className="border-t border-gray-700"></div>
+                <div className="border-t border-border"></div>
 
                 <ThemeSwitcher />
 
-                <div className="border-t border-gray-700"></div>
+                <div className="border-t border-border"></div>
 
                 <WeightTracker />
                 
-                <div className="border-t border-gray-700"></div>
+                <div className="border-t border-border"></div>
 
 
                 <Button onClick={handleLogout} variant="destructive" className="w-full">
