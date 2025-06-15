@@ -2,19 +2,26 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Settings, Palette } from 'lucide-react';
+import { LogOut, User, Settings } from 'lucide-react';
 import { AvatarUploader } from '@/components/AvatarUploader';
 import { useProfile } from '@/hooks/useProfile';
 import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
 import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
 import { WeightTracker } from '@/components/profile/WeightTracker';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProfilePage = () => {
-  const { user, signOut } = useAuth();
-  const { profile, isLoading } = useProfile();
+  const { user } = useAuth();
+  const { profile, isLoading, updateProfile } = useProfile();
 
   const handleSignOut = async () => {
-    await signOut();
+    await supabase.auth.signOut();
+  };
+
+  const handleAvatarUpload = async (newAvatarUrl: string) => {
+    if (updateProfile && profile) {
+      await updateProfile({ ...profile, avatar_url: newAvatarUrl });
+    }
   };
 
   if (isLoading) {
@@ -44,10 +51,14 @@ const ProfilePage = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col items-center space-y-4">
-              <AvatarUploader />
+              <AvatarUploader
+                avatarUrl={profile?.avatar_url}
+                username={profile?.username}
+                onUpload={handleAvatarUpload}
+              />
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-foreground">
-                  {profile?.full_name || 'Nom non défini'}
+                  {profile?.username || 'Nom d\'utilisateur non défini'}
                 </h3>
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>

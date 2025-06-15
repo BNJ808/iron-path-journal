@@ -23,14 +23,14 @@
     --input: 222 28% 28%; /* slate-700 */
     --radius: 0.5rem;
     
-    /* Custom accent colors - versions modérément pastel */
-    --accent-blue: 217 55% 65%; /* bleu modérément pastel */
-    --accent-purple: 262 45% 70%; /* violet modérément pastel */
-    --accent-yellow: 48 60% 70%; /* jaune modérément pastel */
-    --accent-green: 142 40% 65%; /* vert modérément pastel */
-    --accent-orange: 25 60% 70%; /* orange modérément pastel */
-    --accent-red: 0 45% 70%; /* rouge modérément pastel */
-    --accent-rose: 340 50% 70%; /* rose modérément pastel */
+    /* Custom accent colors - versions plus vives et contrastées */
+    --accent-blue: 217 80% 60%; /* bleu plus vif */
+    --accent-purple: 262 70% 65%; /* violet plus vif */
+    --accent-yellow: 48 90% 60%; /* jaune plus vif */
+    --accent-green: 142 70% 55%; /* vert plus vif */
+    --accent-orange: 25 90% 60%; /* orange plus vif */
+    --accent-red: 0 80% 60%; /* rouge plus vif */
+    --accent-rose: 340 80% 65%; /* rose plus vif */
     
     /* Softness control variable */
     --color-softness: 0; /* 0 = couleurs normales, 100 = ultra pastel */
