@@ -16,7 +16,7 @@ interface MuscleGroupRadarChartProps {
 const chartConfig = {
     sets: {
       label: "Séries",
-      color: "hsl(var(--chart-1))",
+      color: "hsl(var(--foreground))",
     },
 };
 
@@ -71,7 +71,7 @@ export const MuscleGroupRadarChart = ({ data, maxSets, timePeriod, onTimePeriodC
                         <Radar
                             dataKey="sets"
                             fill="var(--color-sets)"
-                            fillOpacity={0.6}
+                            fillOpacity={0.4}
                             stroke="var(--color-sets)"
                         />
                     </RechartsRadarChart>
