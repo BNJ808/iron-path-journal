@@ -9,28 +9,12 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 const Layout = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isTimerOpen, setIsTimerOpen] = useState(false);
-  const [lastPath, setLastPath] = useState('/workout');
 
-  // Mettre à jour le dernier chemin seulement si ce n'est pas /timer
-  useEffect(() => {
-    if (location.pathname !== '/timer') {
-      setLastPath(location.pathname);
-    }
-  }, [location.pathname]);
+  const handleTimerClick = () => {
+    setIsTimerOpen(true);
+  };
 
-  // Intercepter immédiatement la navigation vers /timer
-  useEffect(() => {
-    if (location.pathname === '/timer') {
-      // Ouvrir le dialog immédiatement
-      setIsTimerOpen(true);
-      // Rediriger immédiatement vers la dernière page pour éviter l'affichage de TimerPage
-      navigate(lastPath, { replace: true });
-    }
-  }, [location.pathname, navigate, lastPath]);
-
-  // Gérer l'ouverture/fermeture du timer
   const handleTimerOpenChange = (open: boolean) => {
     setIsTimerOpen(open);
   };
@@ -55,7 +39,7 @@ const Layout = () => {
         <main className="flex-grow pb-20 transition-opacity duration-200">
           <Outlet />
         </main>
-        <BottomNav />
+        <BottomNav onTimerClick={handleTimerClick} />
         <TimerDialog open={isTimerOpen} onOpenChange={handleTimerOpenChange} />
       </div>
     </TooltipProvider>
