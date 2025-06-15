@@ -5,6 +5,7 @@ import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
 import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
 import { useWorkoutActions } from '@/hooks/useWorkoutActions';
+import { Dumbbell } from 'lucide-react';
 
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout } = useWorkouts();
@@ -28,7 +29,10 @@ const WorkoutPage = () => {
   
   return (
     <div className="p-4 space-y-4 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-100">Entraînement du jour</h1>
+      <div className="flex items-center gap-2">
+        <Dumbbell className="h-6 w-6 text-accent-blue" />
+        <h1 className="text-2xl font-bold text-gray-100">Entraînement du jour</h1>
+      </div>
       
       {todayWorkout ? (
         <WorkoutInProgress

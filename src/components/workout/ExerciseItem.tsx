@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,13 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
   };
 
   const addSet = () => {
-    const newSet: ExerciseSet = { id: nanoid(), reps: '', weight: '', completed: false };
+    const firstSet = exercise.sets.length > 0 ? exercise.sets[0] : null;
+    const newSet: ExerciseSet = {
+      id: nanoid(),
+      reps: firstSet ? firstSet.reps : '',
+      weight: firstSet ? firstSet.weight : '',
+      completed: false,
+    };
     onUpdate({ ...exercise, sets: [...exercise.sets, newSet] });
   };
 
