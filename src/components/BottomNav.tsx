@@ -19,7 +19,7 @@ const BottomNav = ({ onTimerClick }: BottomNavProps) => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700 flex items-center justify-evenly">
-      {navItems.map((item) => (
+      {navItems.slice(0, 3).map((item) => (
         <NavLink
           key={item.path}
           to={item.path}
@@ -44,6 +44,21 @@ const BottomNav = ({ onTimerClick }: BottomNavProps) => {
         <Timer className="h-6 w-6" />
         <span className="text-xs mt-1">Timer</span>
       </button>
+
+      {/* Bouton Profil en dernier */}
+      <NavLink
+        to="/profile"
+        className={({ isActive }) =>
+          cn(
+            'flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors h-full',
+            isActive && 'text-gray-100',
+            isActive && 'font-bold'
+          )
+        }
+      >
+        <User className="h-6 w-6" />
+        <span className="text-xs mt-1">Profil</span>
+      </NavLink>
     </nav>
   );
 };
