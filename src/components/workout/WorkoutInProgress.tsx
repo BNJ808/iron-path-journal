@@ -1,4 +1,3 @@
-
 import type { Workout, ExerciseLog } from '@/types';
 import { Button } from '@/components/ui/button';
 import { AddExerciseDialog } from '@/components/workout/AddExerciseDialog';
@@ -84,7 +83,7 @@ export const WorkoutInProgress = ({
                   Enregistrer en modèle
               </Button>
           </SaveTemplateDialog>
-          <Button onClick={onFinishWorkout} disabled={workout.exercises.length === 0} className="w-full bg-accent-blue hover:bg-accent-blue/90">
+          <Button onClick={onFinishWorkout} disabled={workout.exercises.length === 0} className="w-full">
               <Save className="mr-2 h-4 w-4" />
               Terminer et Sauvegarder
           </Button>
