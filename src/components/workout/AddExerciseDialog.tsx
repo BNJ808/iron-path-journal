@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import {
   Dialog,
@@ -23,6 +24,7 @@ import useCustomExercises from "@/hooks/useCustomExercises";
 import { useExerciseDatabase } from "@/hooks/useExerciseDatabase";
 import { AddCustomExerciseDialog } from "./AddCustomExerciseDialog";
 import { toast } from "sonner";
+import { MUSCLE_GROUP_COLORS } from "@/data/exercises";
 
 interface AddExerciseDialogProps {
   onAddExercise: (exercise: { id: string; name: string }) => void;
@@ -109,7 +111,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
             <CommandEmpty>Aucun exercice trouvé.</CommandEmpty>
             {sortedGroupedExercises.map((group) => (
               <CommandGroup key={group.group}>
-                <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-yellow">{group.group}</div>
+                <div className={`px-2 py-1.5 text-xs font-semibold uppercase tracking-wider ${MUSCLE_GROUP_COLORS[group.group] || 'text-accent-yellow'}`}>{group.group}</div>
                 {group.exercises.map((exercise) => (
                   <CommandItem
                     key={exercise.id}

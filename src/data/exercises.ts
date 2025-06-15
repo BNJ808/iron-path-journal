@@ -44,6 +44,16 @@ export const EXERCISES_DATABASE = {
   },
 };
 
+export const MUSCLE_GROUP_COLORS: Record<string, string> = {
+  'Pectoraux': 'text-red-400',
+  'Dorsaux': 'text-blue-400',
+  'Épaules': 'text-purple-400',
+  'Jambes': 'text-orange-400',
+  'Biceps': 'text-pink-400',
+  'Triceps': 'text-teal-400',
+  'Autres': 'text-gray-400',
+};
+
 type Exercise = { id: string; name: string };
 export type ExerciseGroup = {
     group: string;

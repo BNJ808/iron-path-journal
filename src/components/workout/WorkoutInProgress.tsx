@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from '@/components/ui/textarea';
 import { useExerciseDatabase } from '@/hooks/useExerciseDatabase';
+import { MUSCLE_GROUP_COLORS } from '@/data/exercises';
 
 interface WorkoutInProgressProps {
   workout: Workout;
@@ -65,7 +66,7 @@ export const WorkoutInProgress = ({
         <div className="space-y-6">
           {groupedWorkoutExercises.map(([groupName, exercises]) => (
             <div key={groupName}>
-              <h3 className="text-lg font-semibold uppercase text-accent-yellow tracking-wider mb-3">{groupName}</h3>
+              <h3 className={`text-lg font-semibold uppercase tracking-wider mb-3 ${MUSCLE_GROUP_COLORS[groupName] || 'text-accent-yellow'}`}>{groupName}</h3>
               <div className="space-y-4">
                 {exercises.map(ex => (
                   <ExerciseItem 
