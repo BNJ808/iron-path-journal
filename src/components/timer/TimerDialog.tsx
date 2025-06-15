@@ -16,7 +16,7 @@ interface TimerDialogProps {
 export const TimerDialog = ({ open, onOpenChange }: TimerDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] animate-in fade-in-0 zoom-in-95 duration-200">
         <DialogHeader>
           <DialogTitle>Minuteur</DialogTitle>
           <DialogDescription>Réglez votre temps de repos.</DialogDescription>
