@@ -16,7 +16,7 @@ interface MuscleGroupRadarChartProps {
 const chartConfig = {
     sets: {
       label: "Séries",
-      color: "hsl(var(--primary-foreground))",
+      color: "hsl(48, 96%, 51%)",
     },
 };
 
