@@ -1,3 +1,4 @@
+
 import { useWorkouts, type ExerciseLog } from '@/hooks/useWorkouts';
 import { useWorkoutTemplates } from '@/hooks/useWorkoutTemplates';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
@@ -8,7 +9,7 @@ import { Dumbbell } from 'lucide-react';
 
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout } = useWorkouts();
-  const { templates, isLoadingTemplates, updateTemplate, deleteTemplate } = useWorkoutTemplates();
+  const { templates, isLoadingTemplates, updateTemplate, deleteTemplate, createTemplate } = useWorkoutTemplates();
   const {
     handleStartWorkout,
     handleAddExercise,
@@ -55,6 +56,7 @@ const WorkoutPage = () => {
           isLoadingTemplates={isLoadingTemplates}
           onUpdateTemplate={handleUpdateTemplate}
           onDeleteTemplate={deleteTemplate}
+          onCreateTemplate={createTemplate}
         />
       )}
     </div>

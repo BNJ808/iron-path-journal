@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,9 +48,13 @@ export const useWorkoutTemplates = () => {
             if (error) throw new Error(error.message);
             return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] };
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['workout_templates', userId] });
+            toast.success(`Modèle "${data.name}" créé !`);
         },
+        onError: (error: any) => {
+            toast.error(`Erreur lors de la création du modèle: ${error.message}`);
+        }
     });
 
     const updateTemplateMutation = useMutation({
