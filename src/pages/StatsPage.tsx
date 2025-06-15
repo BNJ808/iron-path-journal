@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, LineChart, Line, Legend, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import StatCard from '@/components/StatCard';
-import { Dumbbell, Repeat, TrendingUp, BarChart as BarChartIcon, Trophy, LineChart as LineChartIcon } from 'lucide-react';
+import { Dumbbell, Repeat, TrendingUp, BarChart3, BarChart as BarChartIcon, Trophy, LineChart as LineChartIcon } from 'lucide-react';
 import { useMemo, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -158,7 +158,10 @@ const StatsPage = () => {
     
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold text-accent-purple">Statistiques</h1>
+            <div className="flex items-center gap-2">
+                <BarChart3 className="h-6 w-6 text-accent-purple" />
+                <h1 className="text-2xl font-bold text-foreground">Statistiques</h1>
+            </div>
             <p className="text-gray-400 mt-2 mb-6">Visualisez vos progrès et vos performances.</p>
 
             {workouts.length === 0 ? (
