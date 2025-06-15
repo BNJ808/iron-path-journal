@@ -1,152 +1,106 @@
 
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { LogOut, Save, User } from 'lucide-react';
-import { useProfile } from '@/hooks/useProfile';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useEffect } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LogOut, User, Settings } from 'lucide-react';
 import { AvatarUploader } from '@/components/AvatarUploader';
-import { WeightTracker } from '@/components/profile/WeightTracker';
+import { useProfile } from '@/hooks/useProfile';
 import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
-
-const profileFormSchema = z.object({
-    username: z.string()
-        .min(3, { message: "Le nom d'utilisateur doit faire au moins 3 caractères." })
-        .max(50, { message: "Le nom d'utilisateur ne doit pas dépasser 50 caractères." })
-        .regex(/^[a-zA-Z0-9_]+$/, { message: "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des underscores." }),
-});
-
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
-
+import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
+import { WeightTracker } from '@/components/profile/WeightTracker';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProfilePage = () => {
-    const { user } = useAuth();
-    const navigate = useNavigate();
-    const { profile, isLoading: isLoadingProfile, updateProfile, uploadAvatar } = useProfile();
+  const { user } = useAuth();
+  const { profile, isLoading, updateProfile } = useProfile();
 
-    const form = useForm<ProfileFormValues>({
-        resolver: zodResolver(profileFormSchema),
-        defaultValues: {
-            username: '',
-        },
-        mode: 'onChange',
-    });
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
-    useEffect(() => {
-        if (profile?.username) {
-            form.reset({ username: profile.username });
-        }
-    }, [profile, form]);
+  const handleAvatarUpload = async (newAvatarUrl: string) => {
+    if (updateProfile && profile) {
+      await updateProfile({ ...profile, avatar_url: newAvatarUrl });
+    }
+  };
 
-
-    const handleLogout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            toast.error(error.message);
-        } else {
-            toast.success('Vous avez été déconnecté.');
-            navigate('/auth');
-        }
-    };
-    
-    const onSubmit = async (values: ProfileFormValues) => {
-        if (!user || !profile) return;
-
-        try {
-            await updateProfile({ id: user.id, username: values.username });
-            toast.success("Profil mis à jour !");
-            form.reset({ username: values.username });
-        } catch (error: any) {
-            if (error.message.includes('profiles_username_key')) {
-                 form.setError('username', { type: 'manual', message: "Ce nom d'utilisateur est déjà pris." });
-            } else {
-                toast.error("Erreur lors de la mise à jour du profil: " + error.message);
-            }
-        }
-    };
-
-    const handleAvatarUpload = async (file: File) => {
-        if (!uploadAvatar) return;
-        return uploadAvatar(file);
-    };
-
-
-    const isLoading = !user || isLoadingProfile;
-
+  if (isLoading) {
     return (
-        <div className="p-2 sm:p-4 max-w-md mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-                <User className="h-6 w-6 text-gray-100" />
-                <h1 className="text-2xl font-bold text-gray-100">Profil</h1>
-            </div>
-            <div className="space-y-6 app-card p-4 sm:p-6">
-                <div className="flex flex-col items-center space-y-4">
-                    <AvatarUploader
-                        avatarUrl={profile?.avatar_url}
-                        username={profile?.username}
-                        onUpload={handleAvatarUpload}
-                        isLoading={isLoading}
-                    />
-                    <div className="text-center">
-                        {isLoading ? (
-                            <Skeleton className="h-6 w-40" />
-                        ) : (
-                            <>
-                                <p className="text-sm text-gray-400">Email</p>
-                                <p className="font-semibold text-lg">{user.email}</p>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="username"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nom d'utilisateur</FormLabel>
-                                    <FormControl>
-                                        {isLoading ? <Skeleton className="h-10 w-full" /> : <Input placeholder="Votre nom d'utilisateur" {...field} />}
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" disabled={isLoading || form.formState.isSubmitting || !form.formState.isDirty} className="w-full">
-                            <Save />
-                            Enregistrer
-                        </Button>
-                    </form>
-                </Form>
-                
-                <div className="border-t border-border"></div>
-
-                <ThemeSwitcher />
-
-                <div className="border-t border-border"></div>
-
-                <WeightTracker />
-                
-                <div className="border-t border-border"></div>
-
-
-                <Button onClick={handleLogout} variant="destructive" className="w-full">
-                    <LogOut />
-                    Déconnexion
-                </Button>
-            </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Chargement du profil...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-4 space-y-6">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Mon Profil</h1>
+          <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
+        </div>
+
+        {/* Profile Info Card */}
+        <Card className="app-card mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Informations personnelles
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex flex-col items-center space-y-4">
+              <AvatarUploader
+                avatarUrl={profile?.avatar_url}
+                username={profile?.username}
+                onUpload={handleAvatarUpload}
+              />
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-foreground">
+                  {profile?.username || 'Nom d\'utilisateur non défini'}
+                </h3>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Theme Settings Card */}
+        <Card className="app-card mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Paramètres d'apparence
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ThemeSwitcher />
+            <ColorSoftnessSlider />
+          </CardContent>
+        </Card>
+
+        {/* Weight Tracker Card */}
+        <Card className="app-card mb-6">
+          <CardContent className="p-6">
+            <WeightTracker />
+          </CardContent>
+        </Card>
+
+        {/* Sign Out Button */}
+        <div className="flex justify-center">
+          <Button 
+            onClick={handleSignOut}
+            variant="destructive"
+            className="flex items-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Se déconnecter
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProfilePage;
