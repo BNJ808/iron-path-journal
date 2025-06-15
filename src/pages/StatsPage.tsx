@@ -1,8 +1,7 @@
-
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Move } from 'lucide-react';
 import { useMemo, useState, useRef } from 'react';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -17,6 +16,7 @@ import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart'
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { DateRange } from 'react-day-picker';
 import { SortableCardItem } from '@/components/stats/SortableCardItem';
+import { Toggle } from '@/components/ui/toggle';
 
 interface PersonalRecord {
     weight: number;
@@ -32,6 +32,7 @@ const StatsPage = () => {
         from: subDays(new Date(), 29),
         to: new Date(),
     });
+    const [isDndEnabled, setIsDndEnabled] = useState(false);
 
     const defaultCardOrder = useMemo(() => ['stats', 'volume', 'muscle', 'progress', 'ai', 'records'], []);
 
@@ -310,9 +311,19 @@ const StatsPage = () => {
     
     return (
         <div className="p-4">
-            <div className="flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 text-accent-purple" />
-                <h1 className="text-2xl font-bold text-foreground">Statistiques</h1>
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <BarChart3 className="h-6 w-6 text-accent-purple" />
+                    <h1 className="text-2xl font-bold text-foreground">Statistiques</h1>
+                </div>
+                <Toggle
+                    pressed={isDndEnabled}
+                    onPressedChange={setIsDndEnabled}
+                    aria-label="Activer/désactiver la réorganisation"
+                    title="Réorganiser les cartes"
+                >
+                    <Move className="h-4 w-4" />
+                </Toggle>
             </div>
             <p className="text-gray-400 mt-2 mb-6">Visualisez vos progrès et vos performances.</p>
 
@@ -334,7 +345,7 @@ const StatsPage = () => {
                     <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
                         <div className="space-y-6">
                             {cardOrder.map((id) => (
-                                <SortableCardItem key={id} id={id}>
+                                <SortableCardItem key={id} id={id} isDndEnabled={isDndEnabled}>
                                     {cardComponents[id]}
                                 </SortableCardItem>
                             ))}
