@@ -291,7 +291,7 @@ const StatsPage = () => {
 
     if (isLoading) {
         return (
-            <div className="p-4 space-y-6">
+            <div className="p-2 sm:p-4 space-y-6">
                 <div className="flex justify-between items-center">
                     <Skeleton className="h-8 w-48" />
                 </div>
@@ -311,7 +311,7 @@ const StatsPage = () => {
     }
     
     return (
-        <div className="p-4">
+        <div className="p-2 sm:p-4">
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     <BarChart3 className="h-6 w-6 text-accent-purple" />

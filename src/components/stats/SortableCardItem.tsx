@@ -33,7 +33,7 @@ export function SortableCardItem({ id, children, isDndEnabled }: SortableCardIte
       {isDndEnabled && (
         <div
           {...listeners}
-          className="absolute top-3 right-3 cursor-grab active:cursor-grabbing p-1 z-20"
+          className="absolute top-3 right-3 cursor-grab active:cursor-grabbing p-2 z-20"
           aria-label="Glisser pour réorganiser"
           title="Glisser pour réorganiser"
         >

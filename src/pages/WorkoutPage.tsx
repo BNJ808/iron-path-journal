@@ -31,7 +31,7 @@ const WorkoutPage = () => {
   }
   
   return (
-    <div className="p-4 space-y-4 max-w-2xl mx-auto">
+    <div className="p-2 sm:p-4 space-y-4 max-w-2xl mx-auto">
       <div className="flex items-center gap-2">
         <Dumbbell className="h-6 w-6 text-accent-blue" />
         <h1 className="text-2xl font-bold text-foreground">Entraînement du jour</h1>
