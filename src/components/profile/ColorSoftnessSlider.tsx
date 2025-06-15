@@ -1,6 +1,5 @@
 
 import * as React from "react"
-import { useTheme } from "next-themes"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Palette } from 'lucide-react'
@@ -12,30 +11,30 @@ export function ColorSoftnessSlider() {
     setSoftness(value)
     const softnessValue = value[0]
     
-    // Calculer les nouvelles valeurs HSL basées sur la douceur
+    // Base HSL values for vibrant themes
     const themes = {
-      violet: { h: 262, s: 45, l: 70 },
-      blue: { h: 217, s: 55, l: 65 },
-      green: { h: 142, s: 40, l: 65 },
-      yellow: { h: 48, s: 60, l: 70 },
-      orange: { h: 25, s: 60, l: 70 },
-      red: { h: 0, s: 45, l: 70 },
-      rose: { h: 340, s: 50, l: 70 }
+      violet: { h: 262, s: 70, l: 65 },
+      blue: { h: 217, s: 80, l: 60 },
+      green: { h: 142, s: 70, l: 55 },
+      yellow: { h: 48, s: 90, l: 60 },
+      orange: { h: 25, s: 90, l: 60 },
+      red: { h: 0, s: 80, l: 60 },
+      rose: { h: 340, s: 80, l: 65 }
     }
 
-    // Appliquer la douceur en réduisant la saturation et augmentant la luminosité
+    // Apply softness by reducing saturation and increasing lightness
     Object.entries(themes).forEach(([themeName, { h, s, l }]) => {
-      const adjustedS = Math.max(20, s - (softnessValue * 0.3))
-      const adjustedL = Math.min(85, l + (softnessValue * 0.15))
+      const adjustedS = Math.max(20, s - (softnessValue * (s / 150)))
+      const adjustedL = Math.min(90, l + (softnessValue * 0.20))
       
       document.documentElement.style.setProperty(
         `--accent-${themeName === 'violet' ? 'purple' : themeName}`,
         `${h} ${adjustedS}% ${adjustedL}%`
       )
       
-      // Mettre à jour les thèmes principaux aussi
+      // Update the main theme colors as well
       const themeElement = document.documentElement.classList.contains(themeName)
-      if (themeElement || themeName === 'violet') {
+      if (themeElement || (themeName === 'violet' && !document.body.className.split(' ').some(c => Object.keys(themes).includes(c)))) {
         document.documentElement.style.setProperty(
           '--primary',
           `${h} ${adjustedS}% ${adjustedL}%`
@@ -72,3 +71,4 @@ export function ColorSoftnessSlider() {
     </div>
   )
 }
+

@@ -18,9 +18,28 @@ const ProfilePage = () => {
     await supabase.auth.signOut();
   };
 
-  const handleAvatarUpload = async (newAvatarUrl: string) => {
-    if (updateProfile && profile) {
-      await updateProfile({ ...profile, avatar_url: newAvatarUrl });
+  const handleAvatarUpload = async (file: File) => {
+    if (!user || !profile || !updateProfile) return;
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      console.error("Error uploading avatar:", uploadError.message);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    if (data.publicUrl) {
+      await updateProfile({ ...profile, avatar_url: data.publicUrl });
     }
   };
 

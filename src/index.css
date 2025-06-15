@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,64 +23,61 @@
     --radius: 0.5rem;
     
     /* Custom accent colors - versions plus vives et contrastées */
-    --accent-blue: 217 80% 60%; /* bleu plus vif */
-    --accent-purple: 262 70% 65%; /* violet plus vif */
-    --accent-yellow: 48 90% 60%; /* jaune plus vif */
-    --accent-green: 142 70% 55%; /* vert plus vif */
-    --accent-orange: 25 90% 60%; /* orange plus vif */
-    --accent-red: 0 80% 60%; /* rouge plus vif */
-    --accent-rose: 340 80% 65%; /* rose plus vif */
+    --accent-blue: 217 80% 60%;
+    --accent-purple: 262 70% 65%;
+    --accent-yellow: 48 90% 60%;
+    --accent-green: 142 70% 55%;
+    --accent-orange: 25 90% 60%;
+    --accent-red: 0 80% 60%;
+    --accent-rose: 340 80% 65%;
     
-    /* Softness control variable */
-    --color-softness: 0; /* 0 = couleurs normales, 100 = ultra pastel */
-    
-    /* Default theme (violet modérément pastel) */
-    --primary: 262 45% 70%;
-    --primary-foreground: 262 60% 15%;
-    --ring: 262 45% 70%;
+    /* Default theme (violet vibrant) */
+    --primary: 262 70% 65%;
+    --primary-foreground: 262 70% 15%;
+    --ring: 262 70% 65%;
   }
 
-  /* Thèmes avec couleurs modérément pastels */
+  /* Thèmes avec couleurs vives */
   .violet {
-    --primary: 262 45% 70%; /* violet modérément pastel */
-    --primary-foreground: 262 60% 15%;
-    --ring: 262 45% 70%;
+    --primary: 262 70% 65%;
+    --primary-foreground: 262 70% 15%;
+    --ring: 262 70% 65%;
   }
 
   .blue {
-    --primary: 217 55% 65%; /* bleu modérément pastel */
-    --primary-foreground: 217 70% 15%;
-    --ring: 217 55% 65%;
+    --primary: 217 80% 60%;
+    --primary-foreground: 217 80% 15%;
+    --ring: 217 80% 60%;
   }
 
   .green {
-    --primary: 142 40% 65%; /* vert modérément pastel */
+    --primary: 142 70% 55%;
     --primary-foreground: 142 70% 15%;
-    --ring: 142 40% 65%;
+    --ring: 142 70% 55%;
   }
 
   .yellow {
-    --primary: 48 60% 70%; /* jaune modérément pastel */
-    --primary-foreground: 48 80% 10%;
-    --ring: 48 60% 70%;
+    --primary: 48 90% 60%;
+    --primary-foreground: 48 90% 10%;
+    --ring: 48 90% 60%;
   }
   
   .orange {
-    --primary: 25 60% 70%; /* orange modérément pastel */
-    --primary-foreground: 25 80% 13%;
-    --ring: 25 60% 70%;
+    --primary: 25 90% 60%;
+    --primary-foreground: 25 90% 13%;
+    --ring: 25 90% 60%;
   }
   
   .red {
-    --primary: 0 45% 70%; /* rouge modérément pastel */
-    --primary-foreground: 0 70% 15%;
-    --ring: 0 45% 70%;
+    --primary: 0 80% 60%;
+    --primary-foreground: 0 80% 15%;
+    --ring: 0 80% 60%;
   }
   
   .rose {
-    --primary: 340 50% 70%; /* rose modérément pastel */
-    --primary-foreground: 340 70% 15%;
-    --ring: 340 50% 70%;
+    --primary: 340 80% 65%;
+    --primary-foreground: 340 80% 15%;
+    --ring: 340 80% 65%;
   }
 }
 
