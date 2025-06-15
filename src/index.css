@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,50 +34,50 @@
     
     /* Default theme (violet vibrant) */
     --primary: 262 70% 65%;
-    --primary-foreground: 262 70% 15%;
+    --primary-foreground: 222 47% 11%;
     --ring: 262 70% 65%;
   }
 
   /* Thèmes avec couleurs vives */
   .violet {
     --primary: 262 70% 65%;
-    --primary-foreground: 262 70% 15%;
+    --primary-foreground: 222 47% 11%;
     --ring: 262 70% 65%;
   }
 
   .blue {
     --primary: 217 80% 60%;
-    --primary-foreground: 217 80% 15%;
+    --primary-foreground: 222 47% 11%;
     --ring: 217 80% 60%;
   }
 
   .green {
     --primary: 142 70% 55%;
-    --primary-foreground: 142 70% 15%;
+    --primary-foreground: 222 47% 11%;
     --ring: 142 70% 55%;
   }
 
   .yellow {
     --primary: 48 90% 60%;
-    --primary-foreground: 48 90% 10%;
+    --primary-foreground: 222 47% 11%;
     --ring: 48 90% 60%;
   }
   
   .orange {
     --primary: 25 90% 60%;
-    --primary-foreground: 25 90% 13%;
+    --primary-foreground: 222 47% 11%;
     --ring: 25 90% 60%;
   }
   
   .red {
     --primary: 0 80% 60%;
-    --primary-foreground: 0 80% 15%;
+    --primary-foreground: 222 47% 11%;
     --ring: 0 80% 60%;
   }
   
   .rose {
     --primary: 340 80% 65%;
-    --primary-foreground: 340 80% 15%;
+    --primary-foreground: 222 47% 11%;
     --ring: 340 80% 65%;
   }
 }

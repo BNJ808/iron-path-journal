@@ -18,7 +18,7 @@ export function ThemeSwitcher() {
   return (
     <div className="space-y-2">
         <Label htmlFor="theme-select" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
-            <Palette className="h-4 w-4 text-accent-purple" />
+            <Palette className="h-4 w-4 text-primary" />
             Thème de l'application
         </Label>
         <Select value={theme} onValueChange={setTheme}>

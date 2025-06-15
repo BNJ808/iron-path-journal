@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
@@ -50,7 +49,7 @@ export function ColorSoftnessSlider() {
   return (
     <div className="space-y-4">
       <Label htmlFor="color-softness" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
-        <Palette className="h-4 w-4 text-accent-purple" />
+        <Palette className="h-4 w-4 text-primary" />
         Douceur des couleurs
       </Label>
       <div className="space-y-2">
@@ -71,4 +70,3 @@ export function ColorSoftnessSlider() {
     </div>
   )
 }
-
