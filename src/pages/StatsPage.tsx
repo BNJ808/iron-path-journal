@@ -96,7 +96,7 @@ const StatsPage = () => {
                 }
             });
         });
-        return Array.from(exercisesMap, ([id, { name }]))
+        return Array.from(exercisesMap, ([id, { name }]) => ({ id, name }))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [workouts]);
 
