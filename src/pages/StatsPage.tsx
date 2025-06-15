@@ -109,6 +109,7 @@ const StatsPage = () => {
         workouts.forEach(workout => {
             workout.exercises.forEach(exercise => {
                 exercise.sets.forEach(set => {
+                    if (!set.completed) return;
                     const weight = Number(set.weight) || 0;
                     const reps = Number(set.reps) || 0;
                     const currentPR = personalRecords[exercise.name] || { weight: 0, reps: 0 };
@@ -136,10 +137,13 @@ const StatsPage = () => {
             .map(workout => {
                 const workoutVolume = workout.exercises.reduce((acc, exercise) => {
                     return acc + exercise.sets.reduce((setAcc, set) => {
-                        totalSets++;
-                        const weight = Number(set.weight) || 0;
-                        const reps = Number(set.reps) || 0;
-                        return setAcc + reps * weight;
+                        if (set.completed) {
+                            totalSets++;
+                            const weight = Number(set.weight) || 0;
+                            const reps = Number(set.reps) || 0;
+                            return setAcc + reps * weight;
+                        }
+                        return setAcc;
                     }, 0);
                 }, 0);
 
@@ -185,7 +189,7 @@ const StatsPage = () => {
             workout.exercises.forEach(exercise => {
                 const group = exerciseToGroupMap.get(exercise.name);
                 if (group && acc.hasOwnProperty(group)) {
-                    acc[group] += exercise.sets.length;
+                    acc[group] += exercise.sets.filter(s => s.completed).length;
                 }
             });
             return acc;
@@ -224,9 +228,9 @@ const StatsPage = () => {
                 if (exerciseLogs.length === 0) return null;
 
                 const volume = exerciseLogs.reduce((totalVol, log) => 
-                    totalVol + log.sets.reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0), 0);
+                    totalVol + log.sets.filter(s => s.completed).reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0), 0);
                 
-                const maxWeight = Math.max(0, ...exerciseLogs.flatMap(log => log.sets.map(set => Number(set.weight) || 0)));
+                const maxWeight = Math.max(0, ...exerciseLogs.flatMap(log => log.sets.filter(s => s.completed).map(set => Number(set.weight) || 0)));
 
                 return {
                     date: workout.date,
