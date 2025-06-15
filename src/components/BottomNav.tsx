@@ -13,7 +13,7 @@ const navItems = [
 
 const BottomNav = () => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700 flex items-center">
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 border-t border-gray-700 flex items-center px-2">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
