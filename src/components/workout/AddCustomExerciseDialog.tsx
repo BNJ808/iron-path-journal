@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,10 +47,14 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      // Initialize `group` to a value that TypeScript can accept via casting,
+      // but Zod will invalidate, forcing user selection.
+      group: '' as any,
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    // At this point, `values` is guaranteed by Zod to be valid.
     const newExercise = addCustomExercise(values);
     if(newExercise) {
         onExerciseCreated(newExercise);
