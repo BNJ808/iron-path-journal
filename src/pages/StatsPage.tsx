@@ -1,34 +1,19 @@
 
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import { BarChart3, Move } from 'lucide-react';
-import { useMemo, useState, useRef, useCallback } from 'react';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { StatCards } from '@/components/stats/StatCards';
-import { VolumeChart } from '@/components/stats/VolumeChart';
-import { ExerciseProgress } from '@/components/stats/ExerciseProgress';
-import { PersonalRecords } from '@/components/stats/PersonalRecords';
-import { useExerciseDatabase } from '@/hooks/useExerciseDatabase';
-import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
+import { useState, useRef, useCallback } from 'react';
+import { subDays } from 'date-fns';
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { DateRange } from 'react-day-picker';
-import { SortableCardItem } from '@/components/stats/SortableCardItem';
 import { Toggle } from '@/components/ui/toggle';
-import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
-import { calculateEstimated1RM } from '@/utils/calculations';
-
-interface PersonalRecord {
-    weight: number;
-    reps: number;
-}
+import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
+import { useStatsCalculations } from '@/hooks/useStatsCalculations';
+import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
+import { useExerciseProgress } from '@/hooks/useExerciseProgress';
 
 const StatsPage = () => {
     const { workouts, isLoading } = useWorkoutHistory();
-    const { allGroupedExercises } = useExerciseDatabase();
     const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
     const exerciseProgressCardRef = useRef<HTMLDivElement>(null);
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -37,7 +22,7 @@ const StatsPage = () => {
     });
     const [isDndEnabled, setIsDndEnabled] = useState(false);
 
-    const defaultCardOrder = useMemo(() => ['stats', 'oneRepMax', 'volume', 'muscle', 'progress', 'records', 'ai'], []);
+    const defaultCardOrder = ['stats', 'oneRepMax', 'volume', 'muscle', 'progress', 'records', 'ai'];
 
     const [cardOrder, setCardOrder] = useState<string[]>(() => {
         try {
@@ -58,316 +43,14 @@ const StatsPage = () => {
         return defaultCardOrder;
     });
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8, // Require 8px of movement before dragging starts
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-
-        if (over && active.id !== over.id) {
-            setCardOrder((items) => {
-                const oldIndex = items.indexOf(active.id as string);
-                const newIndex = items.indexOf(over.id as string);
-                if (oldIndex === -1 || newIndex === -1) return items;
-                const newOrder = arrayMove(items, oldIndex, newIndex);
-                try {
-                    localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
-                } catch (error) {
-                    console.error("Failed to save card order to localStorage", error);
-                }
-                return newOrder;
-            });
-        }
-    };
-
-    const filteredWorkouts = useMemo(() => {
-        if (!workouts) return [];
-        if (!dateRange?.from) return [];
-
-        const fromDate = startOfDay(dateRange.from);
-        const toDate = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
-        
-        return workouts.filter(w => {
-            const workoutDate = new Date(w.date);
-            return workoutDate >= fromDate && workoutDate <= toDate;
-        });
-    }, [workouts, dateRange]);
-
-    const stats = useMemo(() => {
-        if (!workouts) {
-            return {
-                totalWorkouts: 0,
-                totalVolume: 0,
-                totalSets: 0,
-                averageDuration: 0,
-                personalRecords: {},
-            };
-        }
-
-        const personalRecords: { [key: string]: PersonalRecord } = {};
-        workouts.forEach(workout => {
-            workout.exercises.forEach(exercise => {
-                exercise.sets.forEach(set => {
-                    if (!set.completed) return;
-                    const weight = Number(set.weight) || 0;
-                    const reps = Number(set.reps) || 0;
-                    const currentPR = personalRecords[exercise.name] || { weight: 0, reps: 0 };
-                    if (weight > currentPR.weight) {
-                        personalRecords[exercise.name] = { weight, reps };
-                    }
-                });
-            });
-        });
-
-        if (!filteredWorkouts || filteredWorkouts.length === 0) {
-            return {
-                totalWorkouts: 0,
-                totalVolume: 0,
-                totalSets: 0,
-                averageDuration: 0,
-                personalRecords: personalRecords,
-            };
-        }
-
-        let totalVolume = 0;
-        let totalSets = 0;
-        let totalDuration = 0;
-        let workoutsWithDuration = 0;
-
-        filteredWorkouts.forEach(workout => {
-            if (workout.ended_at && workout.date) {
-                const duration = new Date(workout.ended_at).getTime() - new Date(workout.date).getTime();
-                if (duration > 0) {
-                    totalDuration += duration;
-                    workoutsWithDuration++;
-                }
-            }
-
-            workout.exercises.forEach(exercise => {
-                exercise.sets.forEach(set => {
-                    if (set.completed) {
-                        totalSets++;
-                        const weight = Number(set.weight) || 0;
-                        const reps = Number(set.reps) || 0;
-                        totalVolume += reps * weight;
-                    }
-                });
-            });
-        });
-        
-        const averageDuration = workoutsWithDuration > 0 ? (totalDuration / workoutsWithDuration) / (1000 * 60) : 0; // in minutes
-
-        return {
-            totalWorkouts: filteredWorkouts.length,
-            totalVolume: Math.round(totalVolume),
-            totalSets,
-            averageDuration,
-            personalRecords,
-        };
-    }, [workouts, filteredWorkouts]);
-    
-    const exerciseToGroupMap = useMemo(() => {
-        const map = new Map<string, string>();
-        if (!allGroupedExercises) return map;
-        allGroupedExercises.forEach(group => {
-            group.exercises.forEach(ex => {
-                map.set(ex.name, group.group);
-            });
-        });
-        return map;
-    }, [allGroupedExercises]);
-    
-    const volumeByMuscleGroup = useMemo(() => {
-        if (!filteredWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
-            return [];
-        }
-
-        const initialVolumeByGroup = Object.fromEntries(
-            allGroupedExercises.map(groupData => [groupData.group, 0])
-        );
-
-        const volumeByGroup = filteredWorkouts.reduce((acc, workout) => {
-            workout.exercises.forEach(exercise => {
-                const group = exerciseToGroupMap.get(exercise.name);
-                if (group && acc.hasOwnProperty(group)) {
-                    const exerciseVolume = exercise.sets.reduce((vol, set) => {
-                        if (set.completed) {
-                            return vol + (Number(set.weight) || 0) * (Number(set.reps) || 0);
-                        }
-                        return vol;
-                    }, 0);
-                    acc[group] += exerciseVolume;
-                }
-            });
-            return acc;
-        }, { ...initialVolumeByGroup });
-
-        return Object.entries(volumeByGroup)
-            .map(([group, volume]) => ({ group, volume: Math.round(volume) }))
-            .sort((a, b) => b.volume - a.volume);
-
-    }, [filteredWorkouts, exerciseToGroupMap, allGroupedExercises]);
-
-    const muscleGroupStats = useMemo(() => {
-        if (!filteredWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
-            return { chartData: [], maxSets: 0 };
-        }
-
-        const initialSetsByGroup = Object.fromEntries(
-            allGroupedExercises.map(groupData => [groupData.group, 0])
-        );
-
-        const setsByGroup = filteredWorkouts.reduce((acc, workout) => {
-            workout.exercises.forEach(exercise => {
-                const group = exerciseToGroupMap.get(exercise.name);
-                if (group && acc.hasOwnProperty(group)) {
-                    acc[group] += exercise.sets.filter(s => s.completed).length;
-                }
-            });
-            return acc;
-        }, { ...initialSetsByGroup });
-
-        const chartData = Object.entries(setsByGroup).map(([group, sets]) => ({
-            subject: group,
-            sets,
-        }));
-        
-        const maxSets = Math.max(...chartData.map(d => d.sets));
-        
-        return { chartData, maxSets: Math.max(10, maxSets) };
-    }, [filteredWorkouts, exerciseToGroupMap, allGroupedExercises]);
-
-    const estimated1RMs = useMemo(() => {
-        if (!workouts) return [];
-
-        const records = new Map<string, number>();
-
-        workouts.forEach(workout => {
-            workout.exercises.forEach(exercise => {
-                exercise.sets.forEach(set => {
-                    if (set.completed) {
-                        const weight = Number(set.weight);
-                        const reps = Number(set.reps);
-                        if (weight > 0 && reps > 0) {
-                            const est1RM = calculateEstimated1RM(weight, reps);
-                            const currentMax = records.get(exercise.name) || 0;
-                            if (est1RM > currentMax) {
-                                records.set(exercise.name, est1RM);
-                            }
-                        }
-                    }
-                });
-            });
-        });
-
-        return Array.from(records.entries())
-            .map(([exerciseName, estimated1RM]) => ({ exerciseName, estimated1RM }))
-            .sort((a, b) => b.estimated1RM - a.estimated1RM);
-
-    }, [workouts]);
-
-    const uniqueExercises = useMemo(() => {
-        if (!workouts) return [];
-        const exercisesMap = new Map<string, { name: string }>();
-        workouts.forEach(workout => {
-            workout.exercises.forEach(exercise => {
-                if (!exercisesMap.has(exercise.name)) {
-                    exercisesMap.set(exercise.name, { name: exercise.name });
-                }
-            });
-        });
-        return Array.from(exercisesMap.values())
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [workouts]);
-
-    const selectedExerciseData = useMemo(() => {
-        if (!selectedExerciseName || !workouts) return null;
-
-        const history = workouts
-            .map(workout => {
-                const exerciseLogs = workout.exercises.filter(ex => ex.name === selectedExerciseName);
-                if (exerciseLogs.length === 0) return null;
-
-                const volume = exerciseLogs.reduce((totalVol, log) => 
-                    totalVol + log.sets.filter(s => s.completed).reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0), 0);
-                
-                const maxWeight = Math.max(0, ...exerciseLogs.flatMap(log => log.sets.filter(s => s.completed).map(set => Number(set.weight) || 0)));
-
-                return {
-                    date: workout.date,
-                    displayDate: format(new Date(workout.date), 'd MMM', { locale: fr }),
-                    volume,
-                    maxWeight,
-                };
-            })
-            .filter((item): item is NonNullable<typeof item> => item !== null)
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        
-        return {
-            name: selectedExerciseName,
-            history: history,
-        };
-    }, [selectedExerciseName, workouts]);
+    const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
+    const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(filteredWorkouts);
+    const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);
 
     const handleViewProgression = useCallback((exerciseName: string) => {
         setSelectedExerciseName(exerciseName);
         exerciseProgressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, []);
-
-    const cardComponents: Record<string, React.ReactNode> = useMemo(() => ({
-        stats: (
-            <StatCards
-                totalWorkouts={stats.totalWorkouts}
-                totalVolume={stats.totalVolume}
-                totalSets={stats.totalSets}
-                averageDuration={stats.averageDuration}
-            />
-        ),
-        volume: <VolumeChart chartData={volumeByMuscleGroup} />,
-        muscle: (
-            <MuscleGroupRadarChart
-                data={muscleGroupStats.chartData}
-                maxSets={muscleGroupStats.maxSets}
-            />
-        ),
-        progress: (
-            <ExerciseProgress
-                ref={exerciseProgressCardRef}
-                uniqueExercises={uniqueExercises}
-                selectedExerciseName={selectedExerciseName}
-                onSelectedExerciseChange={setSelectedExerciseName}
-                selectedExerciseData={selectedExerciseData}
-            />
-        ),
-        ai: (
-            <AiAnalysisCard
-                title="Analyse et Conseils IA"
-                type="general"
-                workouts={workouts}
-                currentDateRange={dateRange}
-            />
-        ),
-        records: (
-            <PersonalRecords
-                personalRecords={stats.personalRecords}
-                onViewProgression={handleViewProgression}
-            />
-        ),
-        oneRepMax: (
-            <EstimatedOneRepMax
-                records={estimated1RMs}
-                onViewProgression={handleViewProgression}
-            />
-        )
-    }), [stats, volumeByMuscleGroup, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, workouts, dateRange, handleViewProgression, estimated1RMs]);
 
     if (isLoading) {
         return (
@@ -418,21 +101,23 @@ const StatsPage = () => {
                     <p className="text-sm text-gray-600 mt-2">Terminez une séance pour voir vos statistiques ici, ou changez la plage de dates.</p>
                 </div>
             ) : (
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
-                    <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
-                        <div className="space-y-6">
-                            {cardOrder.map((id) => (
-                                <SortableCardItem key={id} id={id} isDndEnabled={isDndEnabled}>
-                                    {cardComponents[id]}
-                                </SortableCardItem>
-                            ))}
-                        </div>
-                    </SortableContext>
-                </DndContext>
+                <DraggableStatsCards
+                    cardOrder={cardOrder}
+                    onCardOrderChange={setCardOrder}
+                    isDndEnabled={isDndEnabled}
+                    stats={stats}
+                    volumeByMuscleGroup={volumeByMuscleGroup}
+                    muscleGroupStats={muscleGroupStats}
+                    uniqueExercises={uniqueExercises}
+                    selectedExerciseName={selectedExerciseName}
+                    onSelectedExerciseChange={setSelectedExerciseName}
+                    selectedExerciseData={selectedExerciseData}
+                    workouts={workouts}
+                    dateRange={dateRange}
+                    estimated1RMs={estimated1RMs}
+                    onViewProgression={handleViewProgression}
+                    exerciseProgressCardRef={exerciseProgressCardRef}
+                />
             )}
         </div>
     );
