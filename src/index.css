@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,67 +22,66 @@
     --input: 222 28% 28%; /* slate-700 */
     --radius: 0.5rem;
     
-    /* Custom accent colors */
-    --accent-blue: 217 91% 60%; /* blue-500 from image */
-    --accent-purple: 262 83% 58%; /* violet-500 from image */
-    --accent-yellow: 48 96% 50%; /* amber-400 */
-    --accent-green: 142 76% 36%; /* Aligned with green theme */
-    --accent-orange: 25 95% 53%;
-    --accent-red: 0 84% 60%;
-    --accent-rose: 340 82% 57%;
+    /* Custom accent colors - versions pastel plus douces */
+    --accent-blue: 217 65% 70%; /* bleu pastel plus doux */
+    --accent-purple: 262 55% 70%; /* violet pastel plus doux */
+    --accent-yellow: 48 70% 65%; /* jaune pastel plus doux */
+    --accent-green: 142 50% 55%; /* vert pastel plus doux */
+    --accent-orange: 25 70% 65%; /* orange pastel plus doux */
+    --accent-red: 0 55% 70%; /* rouge pastel plus doux */
+    --accent-rose: 340 60% 70%; /* rose pastel plus doux */
     
-    /* Default theme (violet) */
-    --primary: 262 83% 58%;
+    /* Default theme (violet pastel) */
+    --primary: 262 55% 70%;
     --primary-foreground: 210 40% 98%;
-    --ring: 262 83% 58%;
+    --ring: 262 55% 70%;
   }
 
-  /* ... keep existing code (theme color classes) */
+  /* Thèmes avec couleurs pastels douces */
   .violet {
-    --primary: 262 83% 58%;
+    --primary: 262 55% 70%; /* violet pastel */
     --primary-foreground: 210 40% 98%;
-    --ring: 262 83% 58%;
+    --ring: 262 55% 70%;
   }
 
   .blue {
-    --primary: 217 91% 60%;
+    --primary: 217 65% 70%; /* bleu pastel */
     --primary-foreground: 210 40% 98%;
-    --ring: 217 91% 60%;
+    --ring: 217 65% 70%;
   }
 
   .green {
-    --primary: 142 76% 36%;
+    --primary: 142 50% 55%; /* vert pastel */
     --primary-foreground: 142 76% 96%;
-    --ring: 142 76% 36%;
+    --ring: 142 50% 55%;
   }
 
   .yellow {
-    --primary: 48 96% 50%;
+    --primary: 48 70% 65%; /* jaune pastel */
     --primary-foreground: 48 96% 10%;
-    --ring: 48 96% 50%;
+    --ring: 48 70% 65%;
   }
   
   .orange {
-    --primary: 25 95% 53%;
+    --primary: 25 70% 65%; /* orange pastel */
     --primary-foreground: 25 95% 13%;
-    --ring: 25 95% 53%;
+    --ring: 25 70% 65%;
   }
   
   .red {
-    --primary: 0 84% 60%;
+    --primary: 0 55% 70%; /* rouge pastel */
     --primary-foreground: 210 40% 98%;
-    --ring: 0 84% 60%;
+    --ring: 0 55% 70%;
   }
   
   .rose {
-    --primary: 340 82% 57%;
+    --primary: 340 60% 70%; /* rose pastel */
     --primary-foreground: 210 40% 98%;
-    --ring: 340 82% 57%;
+    --ring: 340 60% 70%;
   }
 }
 
 @layer base {
-  /* ... keep existing code (base styles) */
   * {
     @apply border-border;
   }
