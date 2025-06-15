@@ -22,62 +22,62 @@
     --input: 222 28% 28%; /* slate-700 */
     --radius: 0.5rem;
     
-    /* Custom accent colors - versions pastel plus douces */
-    --accent-blue: 217 65% 70%; /* bleu pastel plus doux */
-    --accent-purple: 262 55% 70%; /* violet pastel plus doux */
-    --accent-yellow: 48 70% 65%; /* jaune pastel plus doux */
-    --accent-green: 142 50% 55%; /* vert pastel plus doux */
-    --accent-orange: 25 70% 65%; /* orange pastel plus doux */
-    --accent-red: 0 55% 70%; /* rouge pastel plus doux */
-    --accent-rose: 340 60% 70%; /* rose pastel plus doux */
+    /* Custom accent colors - versions ultra pastel très douces */
+    --accent-blue: 217 40% 80%; /* bleu ultra pastel */
+    --accent-purple: 262 35% 80%; /* violet ultra pastel */
+    --accent-yellow: 48 45% 80%; /* jaune ultra pastel */
+    --accent-green: 142 30% 75%; /* vert ultra pastel */
+    --accent-orange: 25 45% 80%; /* orange ultra pastel */
+    --accent-red: 0 35% 80%; /* rouge ultra pastel */
+    --accent-rose: 340 40% 80%; /* rose ultra pastel */
     
-    /* Default theme (violet pastel) */
-    --primary: 262 55% 70%;
-    --primary-foreground: 210 40% 98%;
-    --ring: 262 55% 70%;
+    /* Default theme (violet ultra pastel) */
+    --primary: 262 35% 80%;
+    --primary-foreground: 262 50% 15%;
+    --ring: 262 35% 80%;
   }
 
-  /* Thèmes avec couleurs pastels douces */
+  /* Thèmes avec couleurs ultra pastels très douces */
   .violet {
-    --primary: 262 55% 70%; /* violet pastel */
-    --primary-foreground: 210 40% 98%;
-    --ring: 262 55% 70%;
+    --primary: 262 35% 80%; /* violet ultra pastel */
+    --primary-foreground: 262 50% 15%;
+    --ring: 262 35% 80%;
   }
 
   .blue {
-    --primary: 217 65% 70%; /* bleu pastel */
-    --primary-foreground: 210 40% 98%;
-    --ring: 217 65% 70%;
+    --primary: 217 40% 80%; /* bleu ultra pastel */
+    --primary-foreground: 217 60% 15%;
+    --ring: 217 40% 80%;
   }
 
   .green {
-    --primary: 142 50% 55%; /* vert pastel */
-    --primary-foreground: 142 76% 96%;
-    --ring: 142 50% 55%;
+    --primary: 142 30% 75%; /* vert ultra pastel */
+    --primary-foreground: 142 60% 15%;
+    --ring: 142 30% 75%;
   }
 
   .yellow {
-    --primary: 48 70% 65%; /* jaune pastel */
-    --primary-foreground: 48 96% 10%;
-    --ring: 48 70% 65%;
+    --primary: 48 45% 80%; /* jaune ultra pastel */
+    --primary-foreground: 48 70% 10%;
+    --ring: 48 45% 80%;
   }
   
   .orange {
-    --primary: 25 70% 65%; /* orange pastel */
-    --primary-foreground: 25 95% 13%;
-    --ring: 25 70% 65%;
+    --primary: 25 45% 80%; /* orange ultra pastel */
+    --primary-foreground: 25 70% 13%;
+    --ring: 25 45% 80%;
   }
   
   .red {
-    --primary: 0 55% 70%; /* rouge pastel */
-    --primary-foreground: 210 40% 98%;
-    --ring: 0 55% 70%;
+    --primary: 0 35% 80%; /* rouge ultra pastel */
+    --primary-foreground: 0 60% 15%;
+    --ring: 0 35% 80%;
   }
   
   .rose {
-    --primary: 340 60% 70%; /* rose pastel */
-    --primary-foreground: 210 40% 98%;
-    --ring: 340 60% 70%;
+    --primary: 340 40% 80%; /* rose ultra pastel */
+    --primary-foreground: 340 60% 15%;
+    --ring: 340 40% 80%;
   }
 }
 
