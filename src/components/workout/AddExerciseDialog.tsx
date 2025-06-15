@@ -106,7 +106,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
                         className="p-1 -m-1 rounded-full hover:bg-accent"
                         aria-label={isFavorite(exercise.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
                       >
-                        <Star className={`h-4 w-4 text-accent-yellow transition-colors ${isFavorite(exercise.id) ? 'fill-accent-yellow' : 'fill-transparent'}`} />
+                        <Star className={`h-4 w-4 transition-colors ${isFavorite(exercise.id) ? 'text-accent-yellow fill-accent-yellow' : 'text-foreground fill-transparent'}`} />
                       </button>
                     </div>
                   </CommandItem>
