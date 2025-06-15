@@ -23,7 +23,7 @@
     --muted: 222 28% 28%; /* slate-700 */
     --muted-foreground: 220 14% 65%; /* slate-400 */
 
-    --accent: 222 28% 28%; /* slate-700 */
+    --accent: 222 28% 35%; /* slightly lighter slate-700 */
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;

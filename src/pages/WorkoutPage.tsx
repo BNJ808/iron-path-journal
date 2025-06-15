@@ -9,7 +9,7 @@ import { Dumbbell } from 'lucide-react';
 
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout } = useWorkouts();
-  const { templates, isLoadingTemplates } = useWorkoutTemplates();
+  const { templates, isLoadingTemplates, updateTemplate, deleteTemplate } = useWorkoutTemplates();
   const {
     handleStartWorkout,
     handleAddExercise,
@@ -22,6 +22,9 @@ const WorkoutPage = () => {
     handleStartFromTemplate,
   } = useWorkoutActions();
 
+  const handleUpdateTemplate = async (id: string, name: string) => {
+    await updateTemplate({ id, name });
+  };
 
   if (isLoadingWorkout) {
     return <WorkoutLoadingSkeleton />;
@@ -51,6 +54,8 @@ const WorkoutPage = () => {
           onStartFromTemplate={handleStartFromTemplate}
           templates={templates}
           isLoadingTemplates={isLoadingTemplates}
+          onUpdateTemplate={handleUpdateTemplate}
+          onDeleteTemplate={deleteTemplate}
         />
       )}
     </div>
