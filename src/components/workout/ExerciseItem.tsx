@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
@@ -45,7 +44,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
         <h3 className="font-bold text-lg text-accent-blue">{exercise.name}</h3>
         <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
-                <MessageSquare className="h-5 w-5 text-accent-yellow" />
+                <MessageSquare className="h-5 w-5" />
             </Button>
             <AiExerciseAnalysisDialog exerciseId={exercise.exerciseId} exerciseName={exercise.name} />
             <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)} aria-label="Remove exercise">
