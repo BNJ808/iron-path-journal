@@ -12,21 +12,46 @@ export const useProfile = () => {
     const queryClient = useQueryClient();
     const userId = user?.id;
 
-    const { data: profile, isLoading } = useQuery({
+    const { data: profile, isLoading, error } = useQuery({
         queryKey: ['profile', userId],
         queryFn: async () => {
             if (!userId) return null;
+            
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
                 .single();
-            if (error && error.code !== 'PGRST116') { // PGRST116: "The result contains 0 rows"
+            
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error fetching profile:', error);
                 throw new Error(error.message);
             }
+            
+            // Si pas de profil, créer un profil par défaut
+            if (!data) {
+                const { data: newProfile, error: insertError } = await supabase
+                    .from('profiles')
+                    .insert({ 
+                        id: userId,
+                        username: user?.email?.split('@')[0] || 'Utilisateur',
+                        updated_at: new Date().toISOString()
+                    })
+                    .select()
+                    .single();
+                
+                if (insertError) {
+                    console.error('Error creating profile:', insertError);
+                    throw new Error(insertError.message);
+                }
+                
+                return newProfile;
+            }
+            
             return data;
         },
         enabled: !!userId,
+        retry: 1,
     });
 
     const updateProfileMutation = useMutation({
@@ -110,6 +135,7 @@ export const useProfile = () => {
     return {
         profile,
         isLoading,
+        error,
         updateProfile: updateProfileMutation.mutateAsync,
         uploadAvatar,
     };

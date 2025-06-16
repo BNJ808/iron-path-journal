@@ -9,37 +9,30 @@ import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
 import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
 import { WeightTracker } from '@/components/profile/WeightTracker';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const ProfilePage = () => {
   const { user } = useAuth();
-  const { profile, isLoading, updateProfile } = useProfile();
+  const { profile, isLoading, error, uploadAvatar } = useProfile();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast.error('Erreur lors de la déconnexion: ' + error.message);
+      } else {
+        toast.success('Déconnexion réussie');
+      }
+    } catch (error: any) {
+      toast.error('Erreur lors de la déconnexion: ' + error.message);
+    }
   };
 
   const handleAvatarUpload = async (file: File) => {
-    if (!user || !profile || !updateProfile) return;
-    
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file, { upsert: true });
-
-    if (uploadError) {
-      console.error("Error uploading avatar:", uploadError.message);
-      return;
-    }
-
-    const { data } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-
-    if (data.publicUrl) {
-      await updateProfile({ ...profile, avatar_url: data.publicUrl });
+    try {
+      await uploadAvatar(file);
+    } catch (error: any) {
+      console.error("Error uploading avatar:", error.message);
     }
   };
 
@@ -47,6 +40,19 @@ const ProfilePage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p>Chargement du profil...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Erreur lors du chargement du profil</p>
+          <Button onClick={() => window.location.reload()}>
+            Réessayer
+          </Button>
+        </div>
       </div>
     );
   }
@@ -74,10 +80,11 @@ const ProfilePage = () => {
                 avatarUrl={profile?.avatar_url}
                 username={profile?.username}
                 onUpload={handleAvatarUpload}
+                isLoading={isLoading}
               />
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-foreground">
-                  {profile?.username || 'Nom d\'utilisateur non défini'}
+                  {profile?.username || user?.email?.split('@')[0] || 'Utilisateur'}
                 </h3>
                 <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
