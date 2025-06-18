@@ -82,6 +82,30 @@ const useSupabaseCustomExercises = () => {
     },
   });
 
+  // Mutation pour supprimer un exercice
+  const deleteExerciseMutation = useMutation({
+    mutationFn: async (exerciseId: string) => {
+      if (!user?.id) {
+        throw new Error('Utilisateur non connecté');
+      }
+
+      const { error } = await supabase
+        .from('custom_exercises')
+        .delete()
+        .eq('id', exerciseId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      return exerciseId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['custom-exercises', user?.id] });
+    },
+  });
+
   // Migrer les exercices depuis localStorage vers Supabase
   const migrateFromLocalStorage = useCallback(async () => {
     if (!user?.id || migrationCompleted) return;
@@ -166,9 +190,28 @@ const useSupabaseCustomExercises = () => {
     }
   }, [customExercises, addExerciseMutation]);
 
+  const deleteCustomExercise = useCallback(async (exerciseId: string) => {
+    const exerciseToDelete = customExercises.find(ex => ex.id === exerciseId);
+    
+    if (!exerciseToDelete) {
+      toast.error("Exercice introuvable.");
+      return false;
+    }
+
+    try {
+      await deleteExerciseMutation.mutateAsync(exerciseId);
+      toast.success(`"${exerciseToDelete.name}" supprimé !`);
+      return true;
+    } catch (error: any) {
+      toast.error("Erreur lors de la suppression de l'exercice: " + error.message);
+      return false;
+    }
+  }, [customExercises, deleteExerciseMutation]);
+
   return { 
     customExercises, 
     addCustomExercise,
+    deleteCustomExercise,
     isLoading,
     error
   };

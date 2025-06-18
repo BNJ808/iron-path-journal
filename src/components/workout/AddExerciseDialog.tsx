@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import {
   Dialog,
@@ -25,6 +24,7 @@ import { useExerciseDatabase } from "@/hooks/useExerciseDatabase";
 import { AddCustomExerciseDialog } from "./AddCustomExerciseDialog";
 import { toast } from "sonner";
 import { MUSCLE_GROUP_COLORS } from "@/data/exercises";
+import { CustomExerciseManagement } from "./CustomExerciseManagement";
 
 interface AddExerciseDialogProps {
   onAddExercise: (exercise: { id: string; name: string }) => void;
@@ -96,7 +96,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
         </DialogHeader>
         <Command>
           <CommandInput placeholder="Rechercher un exercice..." />
-          <div className="p-2 border-b">
+          <div className="p-2 border-b space-y-2">
             <AddCustomExerciseDialog 
               addCustomExercise={addCustomExercise} 
               onExerciseCreated={handleExerciseCreated}
@@ -106,6 +106,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
                 Créer un exercice personnalisé
               </Button>
             </AddCustomExerciseDialog>
+            <CustomExerciseManagement />
           </div>
           <CommandList>
             <CommandEmpty>Aucun exercice trouvé.</CommandEmpty>
