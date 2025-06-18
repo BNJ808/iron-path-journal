@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,34 +40,39 @@ type FormData = z.infer<typeof formSchema>;
 interface AddCustomExerciseDialogProps {
   children: React.ReactNode;
   onExerciseCreated: (exercise: { id: string; name: string }) => void;
-  addCustomExercise: (exercise: { name: string; group: string }) => { id: string; name: string };
+  addCustomExercise: (exercise: { name: string; group: keyof typeof EXERCISES_DATABASE }) => Promise<{ id: string; name: string; group: string }>;
 }
 
 export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustomExercise }: AddCustomExerciseDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      // Initialize `group` to a value that TypeScript can accept via casting,
-      // but Zod will invalidate, forcing user selection.
       group: '' as any,
     },
   });
 
-  function onSubmit(values: FormData) {
-    // Création explicite de l'objet avec les types corrects
-    const exerciseData = {
-      name: values.name,
-      group: values.group
-    };
-    
-    const newExercise = addCustomExercise(exerciseData);
-    if(newExercise) {
-        onExerciseCreated(newExercise);
+  async function onSubmit(values: FormData) {
+    try {
+      setIsSubmitting(true);
+      const exerciseData = {
+        name: values.name,
+        group: values.group as keyof typeof EXERCISES_DATABASE
+      };
+      
+      const newExercise = await addCustomExercise(exerciseData);
+      if(newExercise) {
+        onExerciseCreated({ id: newExercise.id, name: newExercise.name });
+      }
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error('Error creating custom exercise:', error);
+    } finally {
+      setIsSubmitting(false);
     }
-    setOpen(false);
-    form.reset();
   }
 
   return (
@@ -120,11 +126,13 @@ export const AddCustomExerciseDialog = ({ children, onExerciseCreated, addCustom
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="ghost">Annuler</Button>
+                <Button type="button" variant="ghost" disabled={isSubmitting}>
+                  Annuler
+                </Button>
               </DialogClose>
-              <Button type="submit">
+              <Button type="submit" disabled={isSubmitting}>
                 <Plus className="mr-2 h-4 w-4" />
-                Ajouter l'exercice
+                {isSubmitting ? 'Ajout...' : 'Ajouter l\'exercice'}
               </Button>
             </DialogFooter>
           </form>
