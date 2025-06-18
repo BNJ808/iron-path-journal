@@ -46,7 +46,7 @@ export const CustomExerciseManagement = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" className="w-full">
           <Settings className="mr-2 h-4 w-4" />
           Gérer mes exercices
         </Button>
