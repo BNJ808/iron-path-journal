@@ -33,6 +33,30 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_exercises: {
+        Row: {
+          created_at: string
+          id: string
+          muscle_group: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          muscle_group: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          muscle_group?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercise_last_performance: {
         Row: {
           exercise_id: string

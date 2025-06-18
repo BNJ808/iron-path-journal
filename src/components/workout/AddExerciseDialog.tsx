@@ -20,7 +20,7 @@ import {
 import { PlusCircle, Star } from "lucide-react";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
 import { useFavoriteExercises } from "@/hooks/useFavoriteExercises";
-import useCustomExercises from "@/hooks/useCustomExercises";
+import useSupabaseCustomExercises from "@/hooks/useSupabaseCustomExercises";
 import { useExerciseDatabase } from "@/hooks/useExerciseDatabase";
 import { AddCustomExerciseDialog } from "./AddCustomExerciseDialog";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
   const [open, setOpen] = useState(false);
   const { workouts } = useWorkoutHistory();
   const { isFavorite, toggleFavorite } = useFavoriteExercises();
-  const { addCustomExercise } = useCustomExercises();
+  const { addCustomExercise } = useSupabaseCustomExercises();
   const { allGroupedExercises: groupedExercises } = useExerciseDatabase();
 
   const exerciseFrequencies = useMemo(() => {
@@ -75,7 +75,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
   };
 
   const handleExerciseCreated = (exercise: { id: string; name: string }) => {
-    // The toast is now handled in the useCustomExercises hook.
+    // The toast is now handled in the useSupabaseCustomExercises hook.
     // The list updates automatically.
   };
 

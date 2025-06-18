@@ -1,16 +1,10 @@
 
 import { useMemo } from 'react';
 import { groupedExercises as baseGroupedExercises, type ExerciseGroup } from '@/data/exercises';
-import useCustomExercises from '@/hooks/useCustomExercises';
-
-type CustomExercise = {
-  id: string;
-  name: string;
-  group: string;
-}
+import useSupabaseCustomExercises from '@/hooks/useSupabaseCustomExercises';
 
 export const useExerciseDatabase = () => {
-    const { customExercises }: { customExercises: CustomExercise[] } = useCustomExercises();
+    const { customExercises } = useSupabaseCustomExercises();
 
     const allGroupedExercises = useMemo((): ExerciseGroup[] => {
         // Deep copy to avoid modifying the original data
