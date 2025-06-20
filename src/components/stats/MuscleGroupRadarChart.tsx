@@ -43,7 +43,7 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
         <Collapsible defaultOpen={false}>
             <Card>
                 <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer pb-0">
+                    <CardHeader className="cursor-pointer">
                         <div className="flex w-full items-center justify-center">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Hexagon className="h-5 w-5 text-accent-cyan" />
