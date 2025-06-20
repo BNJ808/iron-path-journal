@@ -1,6 +1,8 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Hexagon } from 'lucide-react';
+import { Hexagon, ChevronsUpDown } from 'lucide-react';
 import { PolarGrid, PolarAngleAxis, Radar, RadarChart as RechartsRadarChart, PolarRadiusAxis } from 'recharts';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
 
@@ -36,33 +38,42 @@ const renderColorfulTick = (props: any) => {
 
 export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartProps) => {
     return (
-        <Card>
-            <CardHeader className="items-center pb-0">
-                <CardTitle className="flex items-center gap-2 text-base">
-                    <Hexagon className="h-5 w-5 text-accent-cyan" />
-                    Distribution par Groupe Musculaire
-                </CardTitle>
-                <CardDescription>Nombre de séries par groupe musculaire sur la période sélectionnée</CardDescription>
-            </CardHeader>
-            <CardContent className="pb-0">
-                <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
-                    <RechartsRadarChart data={data}>
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent indicator="line" />}
-                        />
-                        <PolarGrid stroke="hsl(var(--foreground))" />
-                        <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
-                        <PolarRadiusAxis angle={30} domain={[0, maxSets > 0 ? maxSets : 1]} tick={false} axisLine={false} />
-                        <Radar
-                            dataKey="sets"
-                            fill="var(--color-sets)"
-                            fillOpacity={0.6}
-                            stroke="var(--color-sets)"
-                        />
-                    </RechartsRadarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
+        <Collapsible defaultOpen={false}>
+            <Card>
+                <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer pb-0">
+                        <div className="flex w-full items-center justify-between">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <Hexagon className="h-5 w-5 text-accent-cyan" />
+                                Distribution par Groupe Musculaire
+                            </CardTitle>
+                            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        </div>
+                        <CardDescription>Nombre de séries par groupe musculaire sur la période sélectionnée</CardDescription>
+                    </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <CardContent className="pb-0">
+                        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
+                            <RechartsRadarChart data={data}>
+                                <ChartTooltip
+                                    cursor={false}
+                                    content={<ChartTooltipContent indicator="line" />}
+                                />
+                                <PolarGrid stroke="hsl(var(--foreground))" />
+                                <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
+                                <PolarRadiusAxis angle={30} domain={[0, maxSets > 0 ? maxSets : 1]} tick={false} axisLine={false} />
+                                <Radar
+                                    dataKey="sets"
+                                    fill="var(--color-sets)"
+                                    fillOpacity={0.6}
+                                    stroke="var(--color-sets)"
+                                />
+                            </RechartsRadarChart>
+                        </ChartContainer>
+                    </CardContent>
+                </CollapsibleContent>
+            </Card>
+        </Collapsible>
     );
 };
