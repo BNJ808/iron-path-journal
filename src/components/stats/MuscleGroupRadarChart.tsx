@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -45,11 +46,10 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                         <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Hexagon className="h-5 w-5 text-accent-cyan" />
-                                Distribution par Groupe Musculaire
+                                Séries par Groupe Musculaire
                             </CardTitle>
                             <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                         </div>
-                        <CardDescription>Nombre de séries par groupe musculaire sur la période sélectionnée</CardDescription>
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -77,3 +77,4 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
         </Collapsible>
     );
 };
+
