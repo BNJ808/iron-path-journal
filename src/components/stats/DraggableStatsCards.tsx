@@ -6,9 +6,14 @@ import { SortableCardItem } from '@/components/stats/SortableCardItem';
 import { StatCards } from '@/components/stats/StatCards';
 import { VolumeChart } from '@/components/stats/VolumeChart';
 import { ExerciseProgress } from '@/components/stats/ExerciseProgress';
-import { PersonalRecords } from '@/components/stats/PersonalRecords';
+import { InteractivePersonalRecords } from '@/components/stats/InteractivePersonalRecords';
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
 import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
+import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
+import { WeightPerformanceCorrelation } from '@/components/stats/WeightPerformanceCorrelation';
+import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';
+import { StrengthRatios } from '@/components/stats/StrengthRatios';
+import { CombinedChart } from '@/components/stats/CombinedChart';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import type { Workout } from '@/types';
 import { DateRange } from 'react-day-picker';
@@ -35,6 +40,46 @@ interface DraggableStatsCardsProps {
     estimated1RMs: { exerciseName: string; estimated1RM: number }[];
     onViewProgression: (exerciseName: string) => void;
     exerciseProgressCardRef: React.RefObject<HTMLDivElement>;
+    personalRecordsTimeline: Array<{
+        date: string;
+        displayDate: string;
+        exercise: string;
+        weight: number;
+        reps: number;
+        isNewRecord: boolean;
+    }>;
+    progressionPredictions: Array<{
+        exercise: string;
+        currentMax: number;
+        predicted1Month: number;
+        predicted3Months: number;
+        trend: 'ascending' | 'descending' | 'stable';
+        confidence: number;
+    }>;
+    weightPerformanceCorrelation: Array<{
+        exercise: string;
+        correlation: number;
+        significance: 'forte' | 'modérée' | 'faible';
+        dataPoints: Array<{ bodyWeight: number; performance: number; date: string }>;
+    }> | null;
+    exerciseProgressionRanking: Array<{
+        exercise: string;
+        progressionPercent: number;
+        weightGain: number;
+        sessions: number;
+        firstMax: number;
+        lastMax: number;
+        timeSpan: number;
+    }>;
+    strengthRatios: Array<{
+        name: string;
+        ratio: number;
+        exercise1: string;
+        exercise2: string;
+        weight1: number;
+        weight2: number;
+        status: 'équilibré' | 'déséquilibré' | 'normal';
+    }>;
 }
 
 export const DraggableStatsCards = ({
@@ -52,12 +97,17 @@ export const DraggableStatsCards = ({
     dateRange,
     estimated1RMs,
     onViewProgression,
-    exerciseProgressCardRef
+    exerciseProgressCardRef,
+    personalRecordsTimeline,
+    progressionPredictions,
+    weightPerformanceCorrelation,
+    exerciseProgressionRanking,
+    strengthRatios
 }: DraggableStatsCardsProps) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 8, // Require 8px of movement before dragging starts
+                distance: 8,
             },
         }),
         useSensor(KeyboardSensor, {
@@ -116,8 +166,9 @@ export const DraggableStatsCards = ({
             />
         ),
         records: (
-            <PersonalRecords
+            <InteractivePersonalRecords
                 personalRecords={stats.personalRecords}
+                timeline={personalRecordsTimeline}
                 onViewProgression={onViewProgression}
             />
         ),
@@ -126,8 +177,51 @@ export const DraggableStatsCards = ({
                 records={estimated1RMs}
                 onViewProgression={onViewProgression}
             />
+        ),
+        predictions: (
+            <ProgressionPredictions
+                predictions={progressionPredictions}
+            />
+        ),
+        correlation: (
+            <WeightPerformanceCorrelation
+                correlations={weightPerformanceCorrelation}
+            />
+        ),
+        ranking: (
+            <ExerciseProgressionRanking
+                progressions={exerciseProgressionRanking}
+            />
+        ),
+        ratios: (
+            <StrengthRatios
+                ratios={strengthRatios}
+            />
+        ),
+        combined: (
+            <CombinedChart
+                workouts={workouts}
+            />
         )
-    }), [stats, volumeByMuscleGroup, muscleGroupStats, uniqueExercises, selectedExerciseName, selectedExerciseData, workouts, dateRange, estimated1RMs, onViewProgression, exerciseProgressCardRef, onSelectedExerciseChange]);
+    }), [
+        stats, 
+        volumeByMuscleGroup, 
+        muscleGroupStats, 
+        uniqueExercises, 
+        selectedExerciseName, 
+        selectedExerciseData, 
+        workouts, 
+        dateRange, 
+        estimated1RMs, 
+        onViewProgression, 
+        exerciseProgressCardRef, 
+        onSelectedExerciseChange,
+        personalRecordsTimeline,
+        progressionPredictions,
+        weightPerformanceCorrelation,
+        exerciseProgressionRanking,
+        strengthRatios
+    ]);
 
     return (
         <DndContext

@@ -11,6 +11,7 @@ import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
 import { useStatsCalculations } from '@/hooks/useStatsCalculations';
 import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
 import { useExerciseProgress } from '@/hooks/useExerciseProgress';
+import { useAdvancedStats } from '@/hooks/useAdvancedStats';
 
 const StatsPage = () => {
     const { workouts, isLoading } = useWorkoutHistory();
@@ -22,7 +23,20 @@ const StatsPage = () => {
     });
     const [isDndEnabled, setIsDndEnabled] = useState(false);
 
-    const defaultCardOrder = ['stats', 'oneRepMax', 'volume', 'muscle', 'progress', 'records', 'ai'];
+    const defaultCardOrder = [
+        'stats', 
+        'oneRepMax', 
+        'volume', 
+        'muscle', 
+        'progress', 
+        'records', 
+        'predictions', 
+        'correlation', 
+        'ranking', 
+        'ratios', 
+        'combined', 
+        'ai'
+    ];
 
     const [cardOrder, setCardOrder] = useState<string[]>(() => {
         try {
@@ -46,6 +60,13 @@ const StatsPage = () => {
     const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
     const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(filteredWorkouts);
     const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);
+    const {
+        personalRecordsTimeline,
+        progressionPredictions,
+        weightPerformanceCorrelation,
+        exerciseProgressionRanking,
+        strengthRatios
+    } = useAdvancedStats(workouts, dateRange);
 
     const handleViewProgression = useCallback((exerciseName: string) => {
         setSelectedExerciseName(exerciseName);
@@ -117,6 +138,11 @@ const StatsPage = () => {
                     estimated1RMs={estimated1RMs}
                     onViewProgression={handleViewProgression}
                     exerciseProgressCardRef={exerciseProgressCardRef}
+                    personalRecordsTimeline={personalRecordsTimeline}
+                    progressionPredictions={progressionPredictions}
+                    weightPerformanceCorrelation={weightPerformanceCorrelation}
+                    exerciseProgressionRanking={exerciseProgressionRanking}
+                    strengthRatios={strengthRatios}
                 />
             )}
         </div>
