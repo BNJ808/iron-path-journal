@@ -1,8 +1,10 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { startOfToday } from 'date-fns';
 import { Workout, ExerciseLog } from '@/types';
+import { handleSupabaseError } from '@/utils/errorHandling';
 
 export { type ExerciseLog };
 
@@ -29,7 +31,10 @@ export const useWorkouts = () => {
                 .limit(1)
                 .maybeSingle();
 
-            if (error) throw error;
+            if (error) {
+                handleSupabaseError(error, 'récupération de l\'entraînement du jour');
+                throw error;
+            }
             
             if (data) {
                 return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] } as Workout;
@@ -55,7 +60,10 @@ export const useWorkouts = () => {
                 .select()
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                handleSupabaseError(error, 'création d\'entraînement');
+                throw error;
+            }
             return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] } as Workout;
         },
         onSuccess: (data) => {
@@ -77,7 +85,10 @@ export const useWorkouts = () => {
                 .select()
                 .single();
             
-            if (error) throw error;
+            if (error) {
+                handleSupabaseError(error, 'mise à jour d\'entraînement');
+                throw error;
+            }
             return { ...data, exercises: (data.exercises as unknown as ExerciseLog[]) || [] } as Workout;
         },
         onSuccess: (data) => {
@@ -99,7 +110,10 @@ export const useWorkouts = () => {
                 .delete()
                 .eq('id', workoutId);
             
-            if (error) throw error;
+            if (error) {
+                handleSupabaseError(error, 'suppression d\'entraînement');
+                throw error;
+            }
         },
         onSuccess: () => {
             queryClient.setQueryData(['workout', 'today', userId], null);

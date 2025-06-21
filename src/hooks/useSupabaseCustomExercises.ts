@@ -1,10 +1,10 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { EXERCISES_DATABASE } from '@/data/exercises';
+import { handleSupabaseError } from '@/utils/errorHandling';
 
 export type SupabaseCustomExercise = {
   id: string;
@@ -38,7 +38,7 @@ const useSupabaseCustomExercises = () => {
         .order('created_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching custom exercises:', error);
+        handleSupabaseError(error, 'récupération des exercices personnalisés');
         throw error;
       }
 
@@ -72,6 +72,7 @@ const useSupabaseCustomExercises = () => {
         .single();
 
       if (error) {
+        handleSupabaseError(error, 'ajout d\'exercice personnalisé');
         throw error;
       }
 
@@ -96,6 +97,7 @@ const useSupabaseCustomExercises = () => {
         .eq('user_id', user.id);
 
       if (error) {
+        handleSupabaseError(error, 'suppression d\'exercice personnalisé');
         throw error;
       }
 
@@ -106,7 +108,6 @@ const useSupabaseCustomExercises = () => {
     },
   });
 
-  // Migrer les exercices depuis localStorage vers Supabase
   const migrateFromLocalStorage = useCallback(async () => {
     if (!user?.id || migrationCompleted) return;
 
@@ -142,7 +143,7 @@ const useSupabaseCustomExercises = () => {
           );
 
         if (error) {
-          console.error('Error migrating exercises:', error);
+          handleSupabaseError(error, 'migration des exercices');
         } else {
           toast.success(`${exercisesToMigrate.length} exercice(s) migré(s) vers votre compte !`);
           queryClient.invalidateQueries({ queryKey: ['custom-exercises', user?.id] });
