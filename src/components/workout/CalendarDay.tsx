@@ -97,17 +97,17 @@ export const CalendarDay = ({
               className={cn(
                 `${plan.color} text-white rounded shadow-sm transition-all hover:shadow-md group relative`,
                 "px-1 py-0.5 text-[8px] sm:text-xs font-medium",
-                "flex items-center justify-between min-h-[20px]"
+                "flex items-center justify-center min-h-[20px]"
               )}
             >
               <div className={cn(
-                "flex items-center gap-1 flex-1 min-w-0",
+                "flex items-center justify-center gap-1 flex-1 min-w-0 text-center",
                 isDeleteMode && "pr-4"
               )}>
-                {/* Nom du plan adaptatif */}
+                {/* Nom du plan adaptatif - centré */}
                 <div className="flex-1 min-w-0">
-                  {/* Nom complet pour desktop (sm et plus) - sans truncate */}
-                  <div className="hidden sm:block">
+                  {/* Nom complet pour desktop (sm et plus) - centré */}
+                  <div className="hidden sm:block text-center">
                     <div className="font-medium leading-tight break-words text-xs" title={plan.name}>
                       {plan.name}
                     </div>
@@ -118,8 +118,8 @@ export const CalendarDay = ({
                     )}
                   </div>
                   
-                  {/* Nom complet pour tablettes (xs à sm) - avec truncate */}
-                  <div className="hidden xs:block sm:hidden">
+                  {/* Nom complet pour tablettes (xs à sm) - centré */}
+                  <div className="hidden xs:block sm:hidden text-center">
                     <div className="truncate font-medium leading-tight text-[8px]" title={plan.name}>
                       {plan.name}
                     </div>
