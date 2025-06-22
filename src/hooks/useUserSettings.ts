@@ -50,7 +50,12 @@ export const useUserSettings = () => {
         return {};
       }
       
-      return (data?.settings as UserSettings) || {};
+      // Si pas de données ou settings est null, retourner un objet vide
+      if (!data || !data.settings) {
+        return {};
+      }
+      
+      return (data.settings as UserSettings) || {};
     },
     enabled: !!userId,
   });
