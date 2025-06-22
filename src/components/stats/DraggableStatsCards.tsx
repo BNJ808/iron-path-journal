@@ -31,10 +31,10 @@ interface DraggableStatsCardsProps {
     uniqueExercises: { name: string }[];
     selectedExerciseName: string | null;
     onSelectedExerciseChange: (value: string) => void;
-    selectedExerciseData: { name: string; history: any[] } | null;
+    selectedExerciseData: { name: string; data: { date: string; weight: number; reps: number; volume: number }[] };
     workouts: Workout[] | undefined;
     dateRange: DateRange | undefined;
-    estimated1RMs: { exerciseName: string; estimated1RM: number }[];
+    estimated1RMs: { [key: string]: number };
     onViewProgression: (exerciseName: string) => void;
     exerciseProgressCardRef: React.RefObject<HTMLDivElement>;
     personalRecordsTimeline: Array<{
@@ -48,32 +48,30 @@ interface DraggableStatsCardsProps {
     progressionPredictions: Array<{
         exercise: string;
         currentMax: number;
-        predicted1Month: number;
-        predicted3Months: number;
-        trend: 'ascending' | 'descending' | 'stable';
+        predictedMax: number;
+        timeframe: string;
         confidence: number;
     }>;
     exerciseProgressionRanking: Array<{
         exercise: string;
-        progressionPercent: number;
-        weightGain: number;
-        sessions: number;
-        firstMax: number;
-        lastMax: number;
-        timeSpan: number;
+        progressionScore: number;
+        trend: 'improving' | 'stable' | 'declining';
+        recentSessions: number;
     }>;
-    strengthRatios: Array<{
-        name: string;
-        ratio: number;
-        exercise1: string;
-        exercise2: string;
-        weight1: number;
-        weight2: number;
-        status: 'équilibré' | 'déséquilibré' | 'normal';
-    }>;
+    strengthRatios: {
+        squat: number;
+        bench: number;
+        deadlift: number;
+        ratios: {
+            benchToSquat: number;
+            deadliftToSquat: number;
+            deadliftToBench: number;
+        };
+        recommendations: string[];
+    };
 }
 
-export const DraggableStatsCards = ({
+export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
     cardOrder,
     onCardOrderChange,
     isDndEnabled,
@@ -92,8 +90,8 @@ export const DraggableStatsCards = ({
     personalRecordsTimeline,
     progressionPredictions,
     exerciseProgressionRanking,
-    strengthRatios
-}: DraggableStatsCardsProps) => {
+    strengthRatios,
+}) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -113,11 +111,6 @@ export const DraggableStatsCards = ({
             const newIndex = cardOrder.indexOf(over.id as string);
             if (oldIndex === -1 || newIndex === -1) return;
             const newOrder = arrayMove(cardOrder, oldIndex, newIndex);
-            try {
-                localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
-            } catch (error) {
-                console.error("Failed to save card order to localStorage", error);
-            }
             onCardOrderChange(newOrder);
         }
     };
@@ -156,43 +149,59 @@ export const DraggableStatsCards = ({
         ),
         'interactive-personal-records': (
             <EstimatedOneRepMax
-                records={estimated1RMs}
+                estimated1RMs={estimated1RMs}
                 onViewProgression={onViewProgression}
             />
         ),
         'progression-predictions': (
-            <ProgressionPredictions
-                predictions={progressionPredictions}
-            />
+            <ProgressionPredictions predictions={progressionPredictions} />
         ),
         'exercise-progression-ranking': (
-            <ExerciseProgressionRanking
-                progressions={exerciseProgressionRanking}
+            <ExerciseProgressionRanking rankings={exerciseProgressionRanking} />
+        ),
+        'strength-ratios': <StrengthRatios ratios={strengthRatios} />,
+        'ai-analysis': (
+            <AiAnalysisCard
+                title="Analyse IA"
+                type="general"
+                workouts={workouts || []}
+                currentDateRange={dateRange}
             />
         ),
-        'strength-ratios': (
-            <StrengthRatios
-                ratios={strengthRatios}
-            />
-        )
     }), [
-        stats, 
-        volumeByMuscleGroup, 
-        muscleGroupStats, 
-        uniqueExercises, 
-        selectedExerciseName, 
-        selectedExerciseData, 
-        workouts, 
-        dateRange, 
-        estimated1RMs, 
-        onViewProgression, 
-        exerciseProgressCardRef, 
+        stats,
+        volumeByMuscleGroup,
+        muscleGroupStats,
+        uniqueExercises,
+        selectedExerciseName,
         onSelectedExerciseChange,
+        selectedExerciseData,
+        estimated1RMs,
+        onViewProgression,
         personalRecordsTimeline,
         progressionPredictions,
         exerciseProgressionRanking,
-        strengthRatios
+        strengthRatios,
+        workouts,
+        dateRange,
     ]);
+
+    const cards = cardOrder.map((cardId) => ({
+        id: cardId,
+        component: cardComponents[cardId],
+    })).filter(card => card.component); // Filtrer les cartes non définies
+
+    if (!isDndEnabled) {
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {cards.map((card) => (
+                    <div key={card.id}>
+                        {card.component}
+                    </div>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <DndContext
@@ -201,10 +210,10 @@ export const DraggableStatsCards = ({
             onDragEnd={handleDragEnd}
         >
             <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
-                <div className="space-y-6">
-                    {cardOrder.map((id) => (
-                        <SortableCardItem key={id} id={id} isDndEnabled={isDndEnabled}>
-                            {cardComponents[id]}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {cards.map((card) => (
+                        <SortableCardItem key={card.id} id={card.id}>
+                            {card.component}
                         </SortableCardItem>
                     ))}
                 </div>
