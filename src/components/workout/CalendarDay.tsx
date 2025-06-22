@@ -39,15 +39,15 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[100px] p-2 flex flex-col", 
+        "min-h-[80px] p-2 flex flex-col", 
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
       )}
     >
-      {/* Numéro du jour */}
+      {/* Numéro du jour - centré */}
       <div className={cn(
-        "text-sm font-medium mb-2 flex-shrink-0",
+        "text-sm font-medium mb-2 flex-shrink-0 text-center",
         isCurrentDay && "text-primary font-bold"
       )}>
         {dayNumber}
@@ -98,9 +98,9 @@ export const CalendarDay = ({
                     )}
                   </div>
                   
-                  {/* Première lettre pour très petits écrans */}
-                  <div className="xs:hidden flex items-center gap-1.5">
-                    <div className="text-sm font-medium">
+                  {/* Première lettre pour très petits écrans - centrée */}
+                  <div className="xs:hidden flex items-center justify-center gap-1.5 w-full">
+                    <div className="text-sm font-medium text-center">
                       {plan.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="text-[10px] opacity-90 leading-tight">
