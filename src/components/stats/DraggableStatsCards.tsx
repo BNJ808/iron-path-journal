@@ -195,7 +195,7 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
     const cards = cardOrder.map((cardId) => ({
         id: cardId,
         component: cardComponents[cardId],
-    })).filter(card => card.component); // Filtrer les cartes non définies
+    })).filter(card => card.component);
 
     if (!isDndEnabled) {
         return (
@@ -218,7 +218,7 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
             <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {cards.map((card) => (
-                        <SortableCardItem key={card.id} id={card.id}>
+                        <SortableCardItem key={card.id} id={card.id} isDndEnabled={isDndEnabled}>
                             {card.component}
                         </SortableCardItem>
                     ))}
