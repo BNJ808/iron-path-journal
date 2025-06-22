@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { WorkoutPlanCard } from './WorkoutPlanCard';
 import { DroppableCalendarDay } from './DroppableCalendarDay';
@@ -36,6 +35,22 @@ export const WorkoutCalendar = () => {
   });
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Configuration des capteurs optimisée pour mobile
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200,
+      tolerance: 8,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
+
   // Charger depuis localStorage
   useEffect(() => {
     const saved = localStorage.getItem('workoutCalendar');
@@ -62,10 +77,15 @@ export const WorkoutCalendar = () => {
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    // Empêcher le scroll pendant le drag sur mobile
+    document.body.style.overflow = 'hidden';
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    
+    // Restaurer le scroll
+    document.body.style.overflow = '';
     
     if (!over) {
       setActiveId(null);
@@ -180,6 +200,7 @@ export const WorkoutCalendar = () => {
             </div>
             
             <DndContext
+              sensors={sensors}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               collisionDetection={closestCenter}
@@ -229,7 +250,7 @@ export const WorkoutCalendar = () => {
 
               <DragOverlay>
                 {activePlan && (
-                  <div className={`${activePlan.color} text-white px-2 py-1 rounded text-xs font-medium opacity-90`}>
+                  <div className={`${activePlan.color} text-white px-3 py-2 rounded text-sm font-medium opacity-90 shadow-lg border-2 border-white`}>
                     {activePlan.name}
                   </div>
                 )}
