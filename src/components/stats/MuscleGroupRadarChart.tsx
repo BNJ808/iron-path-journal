@@ -44,7 +44,7 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                     <CardHeader className="cursor-pointer flex-1">
                         <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
-                                <Hexagon className="h-5 w-5 text-accent-cyan" />
+                                <Hexagon className="h-5 w-5 text-cyan-500" />
                                 Séries par Groupe Musculaire
                             </CardTitle>
                             <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />

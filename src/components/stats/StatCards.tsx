@@ -18,7 +18,7 @@ export const StatCards = ({ totalWorkouts, totalVolume, totalSets, averageDurati
                 <CardHeader className="cursor-pointer flex-1">
                     <div className="flex w-full items-center justify-between">
                         <CardTitle className="flex items-center gap-2 text-base">
-                            <LayoutGrid className="h-5 w-5 text-accent-blue" />
+                            <LayoutGrid className="h-5 w-5 text-purple-500" />
                             Statistiques Générales
                         </CardTitle>
                         <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />

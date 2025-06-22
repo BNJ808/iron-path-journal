@@ -28,7 +28,7 @@ export const ExerciseProgressionRanking = ({ progressions }: ExerciseProgression
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
-                        <TrendingUp className="h-5 w-5 text-accent-green" />
+                        <TrendingUp className="h-5 w-5 text-rose-500" />
                         Classement par Progression
                     </CardTitle>
                 </CardHeader>
@@ -63,7 +63,7 @@ export const ExerciseProgressionRanking = ({ progressions }: ExerciseProgression
                 <CardHeader>
                     <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>svg]:rotate-180">
                         <CardTitle className="flex items-center gap-2 text-base">
-                            <TrendingUp className="h-5 w-5 text-accent-green" />
+                            <TrendingUp className="h-5 w-5 text-rose-500" />
                             Classement par Progression
                         </CardTitle>
                         <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />

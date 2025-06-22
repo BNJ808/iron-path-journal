@@ -42,7 +42,7 @@
                 <Card ref={ref}>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
-                            <LineChartIcon className="h-5 w-5 text-accent-purple" />
+                            <LineChartIcon className="h-5 w-5 text-indigo-500" />
                             Progression par Exercice
                         </CardTitle>
                     </CardHeader>
