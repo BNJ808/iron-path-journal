@@ -29,44 +29,25 @@ export interface UserSettings {
   };
 }
 
-// Type pour la sérialisation en base de données (les dates sont des strings)
-interface SerializedUserSettings {
-  theme?: string;
-  colorSoftness?: number;
-  statsCardOrder?: string[];
-  statsDateRange?: {
-    from?: string;
-    to?: string;
-  };
-  timerSettings?: {
-    defaultRestTime: number;
-    autoStart: boolean;
-    soundEnabled: boolean;
-  };
-  workoutPreferences?: {
-    showLastPerformance: boolean;
-    autoCompleteRest: boolean;
-    defaultWeightUnit: 'kg' | 'lbs';
-  };
-}
-
-// Fonction pour convertir UserSettings en SerializedUserSettings
-const serializeSettings = (settings: Partial<UserSettings>): SerializedUserSettings => {
-  const serialized = { ...settings };
+// Fonction pour convertir UserSettings en format compatible avec Supabase Json
+const serializeSettings = (settings: Partial<UserSettings>) => {
+  const serialized: any = { ...settings };
   
   if (settings.statsDateRange) {
     serialized.statsDateRange = {
-      from: settings.statsDateRange.from?.toISOString(),
-      to: settings.statsDateRange.to?.toISOString(),
+      from: settings.statsDateRange.from?.toISOString() || null,
+      to: settings.statsDateRange.to?.toISOString() || null,
     };
   }
   
   return serialized;
 };
 
-// Fonction pour convertir SerializedUserSettings en UserSettings
-const deserializeSettings = (serialized: SerializedUserSettings): UserSettings => {
-  const settings = { ...serialized };
+// Fonction pour convertir les données de Supabase en UserSettings
+const deserializeSettings = (serialized: any): UserSettings => {
+  if (!serialized) return {};
+  
+  const settings: UserSettings = { ...serialized };
   
   if (serialized.statsDateRange) {
     settings.statsDateRange = {
@@ -105,7 +86,7 @@ export const useUserSettings = () => {
       }
       
       // Désérialiser les paramètres (convertir les strings de dates en objets Date)
-      return deserializeSettings(data.settings as SerializedUserSettings);
+      return deserializeSettings(data.settings);
     },
     enabled: !!userId,
   });
