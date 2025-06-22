@@ -67,14 +67,14 @@ export const CalendarDay = ({
               )}
             >
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                {/* Première lettre dans un cercle */}
-                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-[10px] font-bold">
+                {/* Première lettre dans un cercle - plus visible sur mobile */}
+                <div className="w-6 h-6 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 border border-white/20">
+                  <span className="text-xs font-bold">
                     {plan.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 hidden sm:block">
                   <div className="truncate font-semibold leading-tight" title={plan.name}>
                     {plan.name}
                   </div>
@@ -83,6 +83,13 @@ export const CalendarDay = ({
                       {plan.exercises.length} ex.
                     </div>
                   )}
+                </div>
+                
+                {/* Affichage mobile simplifié */}
+                <div className="flex-1 min-w-0 sm:hidden">
+                  <div className="text-[10px] opacity-90 leading-tight">
+                    {plan.exercises.length} ex.
+                  </div>
                 </div>
               </div>
               
