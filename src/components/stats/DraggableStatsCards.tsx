@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -7,7 +8,7 @@ import { VolumeChart } from '@/components/stats/VolumeChart';
 import { ExerciseProgress } from '@/components/stats/ExerciseProgress';
 import { InteractivePersonalRecords } from '@/components/stats/InteractivePersonalRecords';
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
-import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
+import { OneRMCalculator } from '@/components/stats/OneRMCalculator';
 import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
 import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';  
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
@@ -138,20 +139,12 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
                 selectedExerciseData={selectedExerciseData}
             />
         ),
-        'interactive-personal-records': (
-            <EstimatedOneRepMax
-                records={Object.entries(estimated1RMs).map(([exerciseName, estimated1RM]) => ({
-                    exerciseName,
-                    estimated1RM
-                }))}
-                onViewProgression={onViewProgression}
-            />
-        ),
+        'one-rm-calculator': <OneRMCalculator />,
         'progression-predictions': (
-            <ProgressionPredictions predictions={progressionPredictions} />
+            <ProgressionPredictions predictions={progressionPredictions || []} />
         ),
         'exercise-progression-ranking': (
-            <ExerciseProgressionRanking progressions={exerciseProgressionRanking} />
+            <ExerciseProgressionRanking progressions={exerciseProgressionRanking || []} />
         ),
         'ai-analysis': (
             <AiAnalysisCard

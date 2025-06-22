@@ -1,3 +1,4 @@
+
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
 import { useState, useEffect } from 'react';
 import { BarChart3, CalendarDays } from 'lucide-react';
@@ -24,14 +25,14 @@ const StatsPage = () => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut sans la carte des ratios de force
+    // Ordre par défaut avec la nouvelle calculatrice 1RM
     return [
       'overview',
       'volume',
       'personalRecords',
       'muscle-groups',
       'exercise-progress',
-      'interactive-personal-records',
+      'one-rm-calculator',
       'progression-predictions',
       'exercise-progression-ranking',
       'ai-analysis'
