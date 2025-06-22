@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trophy, LineChart as LineChartIcon, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from 'react';
 
 interface PersonalRecord {
     weight: number;
@@ -15,24 +16,24 @@ interface PersonalRecordsProps {
 }
 
 export const PersonalRecords = ({ personalRecords, onViewProgression }: PersonalRecordsProps) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     if (Object.keys(personalRecords).length === 0) {
         return null;
     }
 
     return (
-        <Collapsible defaultOpen={false}>
-            <Card>
-                <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
-                    <CardHeader className="cursor-pointer flex-1">
-                        <div className="flex w-full items-center justify-between">
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <Trophy className="h-5 w-5 text-accent-yellow" />
-                                Records Personnels (Poids max)
-                            </CardTitle>
-                            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-                        </div>
-                    </CardHeader>
-                </CollapsibleTrigger>
+        <Card>
+            <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+                <CardHeader>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>svg]:rotate-180">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <Trophy className="h-5 w-5 text-accent-yellow" />
+                            Records Personnels (Poids max)
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+                    </CollapsibleTrigger>
+                </CardHeader>
                 <CollapsibleContent>
                     <CardContent>
                         <ul className="space-y-2">
@@ -52,7 +53,7 @@ export const PersonalRecords = ({ personalRecords, onViewProgression }: Personal
                         </ul>
                     </CardContent>
                 </CollapsibleContent>
-            </Card>
-        </Collapsible>
+            </Collapsible>
+        </Card>
     );
 };
