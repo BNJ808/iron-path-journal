@@ -29,6 +29,55 @@ export interface UserSettings {
   };
 }
 
+// Type pour la sérialisation en base de données (les dates sont des strings)
+interface SerializedUserSettings {
+  theme?: string;
+  colorSoftness?: number;
+  statsCardOrder?: string[];
+  statsDateRange?: {
+    from?: string;
+    to?: string;
+  };
+  timerSettings?: {
+    defaultRestTime: number;
+    autoStart: boolean;
+    soundEnabled: boolean;
+  };
+  workoutPreferences?: {
+    showLastPerformance: boolean;
+    autoCompleteRest: boolean;
+    defaultWeightUnit: 'kg' | 'lbs';
+  };
+}
+
+// Fonction pour convertir UserSettings en SerializedUserSettings
+const serializeSettings = (settings: Partial<UserSettings>): SerializedUserSettings => {
+  const serialized = { ...settings };
+  
+  if (settings.statsDateRange) {
+    serialized.statsDateRange = {
+      from: settings.statsDateRange.from?.toISOString(),
+      to: settings.statsDateRange.to?.toISOString(),
+    };
+  }
+  
+  return serialized;
+};
+
+// Fonction pour convertir SerializedUserSettings en UserSettings
+const deserializeSettings = (serialized: SerializedUserSettings): UserSettings => {
+  const settings = { ...serialized };
+  
+  if (serialized.statsDateRange) {
+    settings.statsDateRange = {
+      from: serialized.statsDateRange.from ? new Date(serialized.statsDateRange.from) : undefined,
+      to: serialized.statsDateRange.to ? new Date(serialized.statsDateRange.to) : undefined,
+    };
+  }
+  
+  return settings;
+};
+
 export const useUserSettings = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -55,7 +104,8 @@ export const useUserSettings = () => {
         return {};
       }
       
-      return (data.settings as UserSettings) || {};
+      // Désérialiser les paramètres (convertir les strings de dates en objets Date)
+      return deserializeSettings(data.settings as SerializedUserSettings);
     },
     enabled: !!userId,
   });
@@ -67,11 +117,14 @@ export const useUserSettings = () => {
       const currentSettings = settings || {};
       const updatedSettings = { ...currentSettings, ...newSettings };
       
+      // Sérialiser les paramètres (convertir les objets Date en strings)
+      const serializedSettings = serializeSettings(updatedSettings);
+      
       const { error } = await supabase
         .from('profiles')
         .upsert({ 
           id: userId, 
-          settings: updatedSettings,
+          settings: serializedSettings,
           updated_at: new Date().toISOString()
         });
       
