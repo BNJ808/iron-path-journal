@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -124,7 +123,7 @@ export const DraggableStatsCards = ({
     };
 
     const cardComponents: Record<string, React.ReactNode> = useMemo(() => ({
-        stats: (
+        overview: (
             <StatCards
                 totalWorkouts={stats.totalWorkouts}
                 totalVolume={stats.totalVolume}
@@ -133,13 +132,20 @@ export const DraggableStatsCards = ({
             />
         ),
         volume: <VolumeChart chartData={volumeByMuscleGroup} />,
-        muscle: (
+        personalRecords: (
+            <InteractivePersonalRecords
+                personalRecords={stats.personalRecords}
+                timeline={personalRecordsTimeline}
+                onViewProgression={onViewProgression}
+            />
+        ),
+        'muscle-groups': (
             <MuscleGroupRadarChart
                 data={muscleGroupStats.chartData}
                 maxSets={muscleGroupStats.maxSets}
             />
         ),
-        progress: (
+        'exercise-progress': (
             <ExerciseProgress
                 ref={exerciseProgressCardRef}
                 uniqueExercises={uniqueExercises}
@@ -148,38 +154,23 @@ export const DraggableStatsCards = ({
                 selectedExerciseData={selectedExerciseData}
             />
         ),
-        ai: (
-            <AiAnalysisCard
-                title="Analyse et Conseils IA"
-                type="general"
-                workouts={workouts}
-                currentDateRange={dateRange}
-            />
-        ),
-        records: (
-            <InteractivePersonalRecords
-                personalRecords={stats.personalRecords}
-                timeline={personalRecordsTimeline}
-                onViewProgression={onViewProgression}
-            />
-        ),
-        oneRepMax: (
+        'interactive-personal-records': (
             <EstimatedOneRepMax
                 records={estimated1RMs}
                 onViewProgression={onViewProgression}
             />
         ),
-        predictions: (
+        'progression-predictions': (
             <ProgressionPredictions
                 predictions={progressionPredictions}
             />
         ),
-        ranking: (
+        'exercise-progression-ranking': (
             <ExerciseProgressionRanking
                 progressions={exerciseProgressionRanking}
             />
         ),
-        ratios: (
+        'strength-ratios': (
             <StrengthRatios
                 ratios={strengthRatios}
             />
