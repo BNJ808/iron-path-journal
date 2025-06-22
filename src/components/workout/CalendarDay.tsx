@@ -96,7 +96,7 @@ export const CalendarDay = ({
               key={planId}
               className={cn(
                 `${plan.color} text-white rounded shadow-sm transition-all hover:shadow-md group relative`,
-                "px-1 py-0.5 text-[8px] font-medium",
+                "px-1 py-0.5 text-[8px] sm:text-xs font-medium",
                 "flex items-center justify-between min-h-[20px]"
               )}
             >
@@ -108,11 +108,11 @@ export const CalendarDay = ({
                 <div className="flex-1 min-w-0">
                   {/* Nom complet pour desktop (sm et plus) - sans truncate */}
                   <div className="hidden sm:block">
-                    <div className="font-medium leading-tight break-words text-[8px]" title={plan.name}>
+                    <div className="font-medium leading-tight break-words text-xs" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[6px] opacity-90 leading-tight mt-0.5">
+                      <div className="text-[10px] opacity-90 leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
