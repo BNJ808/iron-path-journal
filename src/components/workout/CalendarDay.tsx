@@ -4,7 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge } from 'lucide-react';
-import { WorkoutPlan } from './WorkoutCalendar';
+import { WorkoutPlan } from '@/types/workout-calendar';
 import { cn } from '@/lib/utils';
 
 interface CalendarDayProps {

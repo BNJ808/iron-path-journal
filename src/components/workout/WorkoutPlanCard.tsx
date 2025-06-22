@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { EditWorkoutPlanDialog } from './EditWorkoutPlanDialog';
-import { WorkoutPlan } from './WorkoutCalendar';
+import { WorkoutPlan } from '@/types/workout-calendar';
 import { cn } from '@/lib/utils';
 
 interface WorkoutPlanCardProps {
