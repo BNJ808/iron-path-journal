@@ -37,8 +37,16 @@ export const WorkoutCalendar = () => {
     handleDragEnd
   } = useDragAndDrop(calendar, saveCalendar);
 
-  // Extract completed workout dates
-  const completedWorkouts = workouts.map(workout => format(new Date(workout.date), 'yyyy-MM-dd'));
+  // Extract completed workout dates - ensure consistent date formatting
+  const completedWorkouts = workouts.map(workout => {
+    const workoutDate = new Date(workout.date);
+    // Reset hours to avoid timezone issues
+    workoutDate.setHours(0, 0, 0, 0);
+    return format(workoutDate, 'yyyy-MM-dd');
+  });
+
+  console.log('Completed workouts dates:', completedWorkouts);
+  console.log('All workouts:', workouts.map(w => ({ date: w.date, formatted: format(new Date(w.date), 'yyyy-MM-dd') })));
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);

@@ -38,6 +38,14 @@ export const CalendarDay = ({
   const hasScheduledPlans = scheduledPlans.length > 0;
   const isWorkoutCompleted = completedWorkouts.includes(dateKey);
   
+  // Debug logs
+  console.log(`Day ${dateKey}:`, {
+    hasScheduledPlans,
+    isWorkoutCompleted,
+    completedWorkouts: completedWorkouts.filter(date => date === dateKey),
+    scheduledPlans
+  });
+  
   // Determine border color based on workout status
   const getBorderColor = () => {
     if (!hasScheduledPlans || !isCurrentMonth) {
@@ -45,9 +53,9 @@ export const CalendarDay = ({
     }
     
     if (isWorkoutCompleted) {
-      return "border-green-500"; // Completed workout - green
+      return "border-green-500 border-2"; // Completed workout - green with thicker border
     } else {
-      return "border-red-500"; // Missed workout - red
+      return "border-red-500 border-2"; // Missed workout - red with thicker border
     }
   };
 
@@ -55,7 +63,7 @@ export const CalendarDay = ({
     <div
       ref={setNodeRef}
       className={cn(
-        "border-2 rounded-lg transition-all duration-200 relative touch-manipulation",
+        "border rounded-lg transition-all duration-200 relative touch-manipulation",
         "min-h-[60px] p-1.5 flex flex-col", 
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : getBorderColor(),
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
@@ -81,8 +89,8 @@ export const CalendarDay = ({
               key={planId}
               className={cn(
                 `${plan.color} text-white rounded shadow-sm transition-all hover:shadow-md group relative`,
-                "px-1 py-0.5 text-[9px] font-medium",
-                "flex items-center justify-between min-h-[18px]"
+                "px-1 py-0.5 text-[8px] font-medium",
+                "flex items-center justify-between min-h-[20px]"
               )}
             >
               <div className={cn(
@@ -93,11 +101,11 @@ export const CalendarDay = ({
                 <div className="flex-1 min-w-0">
                   {/* Nom complet pour desktop (sm et plus) - sans truncate */}
                   <div className="hidden sm:block">
-                    <div className="font-medium leading-tight break-words text-[9px]" title={plan.name}>
+                    <div className="font-medium leading-tight break-words text-[8px]" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[7px] opacity-90 leading-tight mt-0.5">
+                      <div className="text-[6px] opacity-90 leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
@@ -105,11 +113,11 @@ export const CalendarDay = ({
                   
                   {/* Nom complet pour tablettes (xs à sm) - avec truncate */}
                   <div className="hidden xs:block sm:hidden">
-                    <div className="truncate font-medium leading-tight text-[9px]" title={plan.name}>
+                    <div className="truncate font-medium leading-tight text-[8px]" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[7px] opacity-90 truncate leading-tight mt-0.5">
+                      <div className="text-[6px] opacity-90 truncate leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
@@ -117,7 +125,7 @@ export const CalendarDay = ({
                   
                   {/* Première lettre pour très petits écrans - centrée */}
                   <div className="xs:hidden flex items-center justify-center w-full">
-                    <div className="text-[10px] font-medium text-center">
+                    <div className="text-[9px] font-medium text-center">
                       {plan.name.charAt(0).toUpperCase()}
                     </div>
                   </div>
