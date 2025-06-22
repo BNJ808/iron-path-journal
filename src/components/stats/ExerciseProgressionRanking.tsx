@@ -1,8 +1,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, TrendingUp, Calendar, Target } from 'lucide-react';
+import { Trophy, TrendingUp, Calendar, Target, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from 'react';
 
 interface ExerciseProgression {
     exercise: string;
@@ -19,6 +21,8 @@ interface ExerciseProgressionRankingProps {
 }
 
 export const ExerciseProgressionRanking = ({ progressions }: ExerciseProgressionRankingProps) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     if (progressions.length === 0) {
         return (
             <Card>
@@ -51,60 +55,69 @@ export const ExerciseProgressionRanking = ({ progressions }: ExerciseProgression
         return 'text-red-600';
     };
 
+    const displayedProgressions = isExpanded ? progressions : progressions.slice(0, 3);
+
     return (
         <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                    <TrendingUp className="h-5 w-5 text-accent-green" />
-                    Classement par Progression
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-3">
-                    {progressions.slice(0, 10).map((prog, index) => (
-                        <div key={index} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                            <div className="flex items-center justify-center w-8">
-                                {getRankIcon(index)}
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-1">
-                                    <h4 className="font-medium text-sm truncate">{prog.exercise}</h4>
-                                    <Badge 
-                                        variant="outline" 
-                                        className={`text-xs ${getProgressionColor(prog.progressionPercent)}`}
-                                    >
-                                        +{prog.progressionPercent}%
-                                    </Badge>
-                                </div>
-                                
-                                <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-2">
-                                    <div className="flex items-center gap-1">
-                                        <Target className="h-3 w-3" />
-                                        <span>+{prog.weightGain} kg</span>
+            <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+                <CardHeader>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>svg]:rotate-180">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <TrendingUp className="h-5 w-5 text-accent-green" />
+                            Classement par Progression
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+                    </CollapsibleTrigger>
+                </CardHeader>
+                <CollapsibleContent>
+                    <CardContent>
+                        <div className="space-y-3">
+                            {displayedProgressions.map((prog, index) => (
+                                <div key={index} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                                    <div className="flex items-center justify-center w-8">
+                                        {getRankIcon(index)}
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" />
-                                        <span>{prog.sessions} séances</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <span>{prog.timeSpan} jours</span>
+                                    
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h4 className="font-medium text-sm truncate">{prog.exercise}</h4>
+                                            <Badge 
+                                                variant="outline" 
+                                                className={`text-xs ${getProgressionColor(prog.progressionPercent)}`}
+                                            >
+                                                +{prog.progressionPercent}%
+                                            </Badge>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-2">
+                                            <div className="flex items-center gap-1">
+                                                <Target className="h-3 w-3" />
+                                                <span>+{prog.weightGain} kg</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Calendar className="h-3 w-3" />
+                                                <span>{prog.sessions} séances</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <span>{prog.timeSpan} jours</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-2 text-xs">
+                                            <span>{prog.firstMax} kg</span>
+                                            <Progress 
+                                                value={Math.min(100, Math.max(0, prog.progressionPercent * 2))} 
+                                                className="flex-1 h-1"
+                                            />
+                                            <span className="font-bold">{prog.lastMax} kg</span>
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                <div className="flex items-center gap-2 text-xs">
-                                    <span>{prog.firstMax} kg</span>
-                                    <Progress 
-                                        value={Math.min(100, Math.max(0, prog.progressionPercent * 2))} 
-                                        className="flex-1 h-1"
-                                    />
-                                    <span className="font-bold">{prog.lastMax} kg</span>
-                                </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            </CardContent>
+                    </CardContent>
+                </CollapsibleContent>
+            </Collapsible>
         </Card>
     );
 };
