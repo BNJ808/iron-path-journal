@@ -69,8 +69,20 @@ export const CalendarDay = ({
               <div className="flex items-center gap-1 flex-1 min-w-0">
                 {/* Nom du plan adaptatif */}
                 <div className="flex-1 min-w-0">
-                  {/* Nom complet - s'affiche et se tronque selon l'espace */}
-                  <div className="hidden xs:block">
+                  {/* Nom complet pour desktop (sm et plus) */}
+                  <div className="hidden sm:block">
+                    <div className="truncate font-medium leading-tight" title={plan.name}>
+                      {plan.name}
+                    </div>
+                    {plan.exercises.length > 0 && (
+                      <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
+                        {plan.exercises.length} ex.
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Nom complet pour tablettes (xs à sm) */}
+                  <div className="hidden xs:block sm:hidden">
                     <div className="truncate font-medium leading-tight" title={plan.name}>
                       {plan.name}
                     </div>
