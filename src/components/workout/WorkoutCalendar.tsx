@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Trash2 } from 'lucide-react';
-import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
+import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, format } from 'date-fns';
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
 import { WorkoutPlansSection } from './calendar/WorkoutPlansSection';
 import { CalendarGrid } from './calendar/CalendarGrid';
 import { useDragAndDrop } from './calendar/useDragAndDrop';
 import { useWorkoutCalendarData } from './calendar/useWorkoutCalendarData';
+import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 
 // Re-export types for backward compatibility
 export type { WorkoutPlan } from '@/types/workout-calendar';
@@ -27,12 +28,17 @@ export const WorkoutCalendar = () => {
     deletePlan
   } = useWorkoutCalendarData();
 
+  const { workouts } = useWorkoutHistory();
+
   const {
     sensors,
     activePlan,
     handleDragStart,
     handleDragEnd
   } = useDragAndDrop(calendar, saveCalendar);
+
+  // Extract completed workout dates
+  const completedWorkouts = workouts.map(workout => format(new Date(workout.date), 'yyyy-MM-dd'));
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -88,6 +94,7 @@ export const WorkoutCalendar = () => {
               plans={calendar.plans}
               onRemovePlan={removePlanFromDay}
               isDeleteMode={isDeleteMode}
+              completedWorkouts={completedWorkouts}
             />
 
             <DragOverlay>

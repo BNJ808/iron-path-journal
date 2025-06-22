@@ -16,6 +16,7 @@ interface CalendarDayProps {
   isCurrentDay: boolean;
   onRemovePlan: (planId: string, dateKey: string) => void;
   isDeleteMode: boolean;
+  completedWorkouts?: string[]; // Array of date keys where workouts were completed
 }
 
 export const CalendarDay = ({
@@ -26,23 +27,39 @@ export const CalendarDay = ({
   isCurrentMonth,
   isCurrentDay,
   onRemovePlan,
-  isDeleteMode
+  isDeleteMode,
+  completedWorkouts = []
 }: CalendarDayProps) => {
   const { isOver, setNodeRef } = useDroppable({
     id: `day-${dateKey}`,
   });
 
   const dayNumber = format(day, 'd');
+  const hasScheduledPlans = scheduledPlans.length > 0;
+  const isWorkoutCompleted = completedWorkouts.includes(dateKey);
+  
+  // Determine border color based on workout status
+  const getBorderColor = () => {
+    if (!hasScheduledPlans || !isCurrentMonth) {
+      return "border-border"; // Default state
+    }
+    
+    if (isWorkoutCompleted) {
+      return "border-green-500"; // Completed workout - green
+    } else {
+      return "border-red-500"; // Missed workout - red
+    }
+  };
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        "border rounded-lg transition-all duration-200 relative touch-manipulation",
+        "border-2 rounded-lg transition-all duration-200 relative touch-manipulation",
         "min-h-[60px] p-1.5 flex flex-col", 
-        isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
+        isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : getBorderColor(),
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
-        isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
+        isCurrentDay && "ring-1 ring-primary/20"
       )}
     >
       {/* Numéro du jour - centré */}
@@ -64,8 +81,8 @@ export const CalendarDay = ({
               key={planId}
               className={cn(
                 `${plan.color} text-white rounded shadow-sm transition-all hover:shadow-md group relative`,
-                "px-1.5 py-1 text-[10px] font-medium",
-                "flex items-center justify-between min-h-[20px]"
+                "px-1 py-0.5 text-[9px] font-medium",
+                "flex items-center justify-between min-h-[18px]"
               )}
             >
               <div className={cn(
@@ -76,11 +93,11 @@ export const CalendarDay = ({
                 <div className="flex-1 min-w-0">
                   {/* Nom complet pour desktop (sm et plus) - sans truncate */}
                   <div className="hidden sm:block">
-                    <div className="font-medium leading-tight break-words text-[10px]" title={plan.name}>
+                    <div className="font-medium leading-tight break-words text-[9px]" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[8px] opacity-90 leading-tight mt-0.5">
+                      <div className="text-[7px] opacity-90 leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
@@ -88,11 +105,11 @@ export const CalendarDay = ({
                   
                   {/* Nom complet pour tablettes (xs à sm) - avec truncate */}
                   <div className="hidden xs:block sm:hidden">
-                    <div className="truncate font-medium leading-tight text-[10px]" title={plan.name}>
+                    <div className="truncate font-medium leading-tight text-[9px]" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[8px] opacity-90 truncate leading-tight mt-0.5">
+                      <div className="text-[7px] opacity-90 truncate leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
@@ -100,7 +117,7 @@ export const CalendarDay = ({
                   
                   {/* Première lettre pour très petits écrans - centrée */}
                   <div className="xs:hidden flex items-center justify-center w-full">
-                    <div className="text-xs font-medium text-center">
+                    <div className="text-[10px] font-medium text-center">
                       {plan.name.charAt(0).toUpperCase()}
                     </div>
                   </div>

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { format, isSameMonth, isToday } from 'date-fns';
 import { CalendarDay } from '../CalendarDay';
 import { WorkoutPlan } from '@/types/workout-calendar';
+import { format, isSameMonth } from 'date-fns';
 
 interface CalendarGridProps {
   weeks: Date[][];
@@ -11,54 +11,56 @@ interface CalendarGridProps {
   plans: WorkoutPlan[];
   onRemovePlan: (planId: string, dateKey: string) => void;
   isDeleteMode: boolean;
+  completedWorkouts?: string[]; // Array of completed workout date keys
 }
 
-export const CalendarGrid = ({ 
-  weeks, 
-  currentDate, 
-  scheduledWorkouts, 
-  plans, 
-  onRemovePlan, 
-  isDeleteMode 
+export const CalendarGrid = ({
+  weeks,
+  currentDate,
+  scheduledWorkouts,
+  plans,
+  onRemovePlan,
+  isDeleteMode,
+  completedWorkouts = []
 }: CalendarGridProps) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
     <div className="space-y-4">
       {/* En-têtes des jours */}
       <div className="grid grid-cols-7 gap-1">
-        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
-          <div key={index} className="text-center text-sm font-medium p-2 text-muted-foreground">
+        {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
+          <div key={day} className="text-center text-sm font-semibold text-muted-foreground p-2">
             {day}
           </div>
         ))}
       </div>
-      
-      {/* Grille de calendrier */}
-      <div className="space-y-2">
+
+      {/* Grille du calendrier */}
+      <div className="space-y-1">
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="space-y-1">
-            {/* Jours de la semaine */}
-            <div className="grid grid-cols-7 gap-1">
-              {week.map(day => {
-                const dateKey = format(day, 'yyyy-MM-dd');
-                const scheduledPlans = scheduledWorkouts[dateKey] || [];
-                const isCurrentMonth = isSameMonth(day, currentDate);
-                const isCurrentDay = isToday(day);
-                
-                return (
-                  <CalendarDay
-                    key={dateKey}
-                    day={day}
-                    dateKey={dateKey}
-                    scheduledPlans={scheduledPlans}
-                    plans={plans}
-                    isCurrentMonth={isCurrentMonth}
-                    isCurrentDay={isCurrentDay}
-                    onRemovePlan={onRemovePlan}
-                    isDeleteMode={isDeleteMode}
-                  />
-                );
-              })}
-            </div>
+          <div key={weekIndex} className="grid grid-cols-7 gap-1">
+            {week.map((day) => {
+              const dateKey = format(day, 'yyyy-MM-dd');
+              const dayWithoutTime = new Date(day);
+              dayWithoutTime.setHours(0, 0, 0, 0);
+              
+              return (
+                <CalendarDay
+                  key={dateKey}
+                  day={day}
+                  dateKey={dateKey}
+                  scheduledPlans={scheduledWorkouts[dateKey] || []}
+                  plans={plans}
+                  isCurrentMonth={isSameMonth(day, currentDate)}
+                  isCurrentDay={dayWithoutTime.getTime() === today.getTime()}
+                  onRemovePlan={onRemovePlan}
+                  isDeleteMode={isDeleteMode}
+                  completedWorkouts={completedWorkouts}
+                />
+              );
+            })}
           </div>
         ))}
       </div>
