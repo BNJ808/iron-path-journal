@@ -24,10 +24,9 @@ const StatsPage = () => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut avec la nouvelle carte calculatrice
+    // Ordre par défaut avec la carte des statistiques générales regroupées
     return [
-      'overview',
-      'volume',
+      'general-stats',
       'personalRecords',
       'estimated-1rm',
       'muscle-groups',

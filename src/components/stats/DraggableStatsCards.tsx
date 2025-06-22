@@ -2,8 +2,6 @@
 import React, { useState, useRef } from 'react';
 import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { Card } from "@/components/ui/card";
-import StatCard from '@/components/StatCard';
-import { Activity, BarChart, ListChecks, Flame, User2, Grip, BrainCircuit, TrendingUp } from 'lucide-react';
 import { PersonalRecords } from './PersonalRecords';
 import { MuscleGroupStats } from './MuscleGroupStats';
 import { ExerciseProgress } from './ExerciseProgress';
@@ -11,8 +9,8 @@ import { InteractivePersonalRecords } from './InteractivePersonalRecords';
 import { ProgressionPredictions } from './ProgressionPredictions';
 import { ExerciseProgressionRanking } from './ExerciseProgressionRanking';
 import { AiAnalysis } from './AiAnalysis';
-import { EstimatedOneRepMax } from './EstimatedOneRepMax';
 import { OneRepMaxCalculator } from './OneRepMaxCalculator';
+import { StatCards } from './StatCards';
 
 interface DraggableStatsCardsProps {
   cardOrder: string[];
@@ -61,12 +59,6 @@ export const DraggableStatsCards = ({
   progressionPredictions,
   exerciseProgressionRanking
 }: DraggableStatsCardsProps) => {
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  const toggleFullScreen = () => {
-    setIsFullScreen(!isFullScreen);
-  };
-
   const handleDragEnd = (result: any) => {
     if (!result.destination) {
       return;
@@ -81,22 +73,13 @@ export const DraggableStatsCards = ({
 
   const renderCard = (cardId: string) => {
     switch (cardId) {
-      case 'overview':
+      case 'general-stats':
         return (
-          <StatCard
-            title="Total Workouts"
-            value={stats?.totalWorkouts || 0}
-            icon={Activity}
-            description="Nombre total d'entraînements enregistrés"
-          />
-        );
-      case 'volume':
-        return (
-          <StatCard
-            title="Volume Total"
-            value={`${(stats?.totalVolume || 0).toLocaleString('fr-FR')} kg`}
-            icon={BarChart}
-            description="Volume total soulevé (kg) sur la période"
+          <StatCards
+            totalWorkouts={stats?.totalWorkouts || 0}
+            totalVolume={stats?.totalVolume || 0}
+            totalSets={stats?.totalSets || 0}
+            averageDuration={stats?.averageDuration || 0}
           />
         );
       case 'personalRecords':
@@ -152,12 +135,12 @@ export const DraggableStatsCards = ({
           />
         );
       default:
-        return <Card>Unknown card</Card>;
+        return null; // Ne plus afficher "Unknown card"
     }
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd} >
+    <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable
         droppableId="stats-cards-droppable"
         direction="horizontal"
@@ -169,20 +152,25 @@ export const DraggableStatsCards = ({
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
-            {cardOrder.map((cardId, index) => (
-              <Draggable key={cardId} draggableId={cardId} index={index} isDragDisabled={!isDndEnabled}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={provided.draggableProps.style}
-                  >
-                    {renderCard(cardId)}
-                  </div>
-                )}
-              </Draggable>
-            ))}
+            {cardOrder.map((cardId, index) => {
+              const cardContent = renderCard(cardId);
+              if (!cardContent) return null; // Ne pas rendre les cartes nulles
+              
+              return (
+                <Draggable key={cardId} draggableId={cardId} index={index} isDragDisabled={!isDndEnabled}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={provided.draggableProps.style}
+                    >
+                      {cardContent}
+                    </div>
+                  )}
+                </Draggable>
+              );
+            })}
             {provided.placeholder}
           </div>
         )}
