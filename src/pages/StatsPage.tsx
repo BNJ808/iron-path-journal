@@ -1,30 +1,83 @@
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
-import { DateRangePicker } from '@/components/stats/DateRangePicker';
-import { AiAnalysisCard } from '@/components/AiAnalysisCard';
-import { useState } from 'react';
-import { BarChart3 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { BarChart3, CalendarDays } from 'lucide-react';
 import { useStatsCalculations } from '@/hooks/useStatsCalculations';
 import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
 import { useExerciseProgress } from '@/hooks/useExerciseProgress';
 import { useAdvancedStats } from '@/hooks/useAdvancedStats';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { DateRange } from 'react-day-picker';
+import { DateRangePicker } from '@/components/stats/DateRangePicker';
 
 const StatsPage = () => {
   const [isDndEnabled, setIsDndEnabled] = useState(false);
   const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [cardOrder, setCardOrder] = useState([
-    'overview',
-    'volume',
-    'personalRecords',
-    'muscle-groups',
-    'exercise-progress',
-    'interactive-personal-records',
-    'progression-predictions',
-    'exercise-progression-ranking',
-    'strength-ratios'
-  ]);
+  
+  // Charger l'ordre des cartes depuis localStorage
+  const [cardOrder, setCardOrder] = useState(() => {
+    try {
+      const saved = localStorage.getItem('statsCardOrder');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
+    }
+    // Ordre par défaut avec la carte d'analyse IA incluse
+    return [
+      'overview',
+      'volume',
+      'personalRecords',
+      'muscle-groups',
+      'exercise-progress',
+      'interactive-personal-records',
+      'progression-predictions',
+      'exercise-progression-ranking',
+      'strength-ratios',
+      'ai-analysis' // Ajout de la carte d'analyse IA
+    ];
+  });
+
+  // Charger la plage de dates depuis localStorage
+  useEffect(() => {
+    try {
+      const savedDateRange = localStorage.getItem('statsDateRange');
+      if (savedDateRange) {
+        const parsed = JSON.parse(savedDateRange);
+        // Convertir les chaînes de date en objets Date
+        if (parsed.from) parsed.from = new Date(parsed.from);
+        if (parsed.to) parsed.to = new Date(parsed.to);
+        setDateRange(parsed);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de la plage de dates:', error);
+    }
+  }, []);
+
+  // Sauvegarder la plage de dates dans localStorage à chaque changement
+  const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
+    setDateRange(newDateRange);
+    try {
+      if (newDateRange) {
+        localStorage.setItem('statsDateRange', JSON.stringify(newDateRange));
+      } else {
+        localStorage.removeItem('statsDateRange');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de la plage de dates:', error);
+    }
+  };
+
+  // Sauvegarder l'ordre des cartes dans localStorage
+  const handleCardOrderChange = (newOrder: string[]) => {
+    setCardOrder(newOrder);
+    try {
+      localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de l\'ordre des cartes:', error);
+    }
+  };
 
   const { workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
   const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
@@ -66,33 +119,27 @@ const StatsPage = () => {
         </button>
       </div>
 
-      {/* Sélecteur de plage de dates */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      {/* Section de sélection de plage de dates */}
+      <div className="bg-card rounded-lg p-4 border">
+        <div className="flex items-center gap-2 mb-3">
+          <CalendarDays className="h-5 w-5 text-accent-blue" />
+          <h3 className="font-medium">Période d'analyse</h3>
+        </div>
         <DateRangePicker 
           date={dateRange} 
-          onDateChange={setDateRange}
-          className="w-full sm:w-auto"
+          onDateChange={handleDateRangeChange}
         />
-        
         {dateRange?.from && (
-          <button
-            onClick={() => setDateRange(undefined)}
-            className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Réinitialiser les dates
-          </button>
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={() => handleDateRangeChange(undefined)}
+              className="text-xs px-2 py-1 bg-secondary rounded hover:bg-secondary/80 transition-colors"
+            >
+              Effacer les filtres
+            </button>
+          </div>
         )}
       </div>
-
-      {/* Carte d'analyse IA */}
-      {workouts && workouts.length > 0 && (
-        <AiAnalysisCard
-          title="Analyse IA de vos performances"
-          type="general"
-          workouts={workouts}
-          currentDateRange={dateRange}
-        />
-      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -103,7 +150,7 @@ const StatsPage = () => {
       ) : (
         <DraggableStatsCards
           cardOrder={cardOrder}
-          onCardOrderChange={setCardOrder}
+          onCardOrderChange={handleCardOrderChange}
           isDndEnabled={isDndEnabled}
           stats={stats}
           volumeByMuscleGroup={volumeByMuscleGroup}
