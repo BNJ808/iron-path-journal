@@ -3,7 +3,7 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { Badge } from 'lucide-react';
 import { WorkoutPlan } from './WorkoutCalendar';
 import { cn } from '@/lib/utils';
 
@@ -61,12 +61,12 @@ export const CalendarDay = ({
             <div
               key={planId}
               className={cn(
-                `${plan.color} text-white rounded-md shadow-sm transition-all hover:shadow-md group`,
+                `${plan.color} text-white rounded-md shadow-sm transition-all hover:shadow-md group relative`,
                 "px-2 py-1.5 text-xs font-medium",
                 "flex items-center justify-between min-h-[28px]"
               )}
             >
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+              <div className="flex items-center gap-1 flex-1 min-w-0 pr-6">
                 {/* Nom du plan adaptatif */}
                 <div className="flex-1 min-w-0">
                   {/* Nom complet pour desktop (sm et plus) - sans truncate */}
@@ -105,16 +105,18 @@ export const CalendarDay = ({
                 </div>
               </div>
               
+              {/* Bouton de suppression avec logo badge */}
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all flex-shrink-0 ml-1"
+                className="absolute top-0.5 right-0.5 h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemovePlan(planId, dateKey);
                 }}
+                title="Supprimer ce plan"
               >
-                <X className="h-3 w-3" />
+                <Badge className="h-2.5 w-2.5 rotate-45" />
               </Button>
             </div>
           );
