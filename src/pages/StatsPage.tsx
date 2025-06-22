@@ -1,5 +1,6 @@
-
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
+import { DateRangePicker } from '@/components/stats/DateRangePicker';
+import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import { useState } from 'react';
 import { BarChart3 } from 'lucide-react';
 import { useStatsCalculations } from '@/hooks/useStatsCalculations';
@@ -64,6 +65,34 @@ const StatsPage = () => {
           {isDndEnabled ? 'Terminer' : 'Réorganiser'}
         </button>
       </div>
+
+      {/* Sélecteur de plage de dates */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <DateRangePicker 
+          date={dateRange} 
+          onDateChange={setDateRange}
+          className="w-full sm:w-auto"
+        />
+        
+        {dateRange?.from && (
+          <button
+            onClick={() => setDateRange(undefined)}
+            className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Réinitialiser les dates
+          </button>
+        )}
+      </div>
+
+      {/* Carte d'analyse IA */}
+      {workouts && workouts.length > 0 && (
+        <AiAnalysisCard
+          title="Analyse IA de vos performances"
+          type="general"
+          workouts={workouts}
+          currentDateRange={dateRange}
+        />
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
