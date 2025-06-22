@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/workout', icon: Dumbbell, label: 'Entraînement', color: 'text-accent-blue' },
+  { path: '/calendar', icon: Calendar, label: 'Calendrier', color: 'text-accent-green' },
   { path: '/stats', icon: BarChart3, label: 'Stats', color: 'text-accent-purple' },
   { path: '/history', icon: History, label: 'Historique', color: 'text-accent-yellow' },
-  { path: '/calendar', icon: Calendar, label: 'Calendrier', color: 'text-accent-green' },
   { path: '/profile', icon: User, label: 'Profil', color: 'text-gray-100' },
 ];
 
