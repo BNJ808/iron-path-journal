@@ -6,9 +6,13 @@ import { useStatsCalculations } from '@/hooks/useStatsCalculations';
 import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
 import { useExerciseProgress } from '@/hooks/useExerciseProgress';
 import { useAdvancedStats } from '@/hooks/useAdvancedStats';
+import { useWorkouts } from '@/hooks/useWorkouts';
+import { DateRange } from 'react-day-picker';
 
 const StatsPage = () => {
   const [isDndEnabled, setIsDndEnabled] = useState(false);
+  const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [cardOrder, setCardOrder] = useState([
     'overview',
     'volume',
@@ -21,24 +25,22 @@ const StatsPage = () => {
     'strength-ratios'
   ]);
 
-  const {
-    stats,
-    isLoading: isStatsLoading,
-    volumeData,
-    workoutData,
-    personalRecords
-  } = useStatsCalculations();
-
-  const { muscleGroupData, isLoading: isMuscleLoading } = useMuscleGroupStats();
-  const { exerciseProgressData, isLoading: isProgressLoading } = useExerciseProgress();
+  const { data: workouts, isLoading: isWorkoutsLoading } = useWorkouts();
+  const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
+  const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(workouts);
+  const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);
   const { 
+    personalRecordsTimeline, 
     progressionPredictions, 
     exerciseProgressionRanking, 
-    strengthRatios,
-    isLoading: isAdvancedLoading 
-  } = useAdvancedStats();
+    strengthRatios 
+  } = useAdvancedStats(workouts);
 
-  const isLoading = isStatsLoading || isMuscleLoading || isProgressLoading || isAdvancedLoading;
+  const isLoading = isWorkoutsLoading;
+
+  const handleViewProgression = (exerciseName: string) => {
+    setSelectedExerciseName(exerciseName);
+  };
 
   return (
     <div className="p-2 sm:p-4 space-y-4 max-w-7xl mx-auto">
@@ -71,11 +73,18 @@ const StatsPage = () => {
           onCardOrderChange={setCardOrder}
           isDndEnabled={isDndEnabled}
           stats={stats}
-          volumeData={volumeData}
-          workoutData={workoutData}
-          personalRecords={personalRecords}
-          muscleGroupData={muscleGroupData}
-          exerciseProgressData={exerciseProgressData}
+          volumeByMuscleGroup={volumeByMuscleGroup}
+          muscleGroupStats={muscleGroupStats}
+          uniqueExercises={uniqueExercises}
+          selectedExerciseName={selectedExerciseName}
+          onSelectedExerciseChange={setSelectedExerciseName}
+          selectedExerciseData={selectedExerciseData}
+          workouts={workouts}
+          dateRange={dateRange}
+          estimated1RMs={estimated1RMs}
+          onViewProgression={handleViewProgression}
+          exerciseProgressCardRef={{ current: null }}
+          personalRecordsTimeline={personalRecordsTimeline}
           progressionPredictions={progressionPredictions}
           exerciseProgressionRanking={exerciseProgressionRanking}
           strengthRatios={strengthRatios}
