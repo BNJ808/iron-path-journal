@@ -48,15 +48,22 @@ export const CalendarDay = ({
   
   // Determine border color based on workout status
   const getBorderColor = () => {
-    if (!hasScheduledPlans || !isCurrentMonth) {
-      return "border-border"; // Default state
+    if (!isCurrentMonth) {
+      return "border-border"; // Default state for non-current month
     }
     
+    // Si un entrainement a été validé, bordure verte
     if (isWorkoutCompleted) {
-      return "border-green-500 border-2"; // Completed workout - green with thicker border
-    } else {
-      return "border-red-500 border-2"; // Missed workout - red with thicker border
+      return "border-green-500 border-2";
     }
+    
+    // Si il y a des plans programmés mais pas d'entrainement validé, bordure rouge
+    if (hasScheduledPlans && !isWorkoutCompleted) {
+      return "border-red-500 border-2";
+    }
+    
+    // Sinon, bordure par défaut
+    return "border-border";
   };
 
   return (
