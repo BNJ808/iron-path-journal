@@ -6,7 +6,7 @@ import { useStatsCalculations } from '@/hooks/useStatsCalculations';
 import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
 import { useExerciseProgress } from '@/hooks/useExerciseProgress';
 import { useAdvancedStats } from '@/hooks/useAdvancedStats';
-import { useWorkouts } from '@/hooks/useWorkouts';
+import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { DateRange } from 'react-day-picker';
 
 const StatsPage = () => {
@@ -25,9 +25,9 @@ const StatsPage = () => {
     'strength-ratios'
   ]);
 
-  const { data: workouts, isLoading: isWorkoutsLoading } = useWorkouts();
+  const { data: workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
   const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
-  const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(workouts);
+  const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(filteredWorkouts);
   const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);
   const { 
     personalRecordsTimeline, 
