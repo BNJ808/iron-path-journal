@@ -1,6 +1,6 @@
 
 import StatCard from '@/components/StatCard';
-import { Dumbbell, Repeat, TrendingUp, Clock, ChevronsUpDown, LayoutGrid } from 'lucide-react';
+import { Dumbbell, Repeat, TrendingUp, Clock, ChevronDown, LayoutGrid } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -14,14 +14,14 @@ interface StatCardsProps {
 export const StatCards = ({ totalWorkouts, totalVolume, totalSets, averageDuration }: StatCardsProps) => (
     <Collapsible defaultOpen={false}>
         <Card>
-            <CollapsibleTrigger asChild>
-                 <CardHeader className="cursor-pointer">
+            <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
+                <CardHeader className="cursor-pointer flex-1">
                     <div className="flex w-full items-center justify-between">
                         <CardTitle className="flex items-center gap-2 text-base">
                             <LayoutGrid className="h-5 w-5 text-accent-blue" />
                             Statistiques Générales
                         </CardTitle>
-                        <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
                     </div>
                 </CardHeader>
             </CollapsibleTrigger>

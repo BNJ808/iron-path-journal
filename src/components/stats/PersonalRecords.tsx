@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, LineChart as LineChartIcon, ChevronsUpDown } from 'lucide-react';
+import { Trophy, LineChart as LineChartIcon, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface PersonalRecord {
@@ -22,14 +22,14 @@ export const PersonalRecords = ({ personalRecords, onViewProgression }: Personal
     return (
         <Collapsible defaultOpen={false}>
             <Card>
-                <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer">
+                <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
+                    <CardHeader className="cursor-pointer flex-1">
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Trophy className="h-5 w-5 text-accent-yellow" />
                                 Records Personnels (Poids max)
                             </CardTitle>
-                             <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
                         </div>
                     </CardHeader>
                 </CollapsibleTrigger>

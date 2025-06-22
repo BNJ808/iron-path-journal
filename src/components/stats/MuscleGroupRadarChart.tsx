@@ -1,10 +1,8 @@
 
-
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Hexagon, ChevronsUpDown } from 'lucide-react';
+import { Hexagon, ChevronDown } from 'lucide-react';
 import { PolarGrid, PolarAngleAxis, Radar, RadarChart as RechartsRadarChart, PolarRadiusAxis } from 'recharts';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
 
@@ -42,14 +40,14 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
     return (
         <Collapsible defaultOpen={false}>
             <Card>
-                <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer">
-                        <div className="flex w-full items-center justify-center">
+                <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
+                    <CardHeader className="cursor-pointer flex-1">
+                        <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Hexagon className="h-5 w-5 text-accent-cyan" />
                                 Séries par Groupe Musculaire
                             </CardTitle>
-                            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground ml-auto" />
+                            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
                         </div>
                     </CardHeader>
                 </CollapsibleTrigger>
@@ -78,5 +76,3 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
         </Collapsible>
     );
 };
-
-

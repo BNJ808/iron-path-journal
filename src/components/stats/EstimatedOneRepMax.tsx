@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, BarChart2, ChevronsUpDown } from 'lucide-react';
+import { TrendingUp, BarChart2, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface EstimatedOneRepMaxProps {
@@ -13,14 +13,14 @@ export const EstimatedOneRepMax = ({ records, onViewProgression }: EstimatedOneR
     return (
         <Collapsible defaultOpen={false}>
             <Card>
-                <CollapsibleTrigger asChild>
-                    <CardHeader className="cursor-pointer">
+                <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
+                    <CardHeader className="cursor-pointer flex-1">
                         <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <TrendingUp className="h-5 w-5 text-accent-red" />
                                 1RM Estimé (Top 5)
                             </CardTitle>
-                            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
                         </div>
                     </CardHeader>
                 </CollapsibleTrigger>
