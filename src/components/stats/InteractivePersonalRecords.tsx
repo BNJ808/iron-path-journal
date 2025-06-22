@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, LineChart as LineChartIcon, ChevronsUpDown, Calendar } from 'lucide-react';
+import { Trophy, LineChart as LineChartIcon, ChevronDown, Calendar } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
@@ -47,7 +47,7 @@ export const InteractivePersonalRecords = ({
                                 <Trophy className="h-5 w-5 text-accent-yellow" />
                                 Records Personnels
                             </CardTitle>
-                            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 data-[state=open]:rotate-180" />
                         </div>
                     </CardHeader>
                 </CollapsibleTrigger>
