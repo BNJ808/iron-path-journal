@@ -23,17 +23,17 @@ export const PersonalRecords = ({ personalRecords, onViewProgression }: Personal
     }
 
     return (
-        <Card>
-            <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-                <CardHeader>
-                    <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>svg]:rotate-180">
+        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+            <Card>
+                <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>svg]:rotate-180">
+                    <CardHeader className="cursor-pointer flex-1">
                         <CardTitle className="flex items-center gap-2 text-base">
                             <Trophy className="h-5 w-5 text-accent-yellow" />
                             Records Personnels (Poids max)
                         </CardTitle>
-                        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-                    </CollapsibleTrigger>
-                </CardHeader>
+                    </CardHeader>
+                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 mr-6" />
+                </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent>
                         <ul className="space-y-2">
@@ -53,7 +53,7 @@ export const PersonalRecords = ({ personalRecords, onViewProgression }: Personal
                         </ul>
                     </CardContent>
                 </CollapsibleContent>
-            </Collapsible>
-        </Card>
+            </Card>
+        </Collapsible>
     );
 };
