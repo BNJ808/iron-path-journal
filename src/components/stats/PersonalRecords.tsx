@@ -24,7 +24,7 @@ export const PersonalRecords = ({ personalRecords, onViewProgression }: Personal
             <Card>
                 <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
                     <CardHeader className="cursor-pointer flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Trophy className="h-5 w-5 text-accent-yellow" />
                                 Records Personnels (Poids max)
