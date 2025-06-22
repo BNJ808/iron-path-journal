@@ -25,7 +25,7 @@ const StatsPage = () => {
     'strength-ratios'
   ]);
 
-  const { data: workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
+  const { workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
   const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
   const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(filteredWorkouts);
   const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);
