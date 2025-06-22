@@ -67,9 +67,6 @@ const ProfilePage = () => {
           <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
         </div>
 
-        {/* Sync Status Card */}
-        <SyncStatus />
-
         {/* Profile Info Card */}
         <Card className="app-card mb-6">
           <CardHeader>
@@ -116,6 +113,9 @@ const ProfilePage = () => {
             <WeightTracker />
           </CardContent>
         </Card>
+
+        {/* Sync Status Card - moved to bottom */}
+        <SyncStatus />
 
         {/* Sign Out Button */}
         <div className="flex justify-center">
