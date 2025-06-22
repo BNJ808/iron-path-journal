@@ -7,7 +7,6 @@ import { fr } from 'date-fns/locale';
 import { 
   DndContext, 
   DragEndEvent, 
-  DragOverlay, 
   DragStartEvent, 
   pointerWithin,
   TouchSensor, 
@@ -240,10 +239,10 @@ export const WorkoutCalendar = () => {
 
             {/* Calendrier */}
             <div className="space-y-4">
-              {/* En-têtes des jours - desktop seulement */}
-              <div className="hidden md:grid grid-cols-7 gap-2">
-                {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
-                  <div key={day} className="text-center text-sm font-medium p-2 text-muted-foreground">
+              {/* En-têtes des jours */}
+              <div className="grid grid-cols-7 gap-2">
+                {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
+                  <div key={index} className="text-center text-sm font-medium p-2 text-muted-foreground">
                     {day}
                   </div>
                 ))}
@@ -253,11 +252,6 @@ export const WorkoutCalendar = () => {
               <div className="space-y-4">
                 {weeks.map((week, weekIndex) => (
                   <div key={weekIndex} className="space-y-2">
-                    {/* Indicateur de semaine sur mobile */}
-                    <div className="md:hidden text-xs text-muted-foreground font-medium px-1">
-                      Semaine du {format(week[0], 'd MMM', { locale: fr })}
-                    </div>
-                    
                     {/* Jours de la semaine */}
                     <div className="grid grid-cols-7 gap-2">
                       {week.map(day => {
