@@ -1,4 +1,3 @@
-
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
 import { useState, useEffect } from 'react';
 import { BarChart3, CalendarDays } from 'lucide-react';
@@ -25,7 +24,7 @@ const StatsPage = () => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut avec la carte d'analyse IA incluse
+    // Ordre par défaut sans la carte des ratios de force
     return [
       'overview',
       'volume',
@@ -35,7 +34,6 @@ const StatsPage = () => {
       'interactive-personal-records',
       'progression-predictions',
       'exercise-progression-ranking',
-      'strength-ratios',
       'ai-analysis'
     ];
   });
@@ -91,8 +89,7 @@ const StatsPage = () => {
   const { 
     personalRecordsTimeline, 
     progressionPredictions, 
-    exerciseProgressionRanking, 
-    strengthRatios 
+    exerciseProgressionRanking
   } = useAdvancedStats(workouts, dateRange);
 
   const isLoading = isWorkoutsLoading;
@@ -168,7 +165,6 @@ const StatsPage = () => {
           personalRecordsTimeline={personalRecordsTimeline}
           progressionPredictions={progressionPredictions}
           exerciseProgressionRanking={exerciseProgressionRanking}
-          strengthRatios={strengthRatios}
         />
       )}
     </div>

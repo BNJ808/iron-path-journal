@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -11,7 +10,6 @@ import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart'
 import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
 import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
 import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';  
-import { StrengthRatios } from '@/components/stats/StrengthRatios';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import type { Workout } from '@/types';
 import { DateRange } from 'react-day-picker';
@@ -63,15 +61,6 @@ interface DraggableStatsCardsProps {
         lastMax: number;
         timeSpan: number;
     }>;
-    strengthRatios: Array<{
-        name: string;
-        ratio: number;
-        exercise1: string;
-        exercise2: string;
-        weight1: number;
-        weight2: number;
-        status: 'équilibré' | 'déséquilibré' | 'normal';
-    }>;
 }
 
 export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
@@ -93,7 +82,6 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
     personalRecordsTimeline,
     progressionPredictions,
     exerciseProgressionRanking,
-    strengthRatios,
 }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -165,7 +153,6 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
         'exercise-progression-ranking': (
             <ExerciseProgressionRanking progressions={exerciseProgressionRanking} />
         ),
-        'strength-ratios': <StrengthRatios ratios={strengthRatios} />,
         'ai-analysis': (
             <AiAnalysisCard
                 title="Analyse IA"
@@ -187,7 +174,6 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
         personalRecordsTimeline,
         progressionPredictions,
         exerciseProgressionRanking,
-        strengthRatios,
         workouts,
         dateRange,
     ]);
