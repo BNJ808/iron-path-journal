@@ -13,16 +13,26 @@ export const useWorkoutHistory = () => {
         queryKey: ['workouts', userId],
         queryFn: async () => {
             if (!userId) return [];
+            
+            console.log('Fetching workouts for user:', userId);
+            
             const { data, error } = await supabase
                 .from('workouts')
                 .select('*')
                 .eq('user_id', userId)
                 .eq('status', 'completed')
                 .order('date', { ascending: false });
+                
+            console.log('Workouts query result:', { data, error });
+            
             if (error) throw new Error(error.message);
+            
             // Les types générés par Supabase utilisent un type `Json` générique pour les colonnes JSON.
             // Nous convertissons le résultat vers notre type `Workout` plus spécifique.
-            return data as unknown as Workout[];
+            const workoutsData = data as unknown as Workout[];
+            console.log('Converted workouts data:', workoutsData);
+            
+            return workoutsData;
         },
         enabled: !!userId,
     });

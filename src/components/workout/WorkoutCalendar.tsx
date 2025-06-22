@@ -30,6 +30,8 @@ export const WorkoutCalendar = () => {
 
   const { workouts } = useWorkoutHistory();
 
+  console.log('Raw workouts from useWorkoutHistory:', workouts);
+
   const {
     sensors,
     activePlan,
@@ -39,10 +41,13 @@ export const WorkoutCalendar = () => {
 
   // Extract completed workout dates - ensure consistent date formatting
   const completedWorkouts = workouts.map(workout => {
+    console.log('Processing workout:', workout);
     const workoutDate = new Date(workout.date);
     // Reset hours to avoid timezone issues
     workoutDate.setHours(0, 0, 0, 0);
-    return format(workoutDate, 'yyyy-MM-dd');
+    const formatted = format(workoutDate, 'yyyy-MM-dd');
+    console.log(`Workout date ${workout.date} formatted to ${formatted}`);
+    return formatted;
   });
 
   console.log('Completed workouts dates:', completedWorkouts);
