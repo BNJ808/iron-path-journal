@@ -4,7 +4,6 @@ import { useWorkoutTemplates } from '@/hooks/useWorkoutTemplates';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
 import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
-import { WorkoutCalendar } from '@/components/workout/WorkoutCalendar';
 import { useWorkoutLifecycle } from '@/hooks/useWorkoutLifecycle';
 import { useCurrentWorkoutActions } from '@/hooks/useCurrentWorkoutActions';
 import { useWorkoutTemplateActions } from '@/hooks/useWorkoutTemplateActions';
@@ -50,19 +49,15 @@ const WorkoutPage = () => {
           onCancelWorkout={handleCancelWorkout}
         />
       ) : (
-        <>
-          <StartWorkout
-            onStartWorkout={handleStartWorkout}
-            onStartFromTemplate={handleStartFromTemplate}
-            templates={templates}
-            isLoadingTemplates={isLoadingTemplates}
-            onUpdateTemplate={handleUpdateTemplate}
-            onDeleteTemplate={deleteTemplate}
-            onCreateTemplate={createTemplate}
-          />
-          
-          <WorkoutCalendar />
-        </>
+        <StartWorkout
+          onStartWorkout={handleStartWorkout}
+          onStartFromTemplate={handleStartFromTemplate}
+          templates={templates}
+          isLoadingTemplates={isLoadingTemplates}
+          onUpdateTemplate={handleUpdateTemplate}
+          onDeleteTemplate={deleteTemplate}
+          onCreateTemplate={createTemplate}
+        />
       )}
     </div>
   );
