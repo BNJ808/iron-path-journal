@@ -72,7 +72,7 @@ export const WorkoutCalendar = () => {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-accent-blue" />
-              Planification des Entraînements
+              Planification
             </div>
             <Button
               variant={isDeleteMode ? "destructive" : "outline"}
