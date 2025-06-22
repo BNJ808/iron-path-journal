@@ -66,15 +66,24 @@ export const CalendarDay = ({
                 "flex items-center justify-between min-h-[28px]"
               )}
             >
-              <div className="flex-1 min-w-0">
-                <div className="truncate font-semibold leading-tight" title={plan.name}>
-                  {plan.name}
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                {/* Première lettre dans un cercle */}
+                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-[10px] font-bold">
+                    {plan.name.charAt(0).toUpperCase()}
+                  </span>
                 </div>
-                {plan.exercises.length > 0 && (
-                  <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
-                    {plan.exercises.length} ex.
+                
+                <div className="flex-1 min-w-0">
+                  <div className="truncate font-semibold leading-tight" title={plan.name}>
+                    {plan.name}
                   </div>
-                )}
+                  {plan.exercises.length > 0 && (
+                    <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
+                      {plan.exercises.length} ex.
+                    </div>
+                  )}
+                </div>
               </div>
               
               <Button
