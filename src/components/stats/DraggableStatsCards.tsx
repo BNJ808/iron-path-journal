@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -9,7 +10,7 @@ import { InteractivePersonalRecords } from '@/components/stats/InteractivePerson
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
 import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
 import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
-import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';
+import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';  
 import { StrengthRatios } from '@/components/stats/StrengthRatios';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import type { Workout } from '@/types';
@@ -31,7 +32,7 @@ interface DraggableStatsCardsProps {
     uniqueExercises: { name: string }[];
     selectedExerciseName: string | null;
     onSelectedExerciseChange: (value: string) => void;
-    selectedExerciseData: { name: string; data: { date: string; weight: number; reps: number; volume: number }[] };
+    selectedExerciseData: { name: string; history: { date: string; displayDate: string; volume: number; maxWeight: number }[] } | null;
     workouts: Workout[] | undefined;
     dateRange: DateRange | undefined;
     estimated1RMs: { [key: string]: number };
@@ -48,27 +49,29 @@ interface DraggableStatsCardsProps {
     progressionPredictions: Array<{
         exercise: string;
         currentMax: number;
-        predictedMax: number;
-        timeframe: string;
+        predicted1Month: number;
+        predicted3Months: number;
+        trend: 'ascending' | 'descending' | 'stable';
         confidence: number;
     }>;
     exerciseProgressionRanking: Array<{
         exercise: string;
-        progressionScore: number;
-        trend: 'improving' | 'stable' | 'declining';
-        recentSessions: number;
+        progressionPercent: number;
+        weightGain: number;
+        sessions: number;
+        firstMax: number;
+        lastMax: number;
+        timeSpan: number;
     }>;
-    strengthRatios: {
-        squat: number;
-        bench: number;
-        deadlift: number;
-        ratios: {
-            benchToSquat: number;
-            deadliftToSquat: number;
-            deadliftToBench: number;
-        };
-        recommendations: string[];
-    };
+    strengthRatios: Array<{
+        name: string;
+        ratio: number;
+        exercise1: string;
+        exercise2: string;
+        weight1: number;
+        weight2: number;
+        status: 'équilibré' | 'déséquilibré' | 'normal';
+    }>;
 }
 
 export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
@@ -149,7 +152,10 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
         ),
         'interactive-personal-records': (
             <EstimatedOneRepMax
-                estimated1RMs={estimated1RMs}
+                records={Object.entries(estimated1RMs).map(([exerciseName, estimated1RM]) => ({
+                    exerciseName,
+                    estimated1RM
+                }))}
                 onViewProgression={onViewProgression}
             />
         ),
@@ -157,7 +163,7 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
             <ProgressionPredictions predictions={progressionPredictions} />
         ),
         'exercise-progression-ranking': (
-            <ExerciseProgressionRanking rankings={exerciseProgressionRanking} />
+            <ExerciseProgressionRanking progressions={exerciseProgressionRanking} />
         ),
         'strength-ratios': <StrengthRatios ratios={strengthRatios} />,
         'ai-analysis': (

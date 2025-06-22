@@ -1,3 +1,4 @@
+
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
 import { useState, useEffect } from 'react';
 import { BarChart3, CalendarDays } from 'lucide-react';
@@ -35,7 +36,7 @@ const StatsPage = () => {
       'progression-predictions',
       'exercise-progression-ranking',
       'strength-ratios',
-      'ai-analysis' // Ajout de la carte d'analyse IA
+      'ai-analysis'
     ];
   });
 
@@ -82,8 +83,8 @@ const StatsPage = () => {
   const { workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
   const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
   
-  // Utiliser tous les workouts pour les statistiques des groupes musculaires si pas de filtre de date
-  const workoutsForMuscleStats = dateRange?.from ? filteredWorkouts : workouts || [];
+  // Utiliser les workouts appropriés selon le filtre de date
+  const workoutsForMuscleStats = dateRange?.from ? filteredWorkouts : (workouts || []);
   const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(workoutsForMuscleStats);
   
   const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);

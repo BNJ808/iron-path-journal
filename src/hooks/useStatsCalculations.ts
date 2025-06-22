@@ -37,6 +37,7 @@ export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange:
             };
         }
 
+        // Utiliser tous les workouts pour les records personnels
         const personalRecords: { [key: string]: PersonalRecord } = {};
         workouts.forEach(workout => {
             workout.exercises.forEach(exercise => {
@@ -52,8 +53,8 @@ export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange:
             });
         });
 
-        // Utiliser filteredWorkouts pour les statistiques de période
-        const workoutsToAnalyze = filteredWorkouts.length > 0 ? filteredWorkouts : workouts;
+        // Utiliser filteredWorkouts pour les statistiques de période, mais tous les workouts si pas de filtre
+        const workoutsToAnalyze = dateRange?.from ? filteredWorkouts : workouts;
 
         let totalVolume = 0;
         let totalSets = 0;
@@ -90,10 +91,10 @@ export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange:
             averageDuration,
             personalRecords,
         };
-    }, [workouts, filteredWorkouts]);
+    }, [workouts, filteredWorkouts, dateRange]);
 
     const estimated1RMs = useMemo(() => {
-        if (!workouts) return [];
+        if (!workouts) return {};
 
         const records = new Map<string, number>();
 
@@ -115,10 +116,7 @@ export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange:
             });
         });
 
-        return Array.from(records.entries())
-            .map(([exerciseName, estimated1RM]) => ({ exerciseName, estimated1RM }))
-            .sort((a, b) => b.estimated1RM - a.estimated1RM);
-
+        return Object.fromEntries(records);
     }, [workouts]);
 
     const uniqueExercises = useMemo(() => {
