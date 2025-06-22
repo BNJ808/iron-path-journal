@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import WorkoutPage from "./pages/WorkoutPage";
 import StatsPage from "./pages/StatsPage";
 import HistoryPage from "./pages/HistoryPage";
+import CalendarPage from "./pages/CalendarPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/workout" element={<WorkoutPage />} />
               <Route path="/stats" element={<StatsPage />} />
               <Route path="/history" element={<HistoryPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               {/* Route /timer supprimée - gérée par le dialog dans Layout */}
             </Route>
