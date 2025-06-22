@@ -4,8 +4,7 @@ import { useUserSettings } from '@/hooks/useUserSettings';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Cloud, CloudOff, Check, AlertCircle } from 'lucide-react';
+import { RefreshCw, Cloud } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const SyncStatus = () => {
@@ -39,90 +38,31 @@ export const SyncStatus = () => {
     }
   };
 
-  const getSyncStatusBadge = () => {
-    if (!isOnline) {
-      return (
-        <Badge variant="outline" className="flex items-center gap-1 text-red-400 border-red-400">
-          <CloudOff className="h-3 w-3" />
-          Hors ligne
-        </Badge>
-      );
-    }
-
-    if (isSyncing) {
-      return (
-        <Badge variant="outline" className="flex items-center gap-1 text-blue-400 border-blue-400">
-          <RefreshCw className="h-3 w-3 animate-spin" />
-          Synchronisation...
-        </Badge>
-      );
-    }
-
-    if (lastSyncTime) {
-      return (
-        <Badge variant="outline" className="flex items-center gap-1 text-green-400 border-green-400">
-          <Check className="h-3 w-3" />
-          Synchronisé
-        </Badge>
-      );
-    }
-
-    return (
-      <Badge variant="outline" className="flex items-center gap-1 text-yellow-400 border-yellow-400">
-        <AlertCircle className="h-3 w-3" />
-        En attente
-      </Badge>
-    );
-  };
-
   return (
     <Card className="app-card">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Cloud className="h-5 w-5 text-primary" />
-            Synchronisation multi-plateforme
-          </div>
-          {getSyncStatusBadge()}
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Cloud className="h-5 w-5 text-primary" />
+          Synchronisation multi-plateforme
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-sm text-muted-foreground">
-          <p>Vos paramètres sont automatiquement synchronisés sur tous vos appareils :</p>
-          <ul className="mt-2 ml-4 list-disc space-y-1 text-xs">
-            <li>Thème et couleurs</li>
-            <li>Ordre des cartes de statistiques</li>
-            <li>Plages de dates de filtrage</li>
-            <li>Exercices favoris</li>
-            <li>Paramètres du minuteur</li>
-            <li>Préférences d'entraînement</li>
-          </ul>
-        </div>
-
         {lastSyncTime && (
-          <div className="text-xs text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             Dernière synchronisation : {lastSyncTime.toLocaleString('fr-FR')}
           </div>
         )}
 
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSync}
-            disabled={isSyncing || !isOnline}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Synchronisation...' : 'Synchroniser maintenant'}
-          </Button>
-        </div>
-
-        {!isOnline && (
-          <div className="text-xs text-yellow-400 bg-yellow-400/10 p-2 rounded">
-            ⚠️ Hors ligne - La synchronisation reprendra automatiquement une fois connecté
-          </div>
-        )}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleSync}
+          disabled={isSyncing || !isOnline}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
+          {isSyncing ? 'Synchronisation...' : 'Synchroniser maintenant'}
+        </Button>
       </CardContent>
     </Card>
   );
