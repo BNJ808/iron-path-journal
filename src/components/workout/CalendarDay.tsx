@@ -106,8 +106,7 @@ export const CalendarDay = ({
               } : undefined}
             >
               <div className={cn(
-                "flex items-center justify-center gap-1 flex-1 min-w-0 text-center",
-                isDeleteMode && "pr-4"
+                "flex items-center justify-center gap-1 flex-1 min-w-0 text-center"
               )}>
                 {/* Nom du plan adaptatif - centré */}
                 <div className="flex-1 min-w-0">
@@ -143,22 +142,6 @@ export const CalendarDay = ({
                   </div>
                 </div>
               </div>
-              
-              {/* Bouton de suppression - affiché seulement en mode suppression */}
-              {isDeleteMode && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-0 right-0 h-3 w-3 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemovePlan(planId, dateKey);
-                  }}
-                  title="Supprimer ce plan"
-                >
-                  <Badge className="h-2 w-2 rotate-45" />
-                </Button>
-              )}
             </div>
           );
         })}
