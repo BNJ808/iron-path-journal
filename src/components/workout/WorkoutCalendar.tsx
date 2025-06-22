@@ -218,7 +218,8 @@ export const WorkoutCalendar = () => {
 
               {/* Calendrier */}
               <div className="mt-6">
-                <div className="grid grid-cols-7 gap-1 mb-2">
+                {/* En-têtes des jours - cachés sur mobile */}
+                <div className="hidden md:grid grid-cols-7 gap-1 mb-2">
                   {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
                     <div key={day} className="text-center text-sm font-medium p-2">
                       {day}
@@ -226,7 +227,43 @@ export const WorkoutCalendar = () => {
                   ))}
                 </div>
                 
-                <div className="grid grid-cols-7 gap-1">
+                {/* Vue mobile: affichage horizontal par semaine */}
+                <div className="md:hidden space-y-4">
+                  {Array.from({ length: Math.ceil(calendarDays.length / 7) }).map((_, weekIndex) => {
+                    const weekDays = calendarDays.slice(weekIndex * 7, (weekIndex + 1) * 7);
+                    return (
+                      <div key={weekIndex} className="space-y-2">
+                        <div className="text-xs text-muted-foreground font-medium">
+                          Semaine du {format(weekDays[0], 'd MMM', { locale: fr })}
+                        </div>
+                        <div className="flex gap-1 overflow-x-auto pb-2">
+                          {weekDays.map(day => {
+                            const dateKey = format(day, 'yyyy-MM-dd');
+                            const scheduledPlans = calendar.scheduledWorkouts[dateKey] || [];
+                            const isCurrentMonth = isSameDay(day, currentDate) || 
+                              (day >= monthStart && day <= monthEnd);
+                            
+                            return (
+                              <div key={dateKey} className="flex-shrink-0 w-20">
+                                <DroppableCalendarDay
+                                  day={day}
+                                  dateKey={dateKey}
+                                  scheduledPlans={scheduledPlans}
+                                  plans={calendar.plans}
+                                  isCurrentMonth={isCurrentMonth}
+                                  onRemovePlan={removePlanFromDay}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Vue desktop: grille classique */}
+                <div className="hidden md:grid grid-cols-7 gap-1">
                   {calendarDays.map(day => {
                     const dateKey = format(day, 'yyyy-MM-dd');
                     const scheduledPlans = calendar.scheduledWorkouts[dateKey] || [];
