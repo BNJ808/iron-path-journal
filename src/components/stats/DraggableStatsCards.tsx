@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { Card } from "@/components/ui/card";
@@ -136,7 +135,7 @@ export const DraggableStatsCards = ({
       case 'progression-predictions':
         return (
           <ProgressionPredictions
-            progressions={progressionPredictions}
+            predictions={progressionPredictions}
           />
         );
       case 'exercise-progression-ranking':
