@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { Card } from "@/components/ui/card";
@@ -84,7 +85,7 @@ export const DraggableStatsCards = ({
         return (
           <StatCard
             title="Total Workouts"
-            value={stats.totalWorkouts}
+            value={stats?.totalWorkouts || 0}
             icon={Activity}
             description="Nombre total d'entraînements enregistrés"
           />
@@ -93,7 +94,7 @@ export const DraggableStatsCards = ({
         return (
           <StatCard
             title="Volume Total"
-            value={`${stats.totalVolume.toLocaleString('fr-FR')} kg`}
+            value={`${(stats?.totalVolume || 0).toLocaleString('fr-FR')} kg`}
             icon={BarChart}
             description="Volume total soulevé (kg) sur la période"
           />
@@ -101,7 +102,7 @@ export const DraggableStatsCards = ({
       case 'personalRecords':
         return (
           <PersonalRecords
-            personalRecords={stats.personalRecords}
+            personalRecords={stats?.personalRecords || {}}
             onViewProgression={onViewProgression}
           />
         );
@@ -110,14 +111,14 @@ export const DraggableStatsCards = ({
       case 'muscle-groups':
         return (
           <MuscleGroupStats
-            volumeByMuscleGroup={volumeByMuscleGroup}
-            muscleGroupStats={muscleGroupStats}
+            volumeByMuscleGroup={volumeByMuscleGroup || []}
+            muscleGroupStats={muscleGroupStats || { chartData: [], maxSets: 0 }}
           />
         );
       case 'exercise-progress':
         return (
           <ExerciseProgress
-            uniqueExercises={uniqueExercises}
+            uniqueExercises={uniqueExercises || []}
             selectedExerciseName={selectedExerciseName}
             onSelectedExerciseChange={onSelectedExerciseChange}
             selectedExerciseData={selectedExerciseData}
@@ -127,21 +128,21 @@ export const DraggableStatsCards = ({
       case 'interactive-personal-records':
         return (
           <InteractivePersonalRecords
-            uniqueExercises={uniqueExercises}
-            workouts={workouts}
+            uniqueExercises={uniqueExercises || []}
+            workouts={workouts || []}
             dateRange={dateRange}
           />
         );
       case 'progression-predictions':
         return (
           <ProgressionPredictions
-            predictions={progressionPredictions}
+            predictions={progressionPredictions || []}
           />
         );
       case 'exercise-progression-ranking':
         return (
           <ExerciseProgressionRanking
-            exerciseProgressionRanking={exerciseProgressionRanking}
+            exerciseProgressionRanking={exerciseProgressionRanking || []}
           />
         );
       case 'ai-analysis':

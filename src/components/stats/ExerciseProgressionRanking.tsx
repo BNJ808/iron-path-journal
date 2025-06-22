@@ -20,7 +20,7 @@ interface ExerciseProgressionRankingProps {
     exerciseProgressionRanking: ExerciseProgression[];
 }
 
-export const ExerciseProgressionRanking = ({ exerciseProgressionRanking }: ExerciseProgressionRankingProps) => {
+export const ExerciseProgressionRanking = ({ exerciseProgressionRanking = [] }: ExerciseProgressionRankingProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const progressions = exerciseProgressionRanking || [];

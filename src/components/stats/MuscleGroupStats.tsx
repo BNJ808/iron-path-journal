@@ -9,7 +9,10 @@ interface MuscleGroupStatsProps {
   muscleGroupStats: { chartData: { subject: string; sets: number }[]; maxSets: number };
 }
 
-export const MuscleGroupStats = ({ volumeByMuscleGroup, muscleGroupStats }: MuscleGroupStatsProps) => {
+export const MuscleGroupStats = ({ 
+  volumeByMuscleGroup = [], 
+  muscleGroupStats = { chartData: [], maxSets: 0 } 
+}: MuscleGroupStatsProps) => {
   return (
     <div className="space-y-4">
       {/* Volume by Muscle Group */}
@@ -28,7 +31,7 @@ export const MuscleGroupStats = ({ volumeByMuscleGroup, muscleGroupStats }: Musc
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              {volumeByMuscleGroup.length > 0 ? (
+              {volumeByMuscleGroup && volumeByMuscleGroup.length > 0 ? (
                 <div className="space-y-2">
                   {volumeByMuscleGroup.slice(0, 5).map((item) => (
                     <div key={item.group} className="flex justify-between items-center p-2 rounded bg-secondary/30">
@@ -47,8 +50,8 @@ export const MuscleGroupStats = ({ volumeByMuscleGroup, muscleGroupStats }: Musc
 
       {/* Radar Chart */}
       <MuscleGroupRadarChart 
-        data={muscleGroupStats.chartData} 
-        maxSets={muscleGroupStats.maxSets} 
+        data={muscleGroupStats?.chartData || []} 
+        maxSets={muscleGroupStats?.maxSets || 0} 
       />
     </div>
   );
