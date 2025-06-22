@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -46,7 +45,19 @@ export const useExerciseLastPerformance = () => {
         mutationFn: async (performances: { exerciseId: string; sets: ExerciseSet[] }[]) => {
             if (!userId) throw new Error("User not authenticated");
 
-            const recordsToUpsert = performances.map(p => ({
+            // Éliminer les doublons par exerciceId pour éviter l'erreur ON CONFLICT
+            const uniquePerformances = performances.reduce((acc, current) => {
+                const existingIndex = acc.findIndex(item => item.exerciseId === current.exerciseId);
+                if (existingIndex >= 0) {
+                    // Si l'exercice existe déjà, on garde le plus récent (le dernier)
+                    acc[existingIndex] = current;
+                } else {
+                    acc.push(current);
+                }
+                return acc;
+            }, [] as typeof performances);
+
+            const recordsToUpsert = uniquePerformances.map(p => ({
                 user_id: userId,
                 exercise_id: p.exerciseId,
                 sets: p.sets as any,
@@ -55,11 +66,20 @@ export const useExerciseLastPerformance = () => {
 
             if (recordsToUpsert.length === 0) return;
 
-            const { error } = await supabase
-                .from('exercise_last_performance')
-                .upsert(recordsToUpsert, { onConflict: 'user_id,exercise_id' });
+            // Traiter les mises à jour une par une pour éviter les conflits
+            for (const record of recordsToUpsert) {
+                const { error } = await supabase
+                    .from('exercise_last_performance')
+                    .upsert(record, { 
+                        onConflict: 'user_id,exercise_id',
+                        ignoreDuplicates: false 
+                    });
 
-            if (error) throw error;
+                if (error) {
+                    console.error(`Erreur lors de la mise à jour de l'exercice ${record.exercise_id}:`, error);
+                    throw error;
+                }
+            }
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['exercise_last_performance', userId] });
