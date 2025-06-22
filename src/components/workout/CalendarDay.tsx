@@ -37,7 +37,7 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[120px] p-2", // Augmentation de la hauteur minimale
+        "min-h-[140px] p-2", // Augmentation de la hauteur minimale
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
@@ -81,12 +81,10 @@ export const CalendarDay = ({
                   </div>
                 </div>
                 
-                {/* Affichage mobile - première lettre + nombre d'exercices */}
+                {/* Affichage mobile - première lettre seulement */}
                 <div className="sm:hidden flex items-center gap-1.5 flex-1 min-w-0">
-                  <div className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 border border-white/20">
-                    <span className="text-xs font-bold">
-                      {plan.name.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="text-lg font-bold">
+                    {plan.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-[10px] opacity-90 leading-tight">
                     {plan.exercises.length} ex.
