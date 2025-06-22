@@ -115,7 +115,9 @@ const ProfilePage = () => {
         </Card>
 
         {/* Sync Status Card - moved to bottom */}
-        <SyncStatus />
+        <div className="mb-6">
+          <SyncStatus />
+        </div>
 
         {/* Sign Out Button */}
         <div className="flex justify-center">
