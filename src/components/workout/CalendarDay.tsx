@@ -97,8 +97,13 @@ export const CalendarDay = ({
               className={cn(
                 `${plan.color} text-white rounded shadow-sm transition-all hover:shadow-md group relative`,
                 "px-1 py-0.5 text-[8px] sm:text-xs font-medium",
-                "flex items-center justify-center min-h-[20px]"
+                "flex items-center justify-center min-h-[20px]",
+                isDeleteMode && "cursor-pointer hover:opacity-80"
               )}
+              onClick={isDeleteMode ? (e) => {
+                e.stopPropagation();
+                onRemovePlan(planId, dateKey);
+              } : undefined}
             >
               <div className={cn(
                 "flex items-center justify-center gap-1 flex-1 min-w-0 text-center",
