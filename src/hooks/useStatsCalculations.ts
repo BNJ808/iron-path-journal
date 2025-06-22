@@ -13,7 +13,9 @@ interface PersonalRecord {
 export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange: DateRange | undefined) => {
     const filteredWorkouts = useMemo(() => {
         if (!workouts) return [];
-        if (!dateRange?.from) return [];
+        
+        // Si pas de dateRange, retourner tous les workouts
+        if (!dateRange?.from) return workouts;
 
         const fromDate = startOfDay(dateRange.from);
         const toDate = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
@@ -50,22 +52,15 @@ export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange:
             });
         });
 
-        if (!filteredWorkouts || filteredWorkouts.length === 0) {
-            return {
-                totalWorkouts: 0,
-                totalVolume: 0,
-                totalSets: 0,
-                averageDuration: 0,
-                personalRecords: personalRecords,
-            };
-        }
+        // Utiliser filteredWorkouts pour les statistiques de période
+        const workoutsToAnalyze = filteredWorkouts.length > 0 ? filteredWorkouts : workouts;
 
         let totalVolume = 0;
         let totalSets = 0;
         let totalDuration = 0;
         let workoutsWithDuration = 0;
 
-        filteredWorkouts.forEach(workout => {
+        workoutsToAnalyze.forEach(workout => {
             if (workout.ended_at && workout.date) {
                 const duration = new Date(workout.ended_at).getTime() - new Date(workout.date).getTime();
                 if (duration > 0) {
@@ -89,7 +84,7 @@ export const useStatsCalculations = (workouts: Workout[] | undefined, dateRange:
         const averageDuration = workoutsWithDuration > 0 ? (totalDuration / workoutsWithDuration) / (1000 * 60) : 0; // in minutes
 
         return {
-            totalWorkouts: filteredWorkouts.length,
+            totalWorkouts: workoutsToAnalyze.length,
             totalVolume: Math.round(totalVolume),
             totalSets,
             averageDuration,
