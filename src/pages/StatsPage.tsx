@@ -1,4 +1,3 @@
-
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
 import { useState } from 'react';
 import { BarChart3 } from 'lucide-react';
@@ -34,7 +33,7 @@ const StatsPage = () => {
     progressionPredictions, 
     exerciseProgressionRanking, 
     strengthRatios 
-  } = useAdvancedStats(workouts);
+  } = useAdvancedStats(workouts, dateRange);
 
   const isLoading = isWorkoutsLoading;
 
