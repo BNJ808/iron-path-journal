@@ -15,6 +15,19 @@ const StatsPage = () => {
   const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   
+  // Ordre par défaut avec la calculatrice 1RM en position 2
+  const defaultCardOrder = [
+    'overview',
+    'one-rm-calculator',
+    'volume',
+    'personalRecords',
+    'muscle-groups',
+    'exercise-progress',
+    'progression-predictions',
+    'exercise-progression-ranking',
+    'ai-analysis'
+  ];
+
   // Charger l'ordre des cartes depuis localStorage
   const [cardOrder, setCardOrder] = useState(() => {
     try {
@@ -22,25 +35,20 @@ const StatsPage = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         console.log('Loaded card order from localStorage:', parsed);
+        // Vérifier que la calculatrice 1RM est dans l'ordre sauvegardé
+        if (!parsed.includes('one-rm-calculator')) {
+          console.log('Adding missing one-rm-calculator to saved order');
+          const updatedOrder = [parsed[0], 'one-rm-calculator', ...parsed.slice(1)];
+          localStorage.setItem('statsCardOrder', JSON.stringify(updatedOrder));
+          return updatedOrder;
+        }
         return parsed;
       }
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut avec la calculatrice 1RM
-    const defaultOrder = [
-      'overview',
-      'one-rm-calculator',
-      'volume',
-      'personalRecords',
-      'muscle-groups',
-      'exercise-progress',
-      'progression-predictions',
-      'exercise-progression-ranking',
-      'ai-analysis'
-    ];
-    console.log('Using default card order:', defaultOrder);
-    return defaultOrder;
+    console.log('Using default card order:', defaultCardOrder);
+    return defaultCardOrder;
   });
 
   // Charger la plage de dates depuis localStorage
