@@ -85,8 +85,6 @@ export const WorkoutCalendar = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <CalendarHeader currentDate={currentDate} onDateChange={setCurrentDate} />
-
           <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
@@ -99,6 +97,8 @@ export const WorkoutCalendar = () => {
               onUpdate={updatePlan}
               onDelete={deletePlan}
             />
+
+            <CalendarHeader currentDate={currentDate} onDateChange={setCurrentDate} />
 
             <CalendarGrid
               weeks={weeks}
