@@ -37,7 +37,7 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[100px] p-2 flex flex-col", // Retirer w-full et min-w pour éviter les chevauchements
+        "min-h-[100px] p-2 flex flex-col", 
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
@@ -67,10 +67,11 @@ export const CalendarDay = ({
               )}
             >
               <div className="flex items-center gap-1 flex-1 min-w-0">
-                {/* Affichage desktop - nom complet */}
-                <div className="hidden sm:flex items-center gap-2 flex-1 min-w-0">
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate font-semibold leading-tight" title={plan.name}>
+                {/* Nom du plan adaptatif */}
+                <div className="flex-1 min-w-0">
+                  {/* Nom complet - s'affiche et se tronque selon l'espace */}
+                  <div className="hidden xs:block">
+                    <div className="truncate font-medium leading-tight" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
@@ -79,15 +80,15 @@ export const CalendarDay = ({
                       </div>
                     )}
                   </div>
-                </div>
-                
-                {/* Affichage mobile - première lettre seulement */}
-                <div className="sm:hidden flex items-center gap-1.5 flex-1 min-w-0">
-                  <div className="text-lg font-bold">
-                    {plan.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="text-[10px] opacity-90 leading-tight">
-                    {plan.exercises.length} ex.
+                  
+                  {/* Première lettre pour très petits écrans */}
+                  <div className="xs:hidden flex items-center gap-1.5">
+                    <div className="text-sm font-medium">
+                      {plan.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="text-[10px] opacity-90 leading-tight">
+                      {plan.exercises.length} ex.
+                    </div>
                   </div>
                 </div>
               </div>
