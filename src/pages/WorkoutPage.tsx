@@ -1,8 +1,10 @@
+
 import { useWorkouts, type ExerciseLog } from '@/hooks/useWorkouts';
 import { useWorkoutTemplates } from '@/hooks/useWorkoutTemplates';
 import { WorkoutInProgress } from '@/components/workout/WorkoutInProgress';
 import { StartWorkout } from '@/components/workout/StartWorkout';
 import { WorkoutLoadingSkeleton } from '@/components/workout/WorkoutLoadingSkeleton';
+import { WorkoutCalendar } from '@/components/workout/WorkoutCalendar';
 import { useWorkoutLifecycle } from '@/hooks/useWorkoutLifecycle';
 import { useCurrentWorkoutActions } from '@/hooks/useCurrentWorkoutActions';
 import { useWorkoutTemplateActions } from '@/hooks/useWorkoutTemplateActions';
@@ -10,7 +12,7 @@ import { Dumbbell } from 'lucide-react';
 import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts';
 
 const WorkoutPage = () => {
-  const { todayWorkout, isLoadingWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
+  const { todayWorkout, isLoadingWorkout } = useOfflineWorkouts();
   const { templates, isLoadingTemplates, updateTemplate, deleteTemplate, createTemplate } = useWorkoutTemplates();
   const { handleStartWorkout, handleFinishWorkout, handleCancelWorkout } = useWorkoutLifecycle();
   const {
@@ -20,7 +22,6 @@ const WorkoutPage = () => {
     handleUpdateWorkoutNotes,
   } = useCurrentWorkoutActions();
   const { handleSaveAsTemplate, handleStartFromTemplate } = useWorkoutTemplateActions();
-
 
   const handleUpdateTemplate = async (id: string, name: string, exercises: ExerciseLog[]) => {
     await updateTemplate({ id, name, exercises });
@@ -49,15 +50,19 @@ const WorkoutPage = () => {
           onCancelWorkout={handleCancelWorkout}
         />
       ) : (
-        <StartWorkout
-          onStartWorkout={handleStartWorkout}
-          onStartFromTemplate={handleStartFromTemplate}
-          templates={templates}
-          isLoadingTemplates={isLoadingTemplates}
-          onUpdateTemplate={handleUpdateTemplate}
-          onDeleteTemplate={deleteTemplate}
-          onCreateTemplate={createTemplate}
-        />
+        <>
+          <StartWorkout
+            onStartWorkout={handleStartWorkout}
+            onStartFromTemplate={handleStartFromTemplate}
+            templates={templates}
+            isLoadingTemplates={isLoadingTemplates}
+            onUpdateTemplate={handleUpdateTemplate}
+            onDeleteTemplate={deleteTemplate}
+            onCreateTemplate={createTemplate}
+          />
+          
+          <WorkoutCalendar />
+        </>
       )}
     </div>
   );

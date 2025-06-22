@@ -10,10 +10,8 @@ import { InteractivePersonalRecords } from '@/components/stats/InteractivePerson
 import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
 import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
 import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
-import { WeightPerformanceCorrelation } from '@/components/stats/WeightPerformanceCorrelation';
 import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';
 import { StrengthRatios } from '@/components/stats/StrengthRatios';
-import { CombinedChart } from '@/components/stats/CombinedChart';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 import type { Workout } from '@/types';
 import { DateRange } from 'react-day-picker';
@@ -56,12 +54,6 @@ interface DraggableStatsCardsProps {
         trend: 'ascending' | 'descending' | 'stable';
         confidence: number;
     }>;
-    weightPerformanceCorrelation: Array<{
-        exercise: string;
-        correlation: number;
-        significance: 'forte' | 'modérée' | 'faible';
-        dataPoints: Array<{ bodyWeight: number; performance: number; date: string }>;
-    }> | null;
     exerciseProgressionRanking: Array<{
         exercise: string;
         progressionPercent: number;
@@ -100,7 +92,6 @@ export const DraggableStatsCards = ({
     exerciseProgressCardRef,
     personalRecordsTimeline,
     progressionPredictions,
-    weightPerformanceCorrelation,
     exerciseProgressionRanking,
     strengthRatios
 }: DraggableStatsCardsProps) => {
@@ -183,11 +174,6 @@ export const DraggableStatsCards = ({
                 predictions={progressionPredictions}
             />
         ),
-        correlation: (
-            <WeightPerformanceCorrelation
-                correlations={weightPerformanceCorrelation}
-            />
-        ),
         ranking: (
             <ExerciseProgressionRanking
                 progressions={exerciseProgressionRanking}
@@ -196,11 +182,6 @@ export const DraggableStatsCards = ({
         ratios: (
             <StrengthRatios
                 ratios={strengthRatios}
-            />
-        ),
-        combined: (
-            <CombinedChart
-                workouts={workouts}
             />
         )
     }), [
@@ -218,7 +199,6 @@ export const DraggableStatsCards = ({
         onSelectedExerciseChange,
         personalRecordsTimeline,
         progressionPredictions,
-        weightPerformanceCorrelation,
         exerciseProgressionRanking,
         strengthRatios
     ]);
