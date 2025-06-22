@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek, endOfWeek, isToday, isSameMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { 
@@ -36,6 +36,7 @@ interface WorkoutCalendar {
 
 export const WorkoutCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [calendar, setCalendar] = useState<WorkoutCalendar>({
     plans: [
       { id: '1', name: 'Push', color: 'bg-blue-500', exercises: ['Développé couché', 'Développé incliné', 'Dips'] },
@@ -206,6 +207,19 @@ export const WorkoutCalendar = () => {
             </Button>
           </div>
 
+          {/* Bouton pour activer/désactiver le mode suppression */}
+          <div className="flex justify-end">
+            <Button
+              variant={isDeleteMode ? "destructive" : "outline"}
+              size="sm"
+              onClick={() => setIsDeleteMode(!isDeleteMode)}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              {isDeleteMode ? "Désactiver suppression" : "Activer suppression"}
+            </Button>
+          </div>
+
           <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
@@ -271,6 +285,7 @@ export const WorkoutCalendar = () => {
                             isCurrentMonth={isCurrentMonth}
                             isCurrentDay={isCurrentDay}
                             onRemovePlan={removePlanFromDay}
+                            isDeleteMode={isDeleteMode}
                           />
                         );
                       })}

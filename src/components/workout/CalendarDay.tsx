@@ -15,6 +15,7 @@ interface CalendarDayProps {
   isCurrentMonth: boolean;
   isCurrentDay: boolean;
   onRemovePlan: (planId: string, dateKey: string) => void;
+  isDeleteMode: boolean;
 }
 
 export const CalendarDay = ({
@@ -24,7 +25,8 @@ export const CalendarDay = ({
   plans,
   isCurrentMonth,
   isCurrentDay,
-  onRemovePlan
+  onRemovePlan,
+  isDeleteMode
 }: CalendarDayProps) => {
   const { isOver, setNodeRef } = useDroppable({
     id: `day-${dateKey}`,
@@ -66,7 +68,10 @@ export const CalendarDay = ({
                 "flex items-center justify-between min-h-[28px]"
               )}
             >
-              <div className="flex items-center gap-1 flex-1 min-w-0 pr-6">
+              <div className={cn(
+                "flex items-center gap-1 flex-1 min-w-0",
+                isDeleteMode && "pr-6"
+              )}>
                 {/* Nom du plan adaptatif */}
                 <div className="flex-1 min-w-0">
                   {/* Nom complet pour desktop (sm et plus) - sans truncate */}
@@ -105,19 +110,21 @@ export const CalendarDay = ({
                 </div>
               </div>
               
-              {/* Bouton de suppression avec logo badge */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute top-0.5 right-0.5 h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemovePlan(planId, dateKey);
-                }}
-                title="Supprimer ce plan"
-              >
-                <Badge className="h-2.5 w-2.5 rotate-45" />
-              </Button>
+              {/* Bouton de suppression - affiché seulement en mode suppression */}
+              {isDeleteMode && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-0.5 right-0.5 h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemovePlan(planId, dateKey);
+                  }}
+                  title="Supprimer ce plan"
+                >
+                  <Badge className="h-2.5 w-2.5 rotate-45" />
+                </Button>
+              )}
             </div>
           );
         })}
