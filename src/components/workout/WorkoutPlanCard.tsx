@@ -43,15 +43,15 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
       className={cn(
         `${plan.color} text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing`,
         isDragging && "shadow-2xl scale-105 z-50",
-        "p-4 min-h-[80px] flex items-center gap-3 touch-manipulation"
+        "p-3 min-h-[60px] flex items-center gap-2 touch-manipulation"
       )}
       {...attributes}
       {...listeners}
     >
-      <GripVertical className="h-5 w-5 flex-shrink-0 opacity-60" />
+      <GripVertical className="h-4 w-4 flex-shrink-0 opacity-60" />
       
       <div className="flex-1 min-w-0">
-        <div className="font-semibold text-sm mb-1 truncate">{plan.name}</div>
+        <div className="font-semibold text-sm mb-0.5 truncate">{plan.name}</div>
         {plan.exercises.length > 0 && (
           <div className="text-xs opacity-80 truncate">
             {plan.exercises.length} exercice{plan.exercises.length > 1 ? 's' : ''}
@@ -65,13 +65,13 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 hover:bg-white/20 flex-shrink-0"
+            className="h-7 w-7 p-0 hover:bg-white/20 flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
             }}
           >
-            <MoreVertical className="h-4 w-4" />
+            <MoreVertical className="h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
