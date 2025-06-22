@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -242,7 +241,7 @@ export const WorkoutCalendar = () => {
             {/* Calendrier */}
             <div className="space-y-4">
               {/* En-têtes des jours */}
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1">
                 {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
                   <div key={index} className="text-center text-sm font-medium p-2 text-muted-foreground">
                     {day}
@@ -251,11 +250,11 @@ export const WorkoutCalendar = () => {
               </div>
               
               {/* Grille de calendrier */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="space-y-2">
+                  <div key={weekIndex} className="space-y-1">
                     {/* Jours de la semaine */}
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="grid grid-cols-7 gap-1">
                       {week.map(day => {
                         const dateKey = format(day, 'yyyy-MM-dd');
                         const scheduledPlans = calendar.scheduledWorkouts[dateKey] || [];

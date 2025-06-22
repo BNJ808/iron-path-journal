@@ -37,7 +37,7 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[100px] p-2 w-full min-w-[120px]", // Hauteur à 100px et largeur minimum augmentée
+        "min-h-[100px] p-2 flex flex-col", // Retirer w-full et min-w pour éviter les chevauchements
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
@@ -45,14 +45,14 @@ export const CalendarDay = ({
     >
       {/* Numéro du jour */}
       <div className={cn(
-        "text-sm font-medium mb-2",
+        "text-sm font-medium mb-2 flex-shrink-0",
         isCurrentDay && "text-primary font-bold"
       )}>
         {dayNumber}
       </div>
       
       {/* Plans programmés */}
-      <div className="space-y-1">
+      <div className="space-y-1 flex-1 overflow-hidden">
         {scheduledPlans.map(planId => {
           const plan = plans.find(p => p.id === planId);
           if (!plan) return null;
