@@ -24,11 +24,12 @@ const StatsPage = () => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut sans la carte des ratios de force
+    // Ordre par défaut avec la nouvelle carte calculatrice
     return [
       'overview',
       'volume',
       'personalRecords',
+      'estimated-1rm',
       'muscle-groups',
       'exercise-progress',
       'interactive-personal-records',
