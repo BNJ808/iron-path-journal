@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { EditWorkoutPlanDialog } from './EditWorkoutPlanDialog';
 import { WorkoutPlan } from './WorkoutCalendar';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WorkoutPlanCardProps {
   plan: WorkoutPlan;
@@ -21,7 +20,6 @@ interface WorkoutPlanCardProps {
 }
 
 export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardProps) => {
-  const isMobile = useIsMobile();
   const {
     attributes,
     listeners,
@@ -42,22 +40,22 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
     <div
       ref={setNodeRef}
       style={style}
-      className={`${plan.color} text-white p-3 rounded-lg flex items-center gap-2 cursor-grab active:cursor-grabbing relative ${
-        isDragging ? 'z-50 shadow-2xl scale-105' : 'shadow-md'
-      } ${isMobile ? 'min-h-[48px] touch-manipulation' : ''}`}
+      className={cn(
+        `${plan.color} text-white rounded-lg flex items-center gap-3 cursor-grab active:cursor-grabbing relative transition-all`,
+        isDragging ? 'z-50 shadow-2xl scale-105' : 'shadow-md hover:shadow-lg',
+        "p-3 min-h-[64px]"
+      )}
       {...attributes}
       {...listeners}
     >
-      {isMobile && (
-        <GripVertical className="h-4 w-4 flex-shrink-0 opacity-70" />
-      )}
+      <GripVertical className="h-4 w-4 flex-shrink-0 opacity-70" />
       
       <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm truncate">{plan.name}</div>
+        <div className="font-semibold text-sm truncate mb-1">{plan.name}</div>
         {plan.exercises.length > 0 && (
           <div className="text-xs opacity-80 truncate">
-            {plan.exercises.slice(0, 2).join(', ')}
-            {plan.exercises.length > 2 && '...'}
+            {plan.exercises.length} exercice{plan.exercises.length > 1 ? 's' : ''}
+            {plan.exercises.length <= 2 && ': ' + plan.exercises.slice(0, 2).join(', ')}
           </div>
         )}
       </div>
@@ -67,10 +65,10 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
           <Button
             variant="ghost"
             size="sm"
-            className={`h-6 w-6 p-0 hover:bg-white/20 ${isMobile ? 'h-8 w-8' : ''}`}
+            className="h-8 w-8 p-0 hover:bg-white/20 flex-shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <MoreVertical className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`} />
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -95,3 +93,6 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
     </div>
   );
 };
+
+// Ajouter l'import manquant
+import { cn } from '@/lib/utils';
