@@ -1,10 +1,9 @@
-
-import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts'; // Changer l'import
+import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts';
 import { useExerciseLastPerformance } from '@/hooks/useExerciseLastPerformance';
 import { toast } from 'sonner';
 
 export const useWorkoutLifecycle = () => {
-  const { todayWorkout, createWorkout, updateWorkout, deleteWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
+  const { todayWorkout, createWorkout, updateWorkout, deleteWorkout } = useOfflineWorkouts();
   const { updateLastPerformances } = useExerciseLastPerformance();
 
   const handleStartWorkout = async () => {
@@ -25,14 +24,29 @@ export const useWorkoutLifecycle = () => {
                      .filter(s => s.reps > 0 || s.weight > 0)
       })).filter(ex => ex.sets.length > 0);
 
-      const performancesToUpdate = cleanedExercises
-        .map(ex => ({
-            exerciseId: ex.exerciseId,
-            sets: ex.sets
-                .filter(s => s.completed) // On met à jour les perfs seulement pour les séries cochées "Fait"
-                .map(({ id, reps, weight }) => ({ id, reps, weight }))
-        }))
-        .filter(ex => ex.sets.length > 0);
+      // Créer un Map pour éviter les doublons d'exercices
+      const performanceMap = new Map<string, { exerciseId: string; sets: any[] }>();
+
+      cleanedExercises.forEach(ex => {
+          const completedSets = ex.sets
+              .filter(s => s.completed) // On met à jour les perfs seulement pour les séries cochées "Fait"
+              .map(({ id, reps, weight }) => ({ id, reps, weight }));
+
+          if (completedSets.length > 0) {
+              // Si l'exercice existe déjà, on fusionne les sets
+              if (performanceMap.has(ex.exerciseId)) {
+                  const existing = performanceMap.get(ex.exerciseId)!;
+                  existing.sets = [...existing.sets, ...completedSets];
+              } else {
+                  performanceMap.set(ex.exerciseId, {
+                      exerciseId: ex.exerciseId,
+                      sets: completedSets
+                  });
+              }
+          }
+      });
+
+      const performancesToUpdate = Array.from(performanceMap.values());
 
       try {
         if (performancesToUpdate.length > 0) {
