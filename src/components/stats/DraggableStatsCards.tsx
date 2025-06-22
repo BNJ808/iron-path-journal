@@ -107,54 +107,57 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
         }
     };
 
-    const cardComponents: Record<string, React.ReactNode> = useMemo(() => ({
-        overview: (
-            <StatCards
-                totalWorkouts={stats.totalWorkouts}
-                totalVolume={stats.totalVolume}
-                totalSets={stats.totalSets}
-                averageDuration={stats.averageDuration}
-            />
-        ),
-        volume: <VolumeChart chartData={volumeByMuscleGroup} />,
-        personalRecords: (
-            <InteractivePersonalRecords
-                personalRecords={stats.personalRecords}
-                timeline={personalRecordsTimeline}
-                onViewProgression={onViewProgression}
-            />
-        ),
-        'muscle-groups': (
-            <MuscleGroupRadarChart
-                data={muscleGroupStats.chartData}
-                maxSets={muscleGroupStats.maxSets}
-            />
-        ),
-        'exercise-progress': (
-            <ExerciseProgress
-                ref={exerciseProgressCardRef}
-                uniqueExercises={uniqueExercises}
-                selectedExerciseName={selectedExerciseName}
-                onSelectedExerciseChange={onSelectedExerciseChange}
-                selectedExerciseData={selectedExerciseData}
-            />
-        ),
-        'one-rm-calculator': <OneRMCalculator />,
-        'progression-predictions': (
-            <ProgressionPredictions predictions={progressionPredictions || []} />
-        ),
-        'exercise-progression-ranking': (
-            <ExerciseProgressionRanking progressions={exerciseProgressionRanking || []} />
-        ),
-        'ai-analysis': (
-            <AiAnalysisCard
-                title="Analyse IA"
-                type="general"
-                workouts={workouts || []}
-                currentDateRange={dateRange}
-            />
-        ),
-    }), [
+    const cardComponents: Record<string, React.ReactNode> = useMemo(() => {
+        console.log('Creating card components, cardOrder:', cardOrder);
+        return {
+            overview: (
+                <StatCards
+                    totalWorkouts={stats.totalWorkouts}
+                    totalVolume={stats.totalVolume}
+                    totalSets={stats.totalSets}
+                    averageDuration={stats.averageDuration}
+                />
+            ),
+            'one-rm-calculator': <OneRMCalculator />,
+            volume: <VolumeChart chartData={volumeByMuscleGroup} />,
+            personalRecords: (
+                <InteractivePersonalRecords
+                    personalRecords={stats.personalRecords}
+                    timeline={personalRecordsTimeline}
+                    onViewProgression={onViewProgression}
+                />
+            ),
+            'muscle-groups': (
+                <MuscleGroupRadarChart
+                    data={muscleGroupStats.chartData}
+                    maxSets={muscleGroupStats.maxSets}
+                />
+            ),
+            'exercise-progress': (
+                <ExerciseProgress
+                    ref={exerciseProgressCardRef}
+                    uniqueExercises={uniqueExercises}
+                    selectedExerciseName={selectedExerciseName}
+                    onSelectedExerciseChange={onSelectedExerciseChange}
+                    selectedExerciseData={selectedExerciseData}
+                />
+            ),
+            'progression-predictions': (
+                <ProgressionPredictions predictions={progressionPredictions || []} />
+            ),
+            'exercise-progression-ranking': (
+                <ExerciseProgressionRanking progressions={exerciseProgressionRanking || []} />
+            ),
+            'ai-analysis': (
+                <AiAnalysisCard
+                    title="Analyse IA"
+                    type="general"
+                    workouts={workouts || []}
+                    currentDateRange={dateRange}
+                />
+            ),
+        };
+    }, [
         stats,
         volumeByMuscleGroup,
         muscleGroupStats,
@@ -169,12 +172,19 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
         exerciseProgressionRanking,
         workouts,
         dateRange,
+        cardOrder
     ]);
 
-    const cards = cardOrder.map((cardId) => ({
-        id: cardId,
-        component: cardComponents[cardId],
-    })).filter(card => card.component);
+    const cards = cardOrder.map((cardId) => {
+        const component = cardComponents[cardId];
+        console.log(`Card ${cardId}:`, component ? 'exists' : 'missing');
+        return {
+            id: cardId,
+            component: component,
+        };
+    }).filter(card => card.component);
+
+    console.log('Final cards to render:', cards.map(c => c.id));
 
     if (!isDndEnabled) {
         return (

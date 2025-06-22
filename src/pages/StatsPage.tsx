@@ -20,13 +20,15 @@ const StatsPage = () => {
     try {
       const saved = localStorage.getItem('statsCardOrder');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        console.log('Loaded card order from localStorage:', parsed);
+        return parsed;
       }
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
     // Ordre par défaut avec la calculatrice 1RM
-    return [
+    const defaultOrder = [
       'overview',
       'one-rm-calculator',
       'volume',
@@ -37,6 +39,8 @@ const StatsPage = () => {
       'exercise-progression-ranking',
       'ai-analysis'
     ];
+    console.log('Using default card order:', defaultOrder);
+    return defaultOrder;
   });
 
   // Charger la plage de dates depuis localStorage
@@ -71,6 +75,7 @@ const StatsPage = () => {
 
   // Sauvegarder l'ordre des cartes dans localStorage
   const handleCardOrderChange = (newOrder: string[]) => {
+    console.log('Saving new card order:', newOrder);
     setCardOrder(newOrder);
     try {
       localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
