@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Trash2 } from 'lucide-react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
-import { DeleteModeToggle } from './calendar/DeleteModeToggle';
 import { WorkoutPlansSection } from './calendar/WorkoutPlansSection';
 import { CalendarGrid } from './calendar/CalendarGrid';
 import { useDragAndDrop } from './calendar/useDragAndDrop';
@@ -50,15 +50,23 @@ export const WorkoutCalendar = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-accent-blue" />
-            Planification des Entraînements
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-accent-blue" />
+              Planification des Entraînements
+            </div>
+            <Button
+              variant={isDeleteMode ? "destructive" : "outline"}
+              size="sm"
+              onClick={() => setIsDeleteMode(!isDeleteMode)}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <CalendarHeader currentDate={currentDate} onDateChange={setCurrentDate} />
-          
-          <DeleteModeToggle isDeleteMode={isDeleteMode} onToggle={() => setIsDeleteMode(!isDeleteMode)} />
 
           <DndContext
             sensors={sensors}
