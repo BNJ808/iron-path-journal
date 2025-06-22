@@ -29,12 +29,7 @@ interface StartWorkoutProps {
 export const StartWorkout = ({ onStartWorkout, onStartFromTemplate, templates, isLoadingTemplates, onUpdateTemplate, onDeleteTemplate, onCreateTemplate }: StartWorkoutProps) => {
   return (
     <div className="text-center py-10 space-y-6">
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <List className="h-5 w-5" />
-        <p className="text-gray-400">Démarrer de zéro</p>
-      </div>
-      
-      <Button onClick={onStartWorkout}>Démarrer un entraînement</Button>
+      <Button onClick={onStartWorkout}>Démarrer un entraînement de zéro</Button>
 
       <div className="border-t border-border pt-6 mt-6">
         <h2 className="text-lg font-semibold mb-4 text-gray-200 flex items-center justify-center gap-2">
