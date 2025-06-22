@@ -199,7 +199,7 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
 
     if (!isDndEnabled) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
                 {cards.map((card) => (
                     <div key={card.id}>
                         {card.component}
@@ -216,7 +216,7 @@ export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
             onDragEnd={handleDragEnd}
         >
             <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-4">
                     {cards.map((card) => (
                         <SortableCardItem key={card.id} id={card.id} isDndEnabled={isDndEnabled}>
                             {card.component}
