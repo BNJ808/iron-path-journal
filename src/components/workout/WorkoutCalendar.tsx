@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import {
   DragEndEvent, 
   DragOverlay, 
   DragStartEvent, 
-  closestCenter, 
+  pointerWithin,
   TouchSensor, 
   MouseSensor, 
   useSensor, 
@@ -47,23 +46,23 @@ export const WorkoutCalendar = () => {
   });
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Configuration des capteurs pour le drag and drop
+  // Configuration des capteurs pour le drag and drop - optimisé pour le curseur/doigt
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      distance: 8,
+      distance: 3,
     },
   });
 
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 200,
-      tolerance: 6,
+      delay: 150,
+      tolerance: 5,
     },
   });
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 8,
+      distance: 3,
     },
   });
 
@@ -211,7 +210,7 @@ export const WorkoutCalendar = () => {
             sensors={sensors}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
-            collisionDetection={closestCenter}
+            collisionDetection={pointerWithin}
           >
             {/* Plans d'entraînement */}
             <div className="space-y-4">
