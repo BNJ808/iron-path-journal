@@ -4,34 +4,66 @@ import { Button } from '@/components/ui/button';
 import { Trophy, LineChart as LineChartIcon, ChevronsUpDown, Calendar } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
-
-interface PersonalRecord {
-    weight: number;
-    reps: number;
-}
-
-interface TimelineRecord {
-    date: string;
-    displayDate: string;
-    exercise: string;
-    weight: number;
-    reps: number;
-    isNewRecord: boolean;
-}
+import { useState, useMemo } from 'react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface InteractivePersonalRecordsProps {
-    personalRecords: { [key: string]: PersonalRecord };
-    timeline: TimelineRecord[];
-    onViewProgression: (exerciseName: string) => void;
+  uniqueExercises: { name: string }[];
+  workouts: any[];
+  dateRange: any;
 }
 
 export const InteractivePersonalRecords = ({ 
-    personalRecords, 
-    timeline, 
-    onViewProgression 
+    uniqueExercises,
+    workouts,
+    dateRange
 }: InteractivePersonalRecordsProps) => {
     const [viewMode, setViewMode] = useState<'records' | 'timeline'>('records');
+
+    const { personalRecords, timeline } = useMemo(() => {
+        if (!workouts || workouts.length === 0) {
+            return { personalRecords: {}, timeline: [] };
+        }
+
+        const records: { [key: string]: { weight: number; reps: number } } = {};
+        const timelineRecords: any[] = [];
+
+        workouts.forEach(workout => {
+            workout.exercises?.forEach((exercise: any) => {
+                exercise.sets?.forEach((set: any) => {
+                    if (set.completed && set.weight && set.reps) {
+                        const currentRecord = records[exercise.name];
+                        const weight = Number(set.weight);
+                        const reps = Number(set.reps);
+
+                        if (!currentRecord || weight > currentRecord.weight || 
+                            (weight === currentRecord.weight && reps > currentRecord.reps)) {
+                            records[exercise.name] = { weight, reps };
+                            
+                            timelineRecords.push({
+                                date: workout.date,
+                                displayDate: format(new Date(workout.date), 'd MMM yyyy', { locale: fr }),
+                                exercise: exercise.name,
+                                weight,
+                                reps,
+                                isNewRecord: true
+                            });
+                        }
+                    }
+                });
+            });
+        });
+
+        return { 
+            personalRecords: records, 
+            timeline: timelineRecords.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        };
+    }, [workouts]);
+
+    const onViewProgression = (exerciseName: string) => {
+        console.log('View progression for:', exerciseName);
+    };
 
     if (Object.keys(personalRecords).length === 0) {
         return null;
@@ -45,7 +77,7 @@ export const InteractivePersonalRecords = ({
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Trophy className="h-5 w-5 text-accent-yellow" />
-                                Records Personnels
+                                Records Personnels Interactifs
                             </CardTitle>
                             <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { Card } from "@/components/ui/card";
@@ -24,14 +25,8 @@ interface DraggableStatsCardsProps {
     averageDuration: number;
     personalRecords: { [key: string]: { weight: number; reps: number } };
   };
-  volumeByMuscleGroup: { [muscleGroup: string]: number };
-  muscleGroupStats: {
-    [muscleGroup: string]: {
-      volume: number;
-      sets: number;
-      exercises: number;
-    };
-  };
+  volumeByMuscleGroup: { group: string; volume: number }[];
+  muscleGroupStats: { chartData: { subject: string; sets: number }[]; maxSets: number };
   uniqueExercises: { name: string }[];
   selectedExerciseName: string | null;
   onSelectedExerciseChange: (exerciseName: string | null) => void;
@@ -123,12 +118,11 @@ export const DraggableStatsCards = ({
       case 'exercise-progress':
         return (
           <ExerciseProgress
+            uniqueExercises={uniqueExercises}
             selectedExerciseName={selectedExerciseName}
             onSelectedExerciseChange={onSelectedExerciseChange}
             selectedExerciseData={selectedExerciseData}
-            workouts={workouts}
-            dateRange={dateRange}
-            exerciseProgressCardRef={exerciseProgressCardRef}
+            ref={exerciseProgressCardRef}
           />
         );
       case 'interactive-personal-records':
@@ -142,7 +136,7 @@ export const DraggableStatsCards = ({
       case 'progression-predictions':
         return (
           <ProgressionPredictions
-            progressionPredictions={progressionPredictions}
+            progressions={progressionPredictions}
           />
         );
       case 'exercise-progression-ranking':
