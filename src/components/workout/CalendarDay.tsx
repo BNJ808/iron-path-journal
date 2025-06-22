@@ -39,7 +39,7 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[60px] p-2 flex flex-col", 
+        "min-h-[60px] p-1.5 flex flex-col", 
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
@@ -47,14 +47,14 @@ export const CalendarDay = ({
     >
       {/* Numéro du jour - centré */}
       <div className={cn(
-        "text-sm font-medium mb-2 flex-shrink-0 text-center",
+        "text-xs font-medium mb-1 flex-shrink-0 text-center",
         isCurrentDay && "text-primary font-bold"
       )}>
         {dayNumber}
       </div>
       
       {/* Plans programmés */}
-      <div className="space-y-1 flex-1 overflow-hidden">
+      <div className="space-y-0.5 flex-1 overflow-hidden">
         {scheduledPlans.map(planId => {
           const plan = plans.find(p => p.id === planId);
           if (!plan) return null;
@@ -63,24 +63,24 @@ export const CalendarDay = ({
             <div
               key={planId}
               className={cn(
-                `${plan.color} text-white rounded-md shadow-sm transition-all hover:shadow-md group relative`,
-                "px-2 py-1.5 text-xs font-medium",
-                "flex items-center justify-between min-h-[28px]"
+                `${plan.color} text-white rounded shadow-sm transition-all hover:shadow-md group relative`,
+                "px-1.5 py-1 text-[10px] font-medium",
+                "flex items-center justify-between min-h-[20px]"
               )}
             >
               <div className={cn(
                 "flex items-center gap-1 flex-1 min-w-0",
-                isDeleteMode && "pr-6"
+                isDeleteMode && "pr-4"
               )}>
                 {/* Nom du plan adaptatif */}
                 <div className="flex-1 min-w-0">
                   {/* Nom complet pour desktop (sm et plus) - sans truncate */}
                   <div className="hidden sm:block">
-                    <div className="font-medium leading-tight break-words" title={plan.name}>
+                    <div className="font-medium leading-tight break-words text-[10px]" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[10px] opacity-90 leading-tight mt-0.5">
+                      <div className="text-[8px] opacity-90 leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
@@ -88,26 +88,21 @@ export const CalendarDay = ({
                   
                   {/* Nom complet pour tablettes (xs à sm) - avec truncate */}
                   <div className="hidden xs:block sm:hidden">
-                    <div className="truncate font-medium leading-tight" title={plan.name}>
+                    <div className="truncate font-medium leading-tight text-[10px]" title={plan.name}>
                       {plan.name}
                     </div>
                     {plan.exercises.length > 0 && (
-                      <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
+                      <div className="text-[8px] opacity-90 truncate leading-tight mt-0.5">
                         {plan.exercises.length} ex.
                       </div>
                     )}
                   </div>
                   
                   {/* Première lettre pour très petits écrans - centrée */}
-                  <div className="xs:hidden flex items-center justify-center gap-1.5 w-full">
-                    <div className="text-sm font-medium text-center">
+                  <div className="xs:hidden flex items-center justify-center w-full">
+                    <div className="text-xs font-medium text-center">
                       {plan.name.charAt(0).toUpperCase()}
                     </div>
-                    {plan.exercises.length > 0 && (
-                      <div className="text-[10px] opacity-90 leading-tight">
-                        {plan.exercises.length} ex.
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -117,14 +112,14 @@ export const CalendarDay = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute top-0.5 right-0.5 h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all rounded-full"
+                  className="absolute top-0 right-0 h-3 w-3 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all rounded-full"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRemovePlan(planId, dateKey);
                   }}
                   title="Supprimer ce plan"
                 >
-                  <Badge className="h-2.5 w-2.5 rotate-45" />
+                  <Badge className="h-2 w-2 rotate-45" />
                 </Button>
               )}
             </div>
@@ -135,7 +130,7 @@ export const CalendarDay = ({
       {/* Indicateur de zone de dépôt */}
       {isOver && (
         <div className="absolute inset-0 bg-primary/5 border-2 border-dashed border-primary rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
-          <span className="text-xs text-primary font-medium bg-background/90 px-2 py-1 rounded shadow-sm">
+          <span className="text-[10px] text-primary font-medium bg-background/90 px-1.5 py-0.5 rounded shadow-sm">
             Déposer ici
           </span>
         </div>
