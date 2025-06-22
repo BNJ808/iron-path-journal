@@ -8,6 +8,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
 import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
 import { WeightTracker } from '@/components/profile/WeightTracker';
+import { SyncStatus } from '@/components/profile/SyncStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -65,6 +66,9 @@ const ProfilePage = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">Mon Profil</h1>
           <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
         </div>
+
+        {/* Sync Status Card */}
+        <SyncStatus />
 
         {/* Profile Info Card */}
         <Card className="app-card mb-6">

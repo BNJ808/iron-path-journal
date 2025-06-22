@@ -35,6 +35,7 @@ export const useProfile = () => {
                     .insert({ 
                         id: userId,
                         username: user?.email?.split('@')[0] || 'Utilisateur',
+                        settings: {},
                         updated_at: new Date().toISOString()
                     })
                     .select()
@@ -69,6 +70,7 @@ export const useProfile = () => {
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+            queryClient.invalidateQueries({ queryKey: ['userSettings', userId] });
             queryClient.setQueryData(['profile', userId], data);
         },
     });

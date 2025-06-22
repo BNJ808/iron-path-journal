@@ -7,15 +7,17 @@ import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
 import { useExerciseProgress } from '@/hooks/useExerciseProgress';
 import { useAdvancedStats } from '@/hooks/useAdvancedStats';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { DateRange } from 'react-day-picker';
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
 
 const StatsPage = () => {
   const [isDndEnabled, setIsDndEnabled] = useState(false);
   const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   
-  // Ordre par défaut avec la calculatrice 1RM en position 2
+  const { settings, updateSettings, isLoading: isLoadingSettings } = useUserSettings();
+  
+  // Utiliser les paramètres synchronisés ou les valeurs par défaut
   const defaultCardOrder = [
     'overview',
     'one-rm-calculator',
@@ -28,65 +30,35 @@ const StatsPage = () => {
     'ai-analysis'
   ];
 
-  // Charger l'ordre des cartes depuis localStorage
-  const [cardOrder, setCardOrder] = useState(() => {
-    try {
-      const saved = localStorage.getItem('statsCardOrder');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        console.log('Loaded card order from localStorage:', parsed);
-        // Vérifier que la calculatrice 1RM est dans l'ordre sauvegardé
-        if (!parsed.includes('one-rm-calculator')) {
-          console.log('Adding missing one-rm-calculator to saved order');
-          const updatedOrder = [parsed[0], 'one-rm-calculator', ...parsed.slice(1)];
-          localStorage.setItem('statsCardOrder', JSON.stringify(updatedOrder));
-          return updatedOrder;
-        }
-        return parsed;
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
-    }
-    console.log('Using default card order:', defaultCardOrder);
-    return defaultCardOrder;
-  });
+  const [cardOrder, setCardOrder] = useState(defaultCardOrder);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
-  // Charger la plage de dates depuis localStorage
+  // Synchroniser avec les paramètres utilisateur
   useEffect(() => {
-    try {
-      const savedDateRange = localStorage.getItem('statsDateRange');
-      if (savedDateRange) {
-        const parsed = JSON.parse(savedDateRange);
-        // Convertir les chaînes de date en objets Date
-        if (parsed.from) parsed.from = new Date(parsed.from);
-        if (parsed.to) parsed.to = new Date(parsed.to);
-        setDateRange(parsed);
+    if (!isLoadingSettings && settings) {
+      if (settings.statsCardOrder) {
+        setCardOrder(settings.statsCardOrder);
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement de la plage de dates:', error);
+      if (settings.statsDateRange) {
+        setDateRange(settings.statsDateRange);
+      }
     }
-  }, []);
+  }, [settings, isLoadingSettings]);
 
-  // Sauvegarder la plage de dates dans localStorage à chaque changement
-  const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
+  // Sauvegarder les changements dans les paramètres utilisateur
+  const handleDateRangeChange = async (newDateRange: DateRange | undefined) => {
     setDateRange(newDateRange);
     try {
-      if (newDateRange) {
-        localStorage.setItem('statsDateRange', JSON.stringify(newDateRange));
-      } else {
-        localStorage.removeItem('statsDateRange');
-      }
+      await updateSettings({ statsDateRange: newDateRange });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de la plage de dates:', error);
     }
   };
 
-  // Sauvegarder l'ordre des cartes dans localStorage
-  const handleCardOrderChange = (newOrder: string[]) => {
-    console.log('Saving new card order:', newOrder);
+  const handleCardOrderChange = async (newOrder: string[]) => {
     setCardOrder(newOrder);
     try {
-      localStorage.setItem('statsCardOrder', JSON.stringify(newOrder));
+      await updateSettings({ statsCardOrder: newOrder });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de l\'ordre des cartes:', error);
     }
@@ -106,7 +78,7 @@ const StatsPage = () => {
     exerciseProgressionRanking
   } = useAdvancedStats(workouts, dateRange);
 
-  const isLoading = isWorkoutsLoading;
+  const isLoading = isWorkoutsLoading || isLoadingSettings;
 
   const handleViewProgression = (exerciseName: string) => {
     setSelectedExerciseName(exerciseName);
