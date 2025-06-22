@@ -37,7 +37,7 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[140px] p-2", // Augmentation de la hauteur minimale
+        "min-h-[100px] p-2 w-full min-w-[120px]", // Hauteur à 100px et largeur minimum augmentée
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
