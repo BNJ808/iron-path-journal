@@ -19,10 +19,10 @@ interface ProgressionPredictionsProps {
     predictions: ProgressionPrediction[];
 }
 
-export const ProgressionPredictions = ({ predictions = [] }: ProgressionPredictionsProps) => {
+export const ProgressionPredictions = ({ predictions }: ProgressionPredictionsProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    if (!predictions || predictions.length === 0) {
+    if (predictions.length === 0) {
         return (
             <Card>
                 <CardHeader>

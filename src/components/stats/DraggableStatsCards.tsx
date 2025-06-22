@@ -1,180 +1,215 @@
-
-import React, { useState, useRef } from 'react';
-import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd';
-import { Card } from "@/components/ui/card";
-import { PersonalRecords } from './PersonalRecords';
-import { MuscleGroupStats } from './MuscleGroupStats';
-import { ExerciseProgress } from './ExerciseProgress';
-import { InteractivePersonalRecords } from './InteractivePersonalRecords';
-import { ProgressionPredictions } from './ProgressionPredictions';
-import { ExerciseProgressionRanking } from './ExerciseProgressionRanking';
-import { AiAnalysis } from './AiAnalysis';
-import { OneRepMaxCalculator } from './OneRepMaxCalculator';
-import { StatCards } from './StatCards';
+import React, { useMemo } from 'react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableCardItem } from '@/components/stats/SortableCardItem';
+import { StatCards } from '@/components/stats/StatCards';
+import { VolumeChart } from '@/components/stats/VolumeChart';
+import { ExerciseProgress } from '@/components/stats/ExerciseProgress';
+import { InteractivePersonalRecords } from '@/components/stats/InteractivePersonalRecords';
+import { MuscleGroupRadarChart } from '@/components/stats/MuscleGroupRadarChart';
+import { EstimatedOneRepMax } from '@/components/stats/EstimatedOneRepMax';
+import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
+import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';  
+import { AiAnalysisCard } from '@/components/AiAnalysisCard';
+import type { Workout } from '@/types';
+import { DateRange } from 'react-day-picker';
 
 interface DraggableStatsCardsProps {
-  cardOrder: string[];
-  onCardOrderChange: (newOrder: string[]) => void;
-  isDndEnabled: boolean;
-  stats: {
-    totalWorkouts: number;
-    totalVolume: number;
-    totalSets: number;
-    averageDuration: number;
-    personalRecords: { [key: string]: { weight: number; reps: number } };
-  };
-  volumeByMuscleGroup: { group: string; volume: number }[];
-  muscleGroupStats: { chartData: { subject: string; sets: number }[]; maxSets: number };
-  uniqueExercises: { name: string }[];
-  selectedExerciseName: string | null;
-  onSelectedExerciseChange: (exerciseName: string | null) => void;
-  selectedExerciseData: any;
-  workouts: any;
-  dateRange: any;
-  estimated1RMs: { [exerciseName: string]: number };
-  onViewProgression: (exerciseName: string) => void;
-  exerciseProgressCardRef: React.RefObject<HTMLDivElement>;
-  personalRecordsTimeline: any;
-  progressionPredictions: any;
-  exerciseProgressionRanking: any;
+    cardOrder: string[];
+    onCardOrderChange: (newOrder: string[]) => void;
+    isDndEnabled: boolean;
+    stats: {
+        totalWorkouts: number;
+        totalVolume: number;
+        totalSets: number;
+        averageDuration: number;
+        personalRecords: { [key: string]: { weight: number; reps: number } };
+    };
+    volumeByMuscleGroup: { group: string; volume: number }[];
+    muscleGroupStats: { chartData: { subject: string; sets: number }[]; maxSets: number };
+    uniqueExercises: { name: string }[];
+    selectedExerciseName: string | null;
+    onSelectedExerciseChange: (value: string) => void;
+    selectedExerciseData: { name: string; history: { date: string; displayDate: string; volume: number; maxWeight: number }[] } | null;
+    workouts: Workout[] | undefined;
+    dateRange: DateRange | undefined;
+    estimated1RMs: { [key: string]: number };
+    onViewProgression: (exerciseName: string) => void;
+    exerciseProgressCardRef: React.RefObject<HTMLDivElement>;
+    personalRecordsTimeline: Array<{
+        date: string;
+        displayDate: string;
+        exercise: string;
+        weight: number;
+        reps: number;
+        isNewRecord: boolean;
+    }>;
+    progressionPredictions: Array<{
+        exercise: string;
+        currentMax: number;
+        predicted1Month: number;
+        predicted3Months: number;
+        trend: 'ascending' | 'descending' | 'stable';
+        confidence: number;
+    }>;
+    exerciseProgressionRanking: Array<{
+        exercise: string;
+        progressionPercent: number;
+        weightGain: number;
+        sessions: number;
+        firstMax: number;
+        lastMax: number;
+        timeSpan: number;
+    }>;
 }
 
-export const DraggableStatsCards = ({
-  cardOrder,
-  onCardOrderChange,
-  isDndEnabled,
-  stats,
-  volumeByMuscleGroup,
-  muscleGroupStats,
-  uniqueExercises,
-  selectedExerciseName,
-  onSelectedExerciseChange,
-  selectedExerciseData,
-  workouts,
-  dateRange,
-  estimated1RMs,
-  onViewProgression,
-  exerciseProgressCardRef,
-  personalRecordsTimeline,
-  progressionPredictions,
-  exerciseProgressionRanking
-}: DraggableStatsCardsProps) => {
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) {
-      return;
-    }
+export const DraggableStatsCards: React.FC<DraggableStatsCardsProps> = ({
+    cardOrder,
+    onCardOrderChange,
+    isDndEnabled,
+    stats,
+    volumeByMuscleGroup,
+    muscleGroupStats,
+    uniqueExercises,
+    selectedExerciseName,
+    onSelectedExerciseChange,
+    selectedExerciseData,
+    workouts,
+    dateRange,
+    estimated1RMs,
+    onViewProgression,
+    exerciseProgressCardRef,
+    personalRecordsTimeline,
+    progressionPredictions,
+    exerciseProgressionRanking,
+}) => {
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
-    const newOrder = Array.from(cardOrder);
-    const [movedCard] = newOrder.splice(result.source.index, 1);
-    newOrder.splice(result.destination.index, 0, movedCard);
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
 
-    onCardOrderChange(newOrder);
-  };
+        if (over && active.id !== over.id) {
+            const oldIndex = cardOrder.indexOf(active.id as string);
+            const newIndex = cardOrder.indexOf(over.id as string);
+            if (oldIndex === -1 || newIndex === -1) return;
+            const newOrder = arrayMove(cardOrder, oldIndex, newIndex);
+            onCardOrderChange(newOrder);
+        }
+    };
 
-  const renderCard = (cardId: string) => {
-    switch (cardId) {
-      case 'general-stats':
-        return (
-          <StatCards
-            totalWorkouts={stats?.totalWorkouts || 0}
-            totalVolume={stats?.totalVolume || 0}
-            totalSets={stats?.totalSets || 0}
-            averageDuration={stats?.averageDuration || 0}
-          />
-        );
-      case 'personalRecords':
-        return (
-          <PersonalRecords
-            personalRecords={stats?.personalRecords || {}}
-            onViewProgression={onViewProgression}
-          />
-        );
-      case 'estimated-1rm':
-        return <OneRepMaxCalculator />;
-      case 'muscle-groups':
-        return (
-          <MuscleGroupStats
-            volumeByMuscleGroup={volumeByMuscleGroup || []}
-            muscleGroupStats={muscleGroupStats || { chartData: [], maxSets: 0 }}
-          />
-        );
-      case 'exercise-progress':
-        return (
-          <ExerciseProgress
-            uniqueExercises={uniqueExercises || []}
-            selectedExerciseName={selectedExerciseName}
-            onSelectedExerciseChange={onSelectedExerciseChange}
-            selectedExerciseData={selectedExerciseData}
-            ref={exerciseProgressCardRef}
-          />
-        );
-      case 'interactive-personal-records':
-        return (
-          <InteractivePersonalRecords
-            uniqueExercises={uniqueExercises || []}
-            workouts={workouts || []}
-            dateRange={dateRange}
-          />
-        );
-      case 'progression-predictions':
-        return (
-          <ProgressionPredictions
-            predictions={progressionPredictions || []}
-          />
-        );
-      case 'exercise-progression-ranking':
-        return (
-          <ExerciseProgressionRanking
-            exerciseProgressionRanking={exerciseProgressionRanking || []}
-          />
-        );
-      case 'ai-analysis':
-        return (
-          <AiAnalysis
-            personalRecordsTimeline={personalRecordsTimeline}
-          />
-        );
-      default:
-        return null; // Ne plus afficher "Unknown card"
-    }
-  };
+    const cardComponents: Record<string, React.ReactNode> = useMemo(() => ({
+        overview: (
+            <StatCards
+                totalWorkouts={stats.totalWorkouts}
+                totalVolume={stats.totalVolume}
+                totalSets={stats.totalSets}
+                averageDuration={stats.averageDuration}
+            />
+        ),
+        volume: <VolumeChart chartData={volumeByMuscleGroup} />,
+        personalRecords: (
+            <InteractivePersonalRecords
+                personalRecords={stats.personalRecords}
+                timeline={personalRecordsTimeline}
+                onViewProgression={onViewProgression}
+            />
+        ),
+        'muscle-groups': (
+            <MuscleGroupRadarChart
+                data={muscleGroupStats.chartData}
+                maxSets={muscleGroupStats.maxSets}
+            />
+        ),
+        'exercise-progress': (
+            <ExerciseProgress
+                ref={exerciseProgressCardRef}
+                uniqueExercises={uniqueExercises}
+                selectedExerciseName={selectedExerciseName}
+                onSelectedExerciseChange={onSelectedExerciseChange}
+                selectedExerciseData={selectedExerciseData}
+            />
+        ),
+        'interactive-personal-records': (
+            <EstimatedOneRepMax
+                records={Object.entries(estimated1RMs).map(([exerciseName, estimated1RM]) => ({
+                    exerciseName,
+                    estimated1RM
+                }))}
+                onViewProgression={onViewProgression}
+            />
+        ),
+        'progression-predictions': (
+            <ProgressionPredictions predictions={progressionPredictions} />
+        ),
+        'exercise-progression-ranking': (
+            <ExerciseProgressionRanking progressions={exerciseProgressionRanking} />
+        ),
+        'ai-analysis': (
+            <AiAnalysisCard
+                title="Analyse IA"
+                type="general"
+                workouts={workouts || []}
+                currentDateRange={dateRange}
+            />
+        ),
+    }), [
+        stats,
+        volumeByMuscleGroup,
+        muscleGroupStats,
+        uniqueExercises,
+        selectedExerciseName,
+        onSelectedExerciseChange,
+        selectedExerciseData,
+        estimated1RMs,
+        onViewProgression,
+        personalRecordsTimeline,
+        progressionPredictions,
+        exerciseProgressionRanking,
+        workouts,
+        dateRange,
+    ]);
 
-  return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable
-        droppableId="stats-cards-droppable"
-        direction="horizontal"
-        isDropDisabled={!isDndEnabled}
-      >
-        {(provided) => (
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {cardOrder.map((cardId, index) => {
-              const cardContent = renderCard(cardId);
-              if (!cardContent) return null; // Ne pas rendre les cartes nulles
-              
-              return (
-                <Draggable key={cardId} draggableId={cardId} index={index} isDragDisabled={!isDndEnabled}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={provided.draggableProps.style}
-                    >
-                      {cardContent}
+    const cards = cardOrder.map((cardId) => ({
+        id: cardId,
+        component: cardComponents[cardId],
+    })).filter(card => card.component);
+
+    if (!isDndEnabled) {
+        return (
+            <div className="space-y-4">
+                {cards.map((card) => (
+                    <div key={card.id}>
+                        {card.component}
                     </div>
-                  )}
-                </Draggable>
-              );
-            })}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
-  );
+                ))}
+            </div>
+        );
+    }
+
+    return (
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+        >
+            <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
+                <div className="space-y-4">
+                    {cards.map((card) => (
+                        <SortableCardItem key={card.id} id={card.id} isDndEnabled={isDndEnabled}>
+                            {card.component}
+                        </SortableCardItem>
+                    ))}
+                </div>
+            </SortableContext>
+        </DndContext>
+    );
 };

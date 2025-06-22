@@ -24,11 +24,11 @@ const StatsPage = () => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut avec la carte des statistiques générales regroupées
+    // Ordre par défaut sans la carte des ratios de force
     return [
-      'general-stats',
+      'overview',
+      'volume',
       'personalRecords',
-      'estimated-1rm',
       'muscle-groups',
       'exercise-progress',
       'interactive-personal-records',

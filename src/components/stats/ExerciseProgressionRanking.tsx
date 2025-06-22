@@ -17,13 +17,11 @@ interface ExerciseProgression {
 }
 
 interface ExerciseProgressionRankingProps {
-    exerciseProgressionRanking: ExerciseProgression[];
+    progressions: ExerciseProgression[];
 }
 
-export const ExerciseProgressionRanking = ({ exerciseProgressionRanking = [] }: ExerciseProgressionRankingProps) => {
+export const ExerciseProgressionRanking = ({ progressions }: ExerciseProgressionRankingProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
-
-    const progressions = exerciseProgressionRanking || [];
 
     if (progressions.length === 0) {
         return (
