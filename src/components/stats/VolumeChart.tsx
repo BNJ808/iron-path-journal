@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
 import { BarChart3, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
@@ -55,9 +55,15 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                 <Bar 
                                     dataKey="volume" 
-                                    fill="var(--color-volume)" 
                                     radius={[4, 4, 0, 0]}
-                                />
+                                >
+                                    {chartData.map((entry, index) => (
+                                        <Cell 
+                                            key={`cell-${index}`} 
+                                            fill={MUSCLE_GROUP_COLORS_HEX[entry.group] || MUSCLE_GROUP_COLORS_HEX['Autres']} 
+                                        />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ChartContainer>
                     </CardContent>
