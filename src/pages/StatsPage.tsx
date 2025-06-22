@@ -25,14 +25,14 @@ const StatsPage = () => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'ordre des cartes:', error);
     }
-    // Ordre par défaut avec la nouvelle calculatrice 1RM
+    // Ordre par défaut avec la calculatrice 1RM
     return [
       'overview',
+      'one-rm-calculator',
       'volume',
       'personalRecords',
       'muscle-groups',
       'exercise-progress',
-      'one-rm-calculator',
       'progression-predictions',
       'exercise-progression-ranking',
       'ai-analysis'
