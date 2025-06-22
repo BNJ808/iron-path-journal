@@ -27,7 +27,7 @@ const PLAN_COLORS = [
 interface EditWorkoutPlanDialogProps {
   children: React.ReactNode;
   plan: WorkoutPlan;
-  onUpdate: (planId: string, updates: Partial<WorkoutPlan>) => void;
+  onUpdate: (updates: Partial<WorkoutPlan>) => void;
 }
 
 export const EditWorkoutPlanDialog = ({ children, plan, onUpdate }: EditWorkoutPlanDialogProps) => {
@@ -45,7 +45,7 @@ export const EditWorkoutPlanDialog = ({ children, plan, onUpdate }: EditWorkoutP
       .map(ex => ex.trim())
       .filter(ex => ex.length > 0);
 
-    onUpdate(plan.id, {
+    onUpdate({
       name: name.trim(),
       color: selectedColor,
       exercises: exerciseList,
