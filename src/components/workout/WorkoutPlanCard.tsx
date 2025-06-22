@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { EditWorkoutPlanDialog } from './EditWorkoutPlanDialog';
 import { WorkoutPlan } from './WorkoutCalendar';
+import { cn } from '@/lib/utils';
 
 interface WorkoutPlanCardProps {
   plan: WorkoutPlan;
@@ -32,8 +33,7 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    touchAction: 'none',
+    opacity: isDragging ? 0.8 : 1,
   };
 
   return (
@@ -41,17 +41,17 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
       ref={setNodeRef}
       style={style}
       className={cn(
-        `${plan.color} text-white rounded-lg flex items-center gap-3 cursor-grab active:cursor-grabbing relative transition-all`,
-        isDragging ? 'z-50 shadow-2xl scale-105' : 'shadow-md hover:shadow-lg',
-        "p-3 min-h-[64px]"
+        `${plan.color} text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing`,
+        isDragging && "shadow-2xl scale-105 z-50",
+        "p-4 min-h-[80px] flex items-center gap-3 touch-manipulation"
       )}
       {...attributes}
       {...listeners}
     >
-      <GripVertical className="h-4 w-4 flex-shrink-0 opacity-70" />
+      <GripVertical className="h-5 w-5 flex-shrink-0 opacity-60" />
       
       <div className="flex-1 min-w-0">
-        <div className="font-semibold text-sm truncate mb-1">{plan.name}</div>
+        <div className="font-semibold text-sm mb-1 truncate">{plan.name}</div>
         {plan.exercises.length > 0 && (
           <div className="text-xs opacity-80 truncate">
             {plan.exercises.length} exercice{plan.exercises.length > 1 ? 's' : ''}
@@ -66,7 +66,10 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 hover:bg-white/20 flex-shrink-0"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
           >
             <MoreVertical className="h-4 w-4" />
           </Button>
@@ -93,6 +96,3 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
     </div>
   );
 };
-
-// Ajouter l'import manquant
-import { cn } from '@/lib/utils';

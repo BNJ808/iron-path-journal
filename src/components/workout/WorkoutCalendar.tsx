@@ -5,7 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek, endOfWeek, isToday, isSameMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { 
+  DndContext, 
+  DragEndEvent, 
+  DragOverlay, 
+  DragStartEvent, 
+  closestCenter, 
+  TouchSensor, 
+  MouseSensor, 
+  useSensor, 
+  useSensors,
+  PointerSensor 
+} from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { WorkoutPlanCard } from './WorkoutPlanCard';
 import { CalendarDay } from './CalendarDay';
 import { CreateWorkoutPlanDialog } from './CreateWorkoutPlanDialog';
@@ -35,15 +47,27 @@ export const WorkoutCalendar = () => {
   });
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Configuration des capteurs pour le drag and drop
   const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: {
+      distance: 8,
+    },
   });
 
   const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: { delay: 200, tolerance: 8 },
+    activationConstraint: {
+      delay: 200,
+      tolerance: 6,
+    },
   });
 
-  const sensors = useSensors(mouseSensor, touchSensor);
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor, pointerSensor);
 
   useEffect(() => {
     const saved = localStorage.getItem('workoutCalendar');
@@ -68,25 +92,25 @@ export const WorkoutCalendar = () => {
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   const handleDragStart = (event: DragStartEvent) => {
+    console.log('Drag started:', event.active.id);
     setActiveId(event.active.id as string);
-    document.body.style.overflow = 'hidden';
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
-    document.body.style.overflow = '';
+    console.log('Drag ended:', { active: active?.id, over: over?.id });
     
-    if (!over) {
+    if (!over || !active) {
       setActiveId(null);
       return;
     }
 
     const planId = active.id as string;
-    const dayKey = over.id as string;
+    const overId = over.id as string;
 
-    if (dayKey.startsWith('day-')) {
-      const dateKey = dayKey.replace('day-', '');
+    if (overId.startsWith('day-')) {
+      const dateKey = overId.replace('day-', '');
       const newScheduledWorkouts = { ...calendar.scheduledWorkouts };
       
       if (!newScheduledWorkouts[dateKey]) {
@@ -95,6 +119,7 @@ export const WorkoutCalendar = () => {
       
       if (!newScheduledWorkouts[dateKey].includes(planId)) {
         newScheduledWorkouts[dateKey].push(planId);
+        console.log('Plan added to day:', { planId, dateKey });
       }
 
       saveCalendar({ ...calendar, scheduledWorkouts: newScheduledWorkouts });
@@ -145,14 +170,14 @@ export const WorkoutCalendar = () => {
 
   const activePlan = calendar.plans.find(plan => plan.id === activeId);
 
-  // Grouper les jours par semaine pour un affichage mobile optimisé
+  // Grouper les jours par semaine
   const weeks = [];
   for (let i = 0; i < calendarDays.length; i += 7) {
     weeks.push(calendarDays.slice(i, i + 7));
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -182,37 +207,39 @@ export const WorkoutCalendar = () => {
             </Button>
           </div>
 
-          {/* Plans d'entraînement */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="font-medium">Plans d'entraînement</h4>
-              <CreateWorkoutPlanDialog onAdd={addPlan}>
-                <Button variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Nouveau plan
-                </Button>
-              </CreateWorkoutPlanDialog>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {calendar.plans.map(plan => (
-                <WorkoutPlanCard
-                  key={plan.id}
-                  plan={plan}
-                  onUpdate={updatePlan}
-                  onDelete={deletePlan}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Calendrier */}
           <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             collisionDetection={closestCenter}
           >
+            {/* Plans d'entraînement */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium">Plans d'entraînement</h4>
+                <CreateWorkoutPlanDialog onAdd={addPlan}>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Nouveau plan
+                  </Button>
+                </CreateWorkoutPlanDialog>
+              </div>
+              
+              <SortableContext items={calendar.plans.map(p => p.id)} strategy={verticalListSortingStrategy}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {calendar.plans.map(plan => (
+                    <WorkoutPlanCard
+                      key={plan.id}
+                      plan={plan}
+                      onUpdate={updatePlan}
+                      onDelete={deletePlan}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </div>
+
+            {/* Calendrier */}
             <div className="space-y-4">
               {/* En-têtes des jours - desktop seulement */}
               <div className="hidden md:grid grid-cols-7 gap-2">
@@ -224,16 +251,16 @@ export const WorkoutCalendar = () => {
               </div>
               
               {/* Grille de calendrier */}
-              <div className="space-y-3 md:space-y-2">
+              <div className="space-y-4">
                 {weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="space-y-2 md:space-y-0">
+                  <div key={weekIndex} className="space-y-2">
                     {/* Indicateur de semaine sur mobile */}
-                    <div className="md:hidden text-xs text-muted-foreground font-medium">
+                    <div className="md:hidden text-xs text-muted-foreground font-medium px-1">
                       Semaine du {format(week[0], 'd MMM', { locale: fr })}
                     </div>
                     
                     {/* Jours de la semaine */}
-                    <div className="grid grid-cols-7 gap-1 md:gap-2">
+                    <div className="grid grid-cols-7 gap-2">
                       {week.map(day => {
                         const dateKey = format(day, 'yyyy-MM-dd');
                         const scheduledPlans = calendar.scheduledWorkouts[dateKey] || [];
@@ -261,7 +288,7 @@ export const WorkoutCalendar = () => {
 
             <DragOverlay>
               {activePlan && (
-                <div className={`${activePlan.color} text-white px-3 py-2 rounded-lg text-sm font-medium shadow-xl border-2 border-white/50`}>
+                <div className={`${activePlan.color} text-white px-4 py-3 rounded-lg text-sm font-medium shadow-xl border-2 border-white/30 backdrop-blur-sm`}>
                   {activePlan.name}
                 </div>
               )}

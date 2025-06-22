@@ -36,15 +36,16 @@ export const CalendarDay = ({
     <div
       ref={setNodeRef}
       className={cn(
-        "border rounded-lg p-1 min-h-[60px] md:min-h-[80px] transition-all duration-200 relative",
-        isOver ? "border-primary bg-primary/20 scale-105 shadow-lg" : "border-border",
-        !isCurrentMonth && "bg-muted/30 text-muted-foreground opacity-60",
-        isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/30"
+        "border rounded-lg transition-all duration-200 relative touch-manipulation",
+        "min-h-[80px] p-2",
+        isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
+        !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
+        isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
       )}
     >
       {/* Numéro du jour */}
       <div className={cn(
-        "text-xs md:text-sm font-medium mb-1",
+        "text-sm font-medium mb-2",
         isCurrentDay && "text-primary font-bold"
       )}>
         {dayNumber}
@@ -60,16 +61,17 @@ export const CalendarDay = ({
             <div
               key={planId}
               className={cn(
-                `${plan.color} text-white rounded-md px-1.5 py-1 text-xs font-medium shadow-sm relative group transition-all hover:shadow-md`,
-                "flex items-center justify-between min-h-[24px]"
+                `${plan.color} text-white rounded-md shadow-sm transition-all hover:shadow-md group`,
+                "px-2 py-1.5 text-xs font-medium",
+                "flex items-center justify-between min-h-[28px]"
               )}
             >
               <div className="flex-1 min-w-0">
-                <div className="truncate text-xs font-semibold" title={plan.name}>
+                <div className="truncate font-semibold leading-tight" title={plan.name}>
                   {plan.name}
                 </div>
                 {plan.exercises.length > 0 && (
-                  <div className="text-[10px] opacity-80 truncate leading-tight">
+                  <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
                     {plan.exercises.length} ex.
                   </div>
                 )}
@@ -78,7 +80,7 @@ export const CalendarDay = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all flex-shrink-0 ml-1"
+                className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-all flex-shrink-0 ml-1"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemovePlan(planId, dateKey);
@@ -93,8 +95,8 @@ export const CalendarDay = ({
       
       {/* Indicateur de zone de dépôt */}
       {isOver && (
-        <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary rounded-lg flex items-center justify-center z-10">
-          <span className="text-xs text-primary font-medium bg-background/90 px-2 py-1 rounded">
+        <div className="absolute inset-0 bg-primary/5 border-2 border-dashed border-primary rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
+          <span className="text-xs text-primary font-medium bg-background/90 px-2 py-1 rounded shadow-sm">
             Déposer ici
           </span>
         </div>
