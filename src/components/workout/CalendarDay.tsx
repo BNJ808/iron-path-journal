@@ -37,7 +37,7 @@ export const CalendarDay = ({
       ref={setNodeRef}
       className={cn(
         "border rounded-lg transition-all duration-200 relative touch-manipulation",
-        "min-h-[80px] p-2",
+        "min-h-[120px] p-2", // Augmentation de la hauteur minimale
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border",
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "border-primary bg-primary/5 ring-1 ring-primary/20"
@@ -66,27 +66,28 @@ export const CalendarDay = ({
                 "flex items-center justify-between min-h-[28px]"
               )}
             >
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                {/* Première lettre dans un cercle - plus visible sur mobile */}
-                <div className="w-6 h-6 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 border border-white/20">
-                  <span className="text-xs font-bold">
-                    {plan.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                
-                <div className="flex-1 min-w-0 hidden sm:block">
-                  <div className="truncate font-semibold leading-tight" title={plan.name}>
-                    {plan.name}
-                  </div>
-                  {plan.exercises.length > 0 && (
-                    <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
-                      {plan.exercises.length} ex.
+              <div className="flex items-center gap-1 flex-1 min-w-0">
+                {/* Affichage desktop - nom complet */}
+                <div className="hidden sm:flex items-center gap-2 flex-1 min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate font-semibold leading-tight" title={plan.name}>
+                      {plan.name}
                     </div>
-                  )}
+                    {plan.exercises.length > 0 && (
+                      <div className="text-[10px] opacity-90 truncate leading-tight mt-0.5">
+                        {plan.exercises.length} ex.
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
-                {/* Affichage mobile simplifié */}
-                <div className="flex-1 min-w-0 sm:hidden">
+                {/* Affichage mobile - première lettre + nombre d'exercices */}
+                <div className="sm:hidden flex items-center gap-1.5 flex-1 min-w-0">
+                  <div className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 border border-white/20">
+                    <span className="text-xs font-bold">
+                      {plan.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                   <div className="text-[10px] opacity-90 leading-tight">
                     {plan.exercises.length} ex.
                   </div>
