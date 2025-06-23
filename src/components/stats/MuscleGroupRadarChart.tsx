@@ -100,7 +100,10 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                                     stroke="var(--color-sets)"
                                     dot={(props: any) => {
                                         const { cx, cy, payload } = props;
-                                        const color = MUSCLE_GROUP_COLORS_HEX[payload.subject] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+                                        // Essayons différentes façons d'accéder au nom du groupe musculaire
+                                        const muscleGroup = payload?.subject || payload?.name || '';
+                                        const color = MUSCLE_GROUP_COLORS_HEX[muscleGroup] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+                                        console.log('Dot payload:', payload, 'muscleGroup:', muscleGroup, 'color:', color);
                                         return (
                                             <circle
                                                 cx={cx}
