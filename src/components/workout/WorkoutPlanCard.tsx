@@ -44,17 +44,18 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
       className={cn(
         `${plan.color} text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing`,
         isDragging && "shadow-2xl scale-105 z-50",
-        "p-2 min-h-[48px] flex items-center gap-2"
+        "p-2 min-h-[48px] flex items-center gap-2",
+        "select-none" // Désactive la sélection de texte
       )}
       {...attributes}
       {...listeners}
     >
       <GripVertical className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
       
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold text-sm truncate">{plan.name}</div>
+      <div className="flex-1 min-w-0 select-none">
+        <div className="font-semibold text-sm truncate select-none">{plan.name}</div>
         {plan.exercises.length > 0 && (
-          <div className="text-xs opacity-80 truncate leading-tight">
+          <div className="text-xs opacity-80 truncate leading-tight select-none">
             {plan.exercises.length} exercice{plan.exercises.length > 1 ? 's' : ''}
             {plan.exercises.length <= 2 && ': ' + plan.exercises.slice(0, 2).join(', ')}
           </div>
