@@ -41,8 +41,8 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                         <ChartContainer config={chartConfig} className="h-[400px] w-full">
                             <BarChart 
                                 data={chartData} 
-                                margin={{ top: 10, right: 15, left: 15, bottom: 35 }}
-                                barCategoryGap="15%"
+                                margin={{ top: 10, right: 5, left: 5, bottom: 35 }}
+                                barCategoryGap="8%"
                             >
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
                                 <XAxis 
@@ -59,13 +59,13 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                     tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
                                     axisLine={false}
                                     tickLine={false}
-                                    width={50}
+                                    width={40}
                                 />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                 <Bar 
                                     dataKey="volume" 
                                     radius={[6, 6, 0, 0]}
-                                    maxBarSize={60}
+                                    maxBarSize={80}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell 
