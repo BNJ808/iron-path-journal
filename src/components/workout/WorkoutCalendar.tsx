@@ -8,8 +8,8 @@ import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
 import { WorkoutPlansSection } from './calendar/WorkoutPlansSection';
 import { CalendarGrid } from './calendar/CalendarGrid';
-import { useDragAndDrop } from './calendar/useDragAndDrop';
-import { useWorkoutCalendarData } from './calendar/useWorkoutCalendarData';
+import { useDragAndDropSync } from './calendar/useDragAndDropSync';
+import { useWorkoutCalendarSync } from '@/hooks/useWorkoutCalendarSync';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 
 // Re-export types for backward compatibility
@@ -21,12 +21,13 @@ export const WorkoutCalendar = () => {
   
   const {
     calendar,
-    saveCalendar,
-    removePlanFromDay,
+    isLoading,
     addPlan,
     updatePlan,
-    deletePlan
-  } = useWorkoutCalendarData();
+    deletePlan,
+    addPlanToDate,
+    removePlanFromDate
+  } = useWorkoutCalendarSync();
 
   const { workouts } = useWorkoutHistory();
 
@@ -37,7 +38,7 @@ export const WorkoutCalendar = () => {
     activePlan,
     handleDragStart,
     handleDragEnd
-  } = useDragAndDrop(calendar, saveCalendar);
+  } = useDragAndDropSync(calendar, addPlanToDate);
 
   // Extract completed workout dates - ensure consistent date formatting
   const completedWorkouts = workouts.map(workout => {
@@ -63,6 +64,26 @@ export const WorkoutCalendar = () => {
   const weeks = [];
   for (let i = 0; i < calendarDays.length; i += 7) {
     weeks.push(calendarDays.slice(i, i + 7));
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-accent-blue" />
+              Planification
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <p>Chargement du calendrier...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -105,7 +126,7 @@ export const WorkoutCalendar = () => {
               currentDate={currentDate}
               scheduledWorkouts={calendar.scheduledWorkouts}
               plans={calendar.plans}
-              onRemovePlan={removePlanFromDay}
+              onRemovePlan={removePlanFromDate}
               isDeleteMode={isDeleteMode}
               completedWorkouts={completedWorkouts}
             />
