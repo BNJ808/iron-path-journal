@@ -11,7 +11,7 @@ export const useMuscleGroupStats = (filteredWorkouts: Workout[]) => {
         if (!allGroupedExercises) return map;
         allGroupedExercises.forEach(group => {
             group.exercises.forEach(ex => {
-                map.set(ex.name, group.group);
+                map.set(ex.id, group.group);
             });
         });
         console.log('exerciseToGroupMap:', map);
@@ -35,9 +35,9 @@ export const useMuscleGroupStats = (filteredWorkouts: Workout[]) => {
         const volumeByGroup = filteredWorkouts.reduce((acc, workout) => {
             console.log('Processing workout:', workout.id, 'exercises:', workout.exercises);
             workout.exercises.forEach(exercise => {
-                console.log('Processing exercise:', exercise.name);
-                const group = exerciseToGroupMap.get(exercise.name);
-                console.log('Found group for exercise:', exercise.name, '->', group);
+                console.log('Processing exercise:', exercise.name, 'with exerciseId:', exercise.exerciseId);
+                const group = exerciseToGroupMap.get(exercise.exerciseId);
+                console.log('Found group for exerciseId:', exercise.exerciseId, '->', group);
                 if (group && acc.hasOwnProperty(group)) {
                     const exerciseVolume = exercise.sets.reduce((vol, set) => {
                         if (set.completed) {
@@ -76,7 +76,7 @@ export const useMuscleGroupStats = (filteredWorkouts: Workout[]) => {
 
         const setsByGroup = filteredWorkouts.reduce((acc, workout) => {
             workout.exercises.forEach(exercise => {
-                const group = exerciseToGroupMap.get(exercise.name);
+                const group = exerciseToGroupMap.get(exercise.exerciseId);
                 if (group && acc.hasOwnProperty(group)) {
                     acc[group] += exercise.sets.filter(s => s.completed).length;
                 }
