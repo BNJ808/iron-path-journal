@@ -70,12 +70,15 @@ export const CalendarDay = ({
     <div
       ref={setNodeRef}
       className={cn(
-        "border rounded-lg transition-all duration-200 relative touch-manipulation",
+        "border rounded-lg transition-all duration-200 relative",
         "min-h-[60px] p-1.5 flex flex-col", 
         isOver ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : getBorderColor(),
         !isCurrentMonth && "bg-muted/20 text-muted-foreground opacity-70",
         isCurrentDay && "ring-1 ring-primary/20"
       )}
+      style={{
+        touchAction: 'pan-y', // Permet le scroll vertical mais optimise pour le drop
+      }}
     >
       {/* Numéro du jour - centré */}
       <div className={cn(
@@ -104,6 +107,9 @@ export const CalendarDay = ({
                 e.stopPropagation();
                 onRemovePlan(planId, dateKey);
               } : undefined}
+              style={{
+                touchAction: isDeleteMode ? 'manipulation' : 'none', // Optimise les touches selon le mode
+              }}
             >
               <div className={cn(
                 "flex items-center justify-center gap-1 flex-1 min-w-0 text-center"

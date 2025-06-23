@@ -9,7 +9,7 @@ export const useDragAndDrop = (
 ) => {
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Configuration des capteurs pour le drag and drop - optimisé pour le curseur/doigt
+  // Configuration des capteurs optimisée pour mobile
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 3,
@@ -18,8 +18,8 @@ export const useDragAndDrop = (
 
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 150,
-      tolerance: 5,
+      delay: 50, // Réduit le délai pour une meilleure réactivité
+      tolerance: 8, // Augmente la tolérance pour les mouvements tactiles
     },
   });
 

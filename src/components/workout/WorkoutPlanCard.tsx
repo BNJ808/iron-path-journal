@@ -43,10 +43,14 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
       className={cn(
         `${plan.color} text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing`,
         isDragging && "shadow-2xl scale-105 z-50",
-        "p-2 min-h-[48px] flex items-center gap-2 touch-manipulation"
+        "p-2 min-h-[48px] flex items-center gap-2"
       )}
       {...attributes}
       {...listeners}
+      style={{
+        ...style,
+        touchAction: 'none', // Empêche le scroll lors du drag sur mobile
+      }}
     >
       <GripVertical className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
       
@@ -69,6 +73,14 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
+            }}
+            onPointerDown={(e) => {
+              // Empêche le drag quand on clique sur le menu
+              e.stopPropagation();
+            }}
+            onTouchStart={(e) => {
+              // Empêche le drag quand on touche le menu sur mobile
+              e.stopPropagation();
             }}
           >
             <MoreVertical className="h-3 w-3" />
