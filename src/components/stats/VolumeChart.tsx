@@ -37,11 +37,11 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <CardContent className="pt-0 pb-4">
-                        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                    <CardContent className="pt-0 pb-2">
+                        <ChartContainer config={chartConfig} className="h-[400px] w-full">
                             <BarChart 
                                 data={chartData} 
-                                margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
+                                margin={{ top: 15, right: 15, left: 15, bottom: 50 }}
                                 barCategoryGap="15%"
                             >
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
@@ -52,7 +52,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                     tickLine={false}
                                     angle={-45}
                                     textAnchor="end"
-                                    height={60}
+                                    height={50}
                                     interval={0}
                                 />
                                 <YAxis 
