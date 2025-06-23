@@ -36,6 +36,37 @@ const renderColorfulTick = (props: any) => {
     );
 };
 
+// Custom tooltip component with muscle group color
+const CustomTooltipContent = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        const muscleGroup = label;
+        const color = MUSCLE_GROUP_COLORS_HEX[muscleGroup] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+        const value = payload[0].value;
+        
+        return (
+            <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+                <div className="grid gap-1.5">
+                    <div className="flex w-full flex-wrap items-stretch gap-2 items-center">
+                        <div
+                            className="shrink-0 rounded-[2px] h-2.5 w-2.5"
+                            style={{ backgroundColor: color }}
+                        />
+                        <div className="flex flex-1 justify-between leading-none items-center">
+                            <span className="text-muted-foreground">
+                                {muscleGroup}
+                            </span>
+                            <span className="font-mono font-medium tabular-nums text-foreground">
+                                {value}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    return null;
+};
+
 export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartProps) => {
     return (
         <Collapsible defaultOpen={false}>
@@ -57,7 +88,7 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                             <RechartsRadarChart data={data}>
                                 <ChartTooltip
                                     cursor={false}
-                                    content={<ChartTooltipContent indicator="line" />}
+                                    content={<CustomTooltipContent />}
                                 />
                                 <PolarGrid stroke="hsl(var(--foreground))" />
                                 <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
