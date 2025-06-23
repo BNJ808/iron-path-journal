@@ -37,7 +37,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <CardContent className="pt-0 pb-1">
+                    <CardContent className="pt-0 pb-1 pl-6">
                         <ChartContainer config={chartConfig} className="h-[280px] w-full">
                             <BarChart 
                                 data={chartData} 
