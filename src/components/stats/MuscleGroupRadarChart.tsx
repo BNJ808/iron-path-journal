@@ -1,74 +1,92 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer } from '@/components/ui/chart';
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
+import { Target, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Hexagon, ChevronDown } from 'lucide-react';
-import { PolarGrid, PolarAngleAxis, Radar, RadarChart as RechartsRadarChart, PolarRadiusAxis } from 'recharts';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
 
 interface MuscleGroupRadarChartProps {
-    data: { subject: string; sets: number }[];
+    chartData: { subject: string; sets: number }[];
     maxSets: number;
 }
 
 const chartConfig = {
     sets: {
-      label: "Séries",
-      color: "hsl(48, 96%, 51%)",
+        label: "Séries",
+        color: "hsl(var(--chart-1))",
     },
 };
 
-const renderColorfulTick = (props: any) => {
-    const { payload, x, y, textAnchor, ...rest } = props;
-    const color = MUSCLE_GROUP_COLORS_HEX[payload.value] || MUSCLE_GROUP_COLORS_HEX['Autres'];
-    return (
-        <text
-            {...rest}
-            x={x}
-            y={y}
-            textAnchor={textAnchor}
-            dominantBaseline="central"
-            fill={color}
-            fontSize={12}
-        >
-            {payload.value}
-        </text>
-    );
+// Tooltip personnalisé avec couleur du groupe musculaire
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+    if (active && payload && payload.length) {
+        const muscleGroup = label;
+        const color = MUSCLE_GROUP_COLORS_HEX[muscleGroup] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+        
+        return (
+            <div className="bg-background border border-border rounded-lg shadow-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                    <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: color }}
+                    />
+                    <p className="font-medium text-foreground">{muscleGroup}</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                    Séries: <span className="font-medium text-foreground">{payload[0].value}</span>
+                </p>
+            </div>
+        );
+    }
+    return null;
 };
 
-export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartProps) => {
+export const MuscleGroupRadarChart = ({ chartData, maxSets }: MuscleGroupRadarChartProps) => {
+    if (chartData.length === 0) {
+        return null;
+    }
+
     return (
         <Collapsible defaultOpen={false}>
             <Card>
                 <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
-                    <CardHeader className="cursor-pointer flex-1">
+                    <CardHeader className="cursor-pointer flex-1 pb-3">
                         <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
-                                <Hexagon className="h-5 w-5 text-cyan-500" />
+                                <Target className="h-5 w-5 text-accent-blue" />
                                 Séries par Groupe Musculaire
                             </CardTitle>
                             <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
                         </div>
                     </CardHeader>
                 </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <CardContent className="pb-0">
-                        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
-                            <RechartsRadarChart data={data}>
-                                <ChartTooltip
-                                    cursor={false}
-                                    content={<ChartTooltipContent indicator="line" />}
+                <CollapsibilContent>
+                    <CardContent className="pt-0 pb-1">
+                        <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                            <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                                <PolarGrid stroke="hsl(var(--muted-foreground))" opacity={0.3} />
+                                <PolarAngleAxis 
+                                    dataKey="subject" 
+                                    tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
                                 />
-                                <PolarGrid stroke="hsl(var(--foreground))" />
-                                <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
-                                <PolarRadiusAxis angle={30} domain={[0, maxSets > 0 ? maxSets : 1]} tick={false} axisLine={false} />
+                                <PolarRadiusAxis
+                                    angle={90}
+                                    domain={[0, maxSets]}
+                                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                                    tickCount={5}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
                                 <Radar
+                                    name="Séries"
                                     dataKey="sets"
-                                    fill="var(--color-sets)"
-                                    fillOpacity={0.6}
-                                    stroke="var(--color-sets)"
+                                    stroke="hsl(var(--chart-1))"
+                                    fill="hsl(var(--chart-1))"
+                                    fillOpacity={0.1}
+                                    strokeWidth={2}
+                                    dot={{ r: 4, strokeWidth: 2, fill: "hsl(var(--chart-1))" }}
                                 />
-                            </RechartsRadarChart>
+                            </RadarChart>
                         </ChartContainer>
                     </CardContent>
                 </CollapsibleContent>
