@@ -196,6 +196,48 @@ export const useWorkoutCalendarSync = () => {
     },
   });
 
+  // Écouter les changements en temps réel
+  useEffect(() => {
+    if (!userId) return;
+
+    const planChannel = supabase
+      .channel('workout-plans-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workout_plans',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['workout-plans', userId] });
+        }
+      )
+      .subscribe();
+
+    const scheduleChannel = supabase
+      .channel('workout-schedule-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workout_schedule',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['workout-schedule', userId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(planChannel);
+      supabase.removeChannel(scheduleChannel);
+    };
+  }, [userId, queryClient]);
+
   const calendar: WorkoutCalendarData = {
     plans,
     scheduledWorkouts
