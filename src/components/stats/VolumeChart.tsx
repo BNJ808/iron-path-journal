@@ -34,12 +34,15 @@ const CustomTooltipContent = ({ active, payload, label }: any) => {
                         />
                         <div className="flex flex-1 justify-between leading-none items-center">
                             <span className="text-muted-foreground">
-                                {muscleGroup}
+                                Volume (kg)
                             </span>
                             <span className="font-mono font-medium tabular-nums text-foreground">
-                                Volume (kg) {value}
+                                {value}
                             </span>
                         </div>
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                        {muscleGroup}
                     </div>
                 </div>
             </div>
