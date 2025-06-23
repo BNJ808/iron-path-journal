@@ -18,11 +18,15 @@ const chartConfig = {
 };
 
 export const VolumeChart = ({ chartData }: VolumeChartProps) => {
-    console.log('VolumeChart chartData:', chartData);
+    console.log('=== VOLUME CHART DEBUG ===');
+    console.log('VolumeChart received chartData:', chartData);
+    console.log('ChartData length:', chartData?.length || 0);
+    console.log('ChartData entries:', chartData);
 
     if (!chartData || chartData.length === 0) {
+        console.log('❌ No chart data provided');
         return (
-            <Collapsible defaultOpen={false}>
+            <Collapsible defaultOpen={true}>
                 <Card>
                     <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
                         <CardHeader className="cursor-pointer flex-1">
@@ -48,11 +52,18 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
     }
 
     // Filtrer les données avec un volume > 0 pour l'affichage
-    const filteredData = chartData.filter(item => item.volume > 0);
+    const filteredData = chartData.filter(item => {
+        console.log(`🔍 Filtering item:`, item, `Volume: ${item.volume}, Type: ${typeof item.volume}`);
+        return item.volume > 0;
+    });
+    
+    console.log('📊 Filtered data:', filteredData);
+    console.log('📊 Filtered data length:', filteredData.length);
 
     if (filteredData.length === 0) {
+        console.log('❌ No data with volume > 0');
         return (
-            <Collapsible defaultOpen={false}>
+            <Collapsible defaultOpen={true}>
                 <Card>
                     <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
                         <CardHeader className="cursor-pointer flex-1">
@@ -68,7 +79,10 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                     <CollapsibleContent>
                         <CardContent>
                             <div className="flex items-center justify-center h-32 text-muted-foreground">
-                                Aucun volume enregistré pour cette période
+                                <div className="text-center">
+                                    <p>Aucun volume enregistré pour cette période</p>
+                                    <p className="text-xs mt-2">Données reçues: {chartData.length} groupes</p>
+                                </div>
                             </div>
                         </CardContent>
                     </CollapsibleContent>
@@ -77,8 +91,10 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
         );
     }
 
+    console.log('✅ Rendering chart with data:', filteredData);
+
     return (
-        <Collapsible defaultOpen={false}>
+        <Collapsible defaultOpen={true}>
             <Card>
                 <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
                     <CardHeader className="cursor-pointer flex-1">
@@ -93,6 +109,9 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent>
+                        <div className="mb-4 text-sm text-muted-foreground">
+                            Affichage de {filteredData.length} groupe(s) musculaire(s)
+                        </div>
                         <ChartContainer config={chartConfig} className="h-[400px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart 
