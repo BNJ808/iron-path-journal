@@ -61,7 +61,7 @@ export const MuscleGroupRadarChart = ({ chartData, maxSets }: MuscleGroupRadarCh
                         </div>
                     </CardHeader>
                 </CollapsibleTrigger>
-                <CollapsibilContent>
+                <CollapsibleContent>
                     <CardContent className="pt-0 pb-1">
                         <ChartContainer config={chartConfig} className="h-[280px] w-full">
                             <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
