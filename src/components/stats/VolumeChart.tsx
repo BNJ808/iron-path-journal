@@ -39,39 +39,46 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                 <CollapsibleContent>
                     <CardContent>
                         <ChartContainer config={chartConfig} className="h-[400px] w-full">
-                            <BarChart 
-                                data={chartData} 
-                                layout="horizontal"
-                                margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
-                                <XAxis 
-                                    type="number"
-                                    tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                />
-                                <YAxis 
-                                    type="category"
-                                    dataKey="group" 
-                                    tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    width={70}
-                                />
-                                <ChartTooltip content={<ChartTooltipContent />} />
-                                <Bar 
-                                    dataKey="volume" 
-                                    radius={[0, 4, 4, 0]}
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart 
+                                    data={chartData} 
+                                    layout="horizontal"
+                                    margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
                                 >
-                                    {chartData.map((entry, index) => (
-                                        <Cell 
-                                            key={`cell-${index}`} 
-                                            fill={MUSCLE_GROUP_COLORS_HEX[entry.group] || MUSCLE_GROUP_COLORS_HEX['Autres']} 
-                                        />
-                                    ))}
-                                </Bar>
-                            </BarChart>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
+                                    <XAxis 
+                                        type="number"
+                                        tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                    />
+                                    <YAxis 
+                                        type="category"
+                                        dataKey="group" 
+                                        tick={{ fontSize: 10, fill: "hsl(var(--foreground))" }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        width={60}
+                                    />
+                                    <ChartTooltip 
+                                        content={<ChartTooltipContent 
+                                            formatter={(value) => [`${value} kg`, 'Volume']}
+                                            labelFormatter={(label) => label}
+                                        />} 
+                                    />
+                                    <Bar 
+                                        dataKey="volume" 
+                                        radius={[0, 4, 4, 0]}
+                                    >
+                                        {chartData.map((entry, index) => (
+                                            <Cell 
+                                                key={`cell-${index}`} 
+                                                fill={MUSCLE_GROUP_COLORS_HEX[entry.group] || MUSCLE_GROUP_COLORS_HEX['Autres']} 
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         </ChartContainer>
                     </CardContent>
                 </CollapsibleContent>
