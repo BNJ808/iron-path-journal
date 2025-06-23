@@ -98,6 +98,20 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                                     fill="var(--color-sets)"
                                     fillOpacity={0.6}
                                     stroke="var(--color-sets)"
+                                    dot={(props: any) => {
+                                        const { cx, cy, payload } = props;
+                                        const color = MUSCLE_GROUP_COLORS_HEX[payload.subject] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+                                        return (
+                                            <circle
+                                                cx={cx}
+                                                cy={cy}
+                                                r={4}
+                                                fill={color}
+                                                stroke="white"
+                                                strokeWidth={2}
+                                            />
+                                        );
+                                    }}
                                 />
                             </RechartsRadarChart>
                         </ChartContainer>
