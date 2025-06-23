@@ -21,11 +21,15 @@ const chartConfig = {
 const renderColorfulTick = (props: any) => {
     const { payload, x, y, textAnchor, ...rest } = props;
     const color = MUSCLE_GROUP_COLORS_HEX[payload.value] || MUSCLE_GROUP_COLORS_HEX['Autres'];
+    
+    // Ajuster la position Y spécifiquement pour "Pectoraux"
+    const adjustedY = payload.value === 'Pectoraux' ? y - 8 : y;
+    
     return (
         <text
             {...rest}
             x={x}
-            y={y}
+            y={adjustedY}
             textAnchor={textAnchor}
             dominantBaseline="central"
             fill={color}
