@@ -14,11 +14,17 @@ export const useMuscleGroupStats = (filteredWorkouts: Workout[]) => {
                 map.set(ex.name, group.group);
             });
         });
+        console.log('exerciseToGroupMap:', map);
         return map;
     }, [allGroupedExercises]);
     
     const volumeByMuscleGroup = useMemo(() => {
+        console.log('useMuscleGroupStats - filteredWorkouts:', filteredWorkouts);
+        console.log('useMuscleGroupStats - allGroupedExercises:', allGroupedExercises);
+        console.log('useMuscleGroupStats - exerciseToGroupMap size:', exerciseToGroupMap.size);
+        
         if (!filteredWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
+            console.log('Early return - missing data');
             return [];
         }
 
@@ -27,24 +33,35 @@ export const useMuscleGroupStats = (filteredWorkouts: Workout[]) => {
         );
 
         const volumeByGroup = filteredWorkouts.reduce((acc, workout) => {
+            console.log('Processing workout:', workout.id, 'exercises:', workout.exercises);
             workout.exercises.forEach(exercise => {
+                console.log('Processing exercise:', exercise.name);
                 const group = exerciseToGroupMap.get(exercise.name);
+                console.log('Found group for exercise:', exercise.name, '->', group);
                 if (group && acc.hasOwnProperty(group)) {
                     const exerciseVolume = exercise.sets.reduce((vol, set) => {
                         if (set.completed) {
-                            return vol + (Number(set.weight) || 0) * (Number(set.reps) || 0);
+                            const setVolume = (Number(set.weight) || 0) * (Number(set.reps) || 0);
+                            console.log('Set volume:', setVolume, 'weight:', set.weight, 'reps:', set.reps);
+                            return vol + setVolume;
                         }
                         return vol;
                     }, 0);
+                    console.log('Exercise total volume:', exerciseVolume);
                     acc[group] += exerciseVolume;
                 }
             });
             return acc;
         }, { ...initialVolumeByGroup });
 
-        return Object.entries(volumeByGroup)
+        console.log('Final volumeByGroup:', volumeByGroup);
+
+        const result = Object.entries(volumeByGroup)
             .map(([group, volume]) => ({ group, volume: Math.round(volume) }))
             .sort((a, b) => b.volume - a.volume);
+            
+        console.log('Final result for VolumeChart:', result);
+        return result;
 
     }, [filteredWorkouts, exerciseToGroupMap, allGroupedExercises]);
 
