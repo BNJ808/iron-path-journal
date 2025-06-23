@@ -27,7 +27,7 @@ const renderColorfulTick = (props: any) => {
     if (payload.value === 'Pectoraux') {
         adjustedY = y - 8;
     } else if (payload.value === 'Jambes') {
-        adjustedY = y - 8;
+        adjustedY = y + 8;
     }
     
     return (
