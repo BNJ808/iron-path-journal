@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip, TooltipProps } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
 import { BarChart3, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
@@ -15,21 +15,6 @@ const chartConfig = {
         label: "Volume (kg)",
         color: "hsl(var(--chart-1))",
     },
-};
-
-// Tooltip personnalisé pour un meilleur affichage
-const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-background border border-border rounded-lg shadow-lg p-3">
-                <p className="font-medium text-foreground mb-1">{label}</p>
-                <p className="text-sm text-muted-foreground">
-                    Volume: <span className="font-medium text-foreground">{payload[0].value?.toLocaleString()} kg</span>
-                </p>
-            </div>
-        );
-    }
-    return null;
 };
 
 export const VolumeChart = ({ chartData }: VolumeChartProps) => {
@@ -76,7 +61,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                     tickLine={false}
                                     width={40}
                                 />
-                                <Tooltip content={<CustomTooltip />} />
+                                <ChartTooltip content={<ChartTooltipContent />} />
                                 <Bar 
                                     dataKey="volume" 
                                     radius={[6, 6, 0, 0]}

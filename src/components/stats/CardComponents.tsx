@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StatCards } from '@/components/stats/StatCards';
 import { VolumeChart } from '@/components/stats/VolumeChart';
@@ -77,7 +78,7 @@ export const createCardComponents = (props: CardComponentsProps): Record<string,
         ),
         'muscle-groups': (
             <MuscleGroupRadarChart
-                chartData={props.muscleGroupStats.chartData}
+                data={props.muscleGroupStats.chartData}
                 maxSets={props.muscleGroupStats.maxSets}
             />
         ),
