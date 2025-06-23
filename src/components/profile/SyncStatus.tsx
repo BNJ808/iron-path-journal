@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,7 @@ export const SyncStatus = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
-  // Auto-sync au démarrage si en ligne
-  useEffect(() => {
-    if (isOnline && !isLoading && settings) {
-      handleSync();
-    }
-  }, [isOnline, isLoading, settings]);
+  // Suppression de l'auto-sync au démarrage pour éviter les notifications automatiques
 
   const handleSync = async () => {
     if (!isOnline) {
