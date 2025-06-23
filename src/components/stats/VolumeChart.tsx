@@ -26,7 +26,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
         <Collapsible defaultOpen={false}>
             <Card>
                 <CollapsibleTrigger className="flex w-full items-center justify-between text-left [&[data-state=open]>div>svg]:rotate-180">
-                    <CardHeader className="cursor-pointer flex-1">
+                    <CardHeader className="cursor-pointer flex-1 pb-3">
                         <div className="flex w-full items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <BarChart3 className="h-5 w-5 text-emerald-500" />
@@ -37,25 +37,35 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <CardContent>
-                        <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CardContent className="pt-0 pb-4">
+                        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                            <BarChart 
+                                data={chartData} 
+                                margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
+                                barCategoryGap="15%"
+                            >
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
                                 <XAxis 
                                     dataKey="group" 
-                                    tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
+                                    tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
                                     axisLine={false}
                                     tickLine={false}
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={60}
+                                    interval={0}
                                 />
                                 <YAxis 
-                                    tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
+                                    tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
                                     axisLine={false}
                                     tickLine={false}
+                                    width={50}
                                 />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                 <Bar 
                                     dataKey="volume" 
-                                    radius={[4, 4, 0, 0]}
+                                    radius={[6, 6, 0, 0]}
+                                    maxBarSize={60}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell 
