@@ -38,7 +38,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent className="pt-0 pb-1">
-                        <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                        <ChartContainer config={chartConfig} className="h-[280px] w-full">
                             <BarChart 
                                 data={chartData} 
                                 margin={{ top: 10, right: 5, left: 5, bottom: 35 }}
