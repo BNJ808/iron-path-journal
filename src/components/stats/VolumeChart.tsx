@@ -38,24 +38,31 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent>
-                        <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                            <BarChart 
+                                data={chartData} 
+                                layout="horizontal"
+                                margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                            >
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
                                 <XAxis 
-                                    dataKey="group" 
+                                    type="number"
                                     tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
                                     axisLine={false}
                                     tickLine={false}
                                 />
                                 <YAxis 
+                                    type="category"
+                                    dataKey="group" 
                                     tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
                                     axisLine={false}
                                     tickLine={false}
+                                    width={70}
                                 />
                                 <ChartTooltip content={<ChartTooltipContent />} />
                                 <Bar 
                                     dataKey="volume" 
-                                    radius={[4, 4, 0, 0]}
+                                    radius={[0, 4, 4, 0]}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell 
