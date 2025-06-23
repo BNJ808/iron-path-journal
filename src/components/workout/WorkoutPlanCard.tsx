@@ -34,6 +34,7 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.8 : 1,
+    touchAction: 'none', // Empêche le scroll lors du drag sur mobile
   };
 
   return (
@@ -47,10 +48,6 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
       )}
       {...attributes}
       {...listeners}
-      style={{
-        ...style,
-        touchAction: 'none', // Empêche le scroll lors du drag sur mobile
-      }}
     >
       <GripVertical className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
       
