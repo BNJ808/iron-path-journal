@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { BarChart3, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
@@ -10,18 +9,10 @@ interface VolumeChartProps {
     chartData: { group: string; volume: number }[];
 }
 
-const chartConfig = {
-    volume: {
-        label: "Volume (kg)",
-        color: "hsl(var(--chart-1))",
-    },
-};
-
 export const VolumeChart = ({ chartData }: VolumeChartProps) => {
     console.log('=== VOLUME CHART DEBUG ===');
     console.log('VolumeChart received chartData:', chartData);
     console.log('ChartData length:', chartData?.length || 0);
-    console.log('ChartData entries:', chartData);
 
     if (!chartData || chartData.length === 0) {
         console.log('❌ No chart data provided');
@@ -130,19 +121,14 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                         fontSize={12}
                                         width={70}
                                     />
-                                    <ChartTooltip 
-                                        content={({ active, payload, label }) => {
-                                            if (active && payload && payload.length) {
-                                                return (
-                                                    <div className="bg-background border rounded-lg p-2 shadow-lg">
-                                                        <p className="font-medium">{label}</p>
-                                                        <p className="text-sm">
-                                                            Volume: {payload[0].value} kg
-                                                        </p>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
+                                    <Tooltip 
+                                        formatter={(value, name) => [`${value} kg`, 'Volume']}
+                                        labelFormatter={(label) => label}
+                                        contentStyle={{
+                                            backgroundColor: 'hsl(var(--background))',
+                                            border: '1px solid hsl(var(--border))',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                                         }}
                                     />
                                     <Bar 
