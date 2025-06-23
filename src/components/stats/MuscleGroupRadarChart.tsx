@@ -33,7 +33,11 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
                     />
                     <p className="font-medium text-foreground">{muscleGroup}</p>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <span 
+                        className="w-3 h-0.5 inline-block"
+                        style={{ backgroundColor: color }}
+                    />
                     Séries: <span className="font-medium text-foreground">{payload[0].value}</span>
                 </p>
             </div>
