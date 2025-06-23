@@ -6,22 +6,35 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calculator, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { calculateEstimated1RM } from '@/utils/calculations';
 
 export const OneRMCalculator = () => {
     const [weight, setWeight] = useState<string>('');
     const [reps, setReps] = useState<string>('');
     const [result, setResult] = useState<number | null>(null);
+    const [formulaUsed, setFormulaUsed] = useState<string>('');
 
     const calculateOneRM = () => {
         const w = parseFloat(weight);
         const r = parseInt(reps);
         
         if (w > 0 && r > 0 && r <= 20) {
-            // Formule de Brzycki: 1RM = Poids × (36 / (37 - Répétitions))
-            const oneRM = w * (36 / (37 - r));
-            setResult(Math.round(oneRM * 10) / 10);
+            const oneRM = calculateEstimated1RM(w, r);
+            setResult(oneRM);
+            
+            // Déterminer quelle formule est principalement utilisée
+            if (r === 1) {
+                setFormulaUsed('Poids réel (1 répétition)');
+            } else if (r <= 6) {
+                setFormulaUsed('Moyenne de Epley, Brzycki et Lander (optimale pour 2-6 reps)');
+            } else if (r <= 10) {
+                setFormulaUsed('Formule de Epley (recommandée pour 7-10 reps)');
+            } else {
+                setFormulaUsed('Formule de Epley (estimation approximative pour >10 reps)');
+            }
         } else {
             setResult(null);
+            setFormulaUsed('');
         }
     };
 
@@ -29,6 +42,7 @@ export const OneRMCalculator = () => {
         setWeight('');
         setReps('');
         setResult(null);
+        setFormulaUsed('');
     };
 
     return (
@@ -48,7 +62,7 @@ export const OneRMCalculator = () => {
                 <CollapsibleContent>
                     <CardHeader className="pt-0">
                         <CardDescription>
-                            Calculez votre maximum théorique sur une répétition (1RM) basé sur vos performances actuelles.
+                            Calculez votre maximum théorique sur une répétition (1RM) avec des formules adaptées au nombre de répétitions.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -90,13 +104,16 @@ export const OneRMCalculator = () => {
                                 <p className="text-sm text-muted-foreground mb-1">Votre 1RM estimé</p>
                                 <p className="text-2xl font-bold text-primary">{result} kg</p>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    Basé sur la formule de Brzycki
+                                    {formulaUsed}
                                 </p>
                             </div>
                         )}
                         
-                        <div className="text-xs text-muted-foreground">
-                            <p>Note: Cette estimation est basée sur la formule de Brzycki et est plus précise pour 2-10 répétitions.</p>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                            <p><strong>Formules utilisées :</strong></p>
+                            <p>• <strong>2-6 reps</strong> : Moyenne de Epley, Brzycki et Lander (plus précise)</p>
+                            <p>• <strong>7-10 reps</strong> : Formule de Epley (recommandée)</p>
+                            <p>• <strong>11+ reps</strong> : Formule de Epley (estimation moins fiable)</p>
                         </div>
                     </CardContent>
                 </CollapsibleContent>
