@@ -108,40 +108,45 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <CardContent>
+                    <CardContent className="pt-6">
                         <div className="mb-4 text-sm text-muted-foreground">
                             Affichage de {filteredData.length} groupe(s) musculaire(s)
                         </div>
-                        <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                        <div className="w-full h-[400px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart 
                                     data={filteredData} 
                                     layout="horizontal"
-                                    margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+                                    margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
                                 >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
+                                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                                     <XAxis 
                                         type="number"
-                                        tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
-                                        axisLine={false}
-                                        tickLine={false}
+                                        fontSize={12}
                                     />
                                     <YAxis 
                                         type="category"
                                         dataKey="group" 
-                                        tick={{ fontSize: 10, fill: "hsl(var(--foreground))" }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        width={60}
+                                        fontSize={12}
+                                        width={70}
                                     />
                                     <ChartTooltip 
-                                        content={<ChartTooltipContent 
-                                            formatter={(value) => [`${value} kg`, 'Volume']}
-                                            labelFormatter={(label) => label}
-                                        />} 
+                                        content={({ active, payload, label }) => {
+                                            if (active && payload && payload.length) {
+                                                return (
+                                                    <div className="bg-background border rounded-lg p-2 shadow-lg">
+                                                        <p className="font-medium">{label}</p>
+                                                        <p className="text-sm">
+                                                            Volume: {payload[0].value} kg
+                                                        </p>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }}
                                     />
                                     <Bar 
-                                        dataKey="volume" 
+                                        dataKey="volume"
                                         radius={[0, 4, 4, 0]}
                                     >
                                         {filteredData.map((entry, index) => (
@@ -153,7 +158,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
-                        </ChartContainer>
+                        </div>
                     </CardContent>
                 </CollapsibleContent>
             </Card>
