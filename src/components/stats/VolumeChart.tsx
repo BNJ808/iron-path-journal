@@ -75,7 +75,7 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                         <ChartContainer config={chartConfig} className="h-[280px] w-full">
                             <BarChart 
                                 data={chartData} 
-                                margin={{ top: 10, right: 5, left: 15, bottom: 35 }}
+                                margin={{ top: 10, right: 5, left: 5, bottom: 20 }}
                                 barCategoryGap="8%"
                             >
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
@@ -86,14 +86,14 @@ export const VolumeChart = ({ chartData }: VolumeChartProps) => {
                                     tickLine={false}
                                     angle={-45}
                                     textAnchor="end"
-                                    height={40}
+                                    height={30}
                                     interval={0}
                                 />
                                 <YAxis 
                                     tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
                                     axisLine={false}
                                     tickLine={false}
-                                    width={40}
+                                    width={30}
                                 />
                                 <ChartTooltip content={<CustomTooltipContent />} />
                                 <Bar 
