@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Bell, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -40,11 +40,47 @@ const playTripleBeep = () => {
   setTimeout(() => createBeepSound(), 600);
 };
 
+// Fonction pour demander la permission des notifications
+const requestNotificationPermission = async () => {
+  if ('Notification' in window) {
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+  }
+  return false;
+};
+
+// Fonction pour envoyer une notification
+const sendNotification = () => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notification = new Notification('Iron Path Journal', {
+      body: 'Votre temps de repos est terminé !',
+      icon: '/placeholder.svg',
+      badge: '/placeholder.svg',
+      vibrate: [200, 100, 200, 100, 200],
+      silent: false,
+      requireInteraction: true
+    });
+
+    // Auto-fermer après 10 secondes
+    setTimeout(() => {
+      notification.close();
+    }, 10000);
+  }
+};
+
 export const TimerView = () => {
   const [duration, setDuration] = useState(60);
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  // Vérifier si les notifications sont disponibles et autorisées
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationsEnabled(Notification.permission === 'granted');
+    }
+  }, []);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -61,6 +97,12 @@ export const TimerView = () => {
           console.log('Impossible de jouer le son:', error);
         }
       }
+
+      // Envoyer une notification si autorisée
+      if (notificationsEnabled) {
+        sendNotification();
+      }
+      
       return;
     }
 
@@ -69,7 +111,7 @@ export const TimerView = () => {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [isRunning, timeLeft, soundEnabled]);
+  }, [isRunning, timeLeft, soundEnabled, notificationsEnabled]);
 
   const handleSetDuration = useCallback((newDuration: number) => {
     setDuration(newDuration);
@@ -93,6 +135,21 @@ export const TimerView = () => {
     toast.info(soundEnabled ? 'Son désactivé' : 'Son activé');
   };
 
+  const toggleNotifications = async () => {
+    if (!notificationsEnabled) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        setNotificationsEnabled(true);
+        toast.success('Notifications activées');
+      } else {
+        toast.error('Autorisation des notifications refusée');
+      }
+    } else {
+      setNotificationsEnabled(false);
+      toast.info('Notifications désactivées');
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -103,8 +160,8 @@ export const TimerView = () => {
 
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      {/* Contrôle du son */}
-      <div className="mb-4">
+      {/* Contrôles son et notifications */}
+      <div className="mb-4 flex gap-4">
         <Button
           variant="ghost"
           size="sm"
@@ -117,8 +174,22 @@ export const TimerView = () => {
           {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           {soundEnabled ? 'Son activé' : 'Son désactivé'}
         </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleNotifications}
+          className={cn(
+            "flex items-center gap-2",
+            notificationsEnabled ? "text-accent-green" : "text-gray-500"
+          )}
+        >
+          {notificationsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+          {notificationsEnabled ? 'Notifications activées' : 'Notifications désactivées'}
+        </Button>
       </div>
 
+      {/* Cercle de progression et temps */}
       <div className="relative w-64 h-64 flex items-center justify-center mb-8">
         <svg className="absolute w-full h-full" viewBox="0 0 100 100">
           <circle
@@ -147,6 +218,7 @@ export const TimerView = () => {
         <span className="text-6xl font-mono font-bold">{formatTime(timeLeft)}</span>
       </div>
 
+      {/* Durées prédéfinies */}
       <p className="text-gray-400 mb-4">Choisissez une durée prédéfinie :</p>
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {PRESET_DURATIONS.map(({ label, value }) => (
@@ -163,6 +235,7 @@ export const TimerView = () => {
         ))}
       </div>
 
+      {/* Contrôles du timer */}
       <div className="flex gap-4">
         <Button onClick={handleStartPause} size="lg" className="w-40 bg-accent-blue hover:bg-blue-600 text-white font-bold">
           {isRunning ? <Pause className="mr-2" /> : <Play className="mr-2" />}
