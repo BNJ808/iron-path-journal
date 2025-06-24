@@ -27,10 +27,17 @@ const createBeepSound = () => {
   
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
   gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
   
   oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + 1);
+  oscillator.stop(audioContext.currentTime + 0.5);
+};
+
+// Fonction pour jouer 3 beeps de suite
+const playTripleBeep = () => {
+  createBeepSound();
+  setTimeout(() => createBeepSound(), 300);
+  setTimeout(() => createBeepSound(), 600);
 };
 
 export const TimerView = () => {
@@ -49,7 +56,7 @@ export const TimerView = () => {
       // Jouer le son si activé
       if (soundEnabled) {
         try {
-          createBeepSound();
+          playTripleBeep();
         } catch (error) {
           console.log('Impossible de jouer le son:', error);
         }
