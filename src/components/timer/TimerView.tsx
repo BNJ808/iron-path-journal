@@ -1,6 +1,7 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -12,10 +13,31 @@ const PRESET_DURATIONS = [
   { label: '3m', value: 180 },
 ];
 
+// Fonction pour créer un son de notification simple
+const createBeepSound = () => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+  oscillator.type = 'sine';
+  
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+  
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 1);
+};
+
 export const TimerView = () => {
   const [duration, setDuration] = useState(60);
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -23,7 +45,15 @@ export const TimerView = () => {
     if (timeLeft <= 0) {
       setIsRunning(false);
       toast.info("Le temps est écoulé !");
-      // On pourrait ajouter un son ici si un fichier audio était disponible
+      
+      // Jouer le son si activé
+      if (soundEnabled) {
+        try {
+          createBeepSound();
+        } catch (error) {
+          console.log('Impossible de jouer le son:', error);
+        }
+      }
       return;
     }
 
@@ -32,7 +62,7 @@ export const TimerView = () => {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, soundEnabled]);
 
   const handleSetDuration = useCallback((newDuration: number) => {
     setDuration(newDuration);
@@ -51,6 +81,11 @@ export const TimerView = () => {
     setIsRunning(false);
   }, [duration]);
 
+  const toggleSound = () => {
+    setSoundEnabled(prev => !prev);
+    toast.info(soundEnabled ? 'Son désactivé' : 'Son activé');
+  };
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -61,6 +96,22 @@ export const TimerView = () => {
 
   return (
     <div className="flex flex-col items-center justify-center text-center">
+      {/* Contrôle du son */}
+      <div className="mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleSound}
+          className={cn(
+            "flex items-center gap-2",
+            soundEnabled ? "text-accent-green" : "text-gray-500"
+          )}
+        >
+          {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+          {soundEnabled ? 'Son activé' : 'Son désactivé'}
+        </Button>
+      </div>
+
       <div className="relative w-64 h-64 flex items-center justify-center mb-8">
         <svg className="absolute w-full h-full" viewBox="0 0 100 100">
           <circle
