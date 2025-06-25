@@ -17,15 +17,15 @@
       "type": "image/x-icon"
     },
     {
-      "src": "/placeholder.svg",
+      "src": "/lovable-uploads/a945e0dd-1f61-4959-a584-12651a94ae3e.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/placeholder.svg",
+      "src": "/lovable-uploads/65e57f81-c965-44f9-ba0e-6116c73d15f3.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
