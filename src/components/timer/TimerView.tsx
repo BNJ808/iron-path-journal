@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Bell, BellOff } from 'lucide-react';
@@ -56,7 +55,6 @@ const sendNotification = () => {
       body: 'Votre temps de repos est terminé !',
       icon: '/placeholder.svg',
       badge: '/placeholder.svg',
-      vibrate: [200, 100, 200, 100, 200],
       silent: false,
       requireInteraction: true
     });
