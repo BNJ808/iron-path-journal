@@ -4,7 +4,7 @@ import { List, PlusCircle } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
 import { WorkoutTemplateCard } from './WorkoutTemplateCard';
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useState, useEffect } from 'react';
 
@@ -33,6 +33,21 @@ export const StartWorkout = ({
     setOrderedTemplates(templates);
   }, [templates]);
 
+  // Configuration des capteurs pour un meilleur contrôle du drag
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Distance minimale avant de commencer le drag
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100, // Délai pour permettre le scroll et les taps
+        tolerance: 8, // Tolérance de mouvement
+      },
+    })
+  );
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -59,17 +74,21 @@ export const StartWorkout = ({
             <p className="text-gray-400">Chargement des modèles...</p>
         ) : (
           <>
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <DndContext 
+              collisionDetection={closestCenter} 
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+            >
               <SortableContext items={orderedTemplates.map(t => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-w-4xl mx-auto mb-4">
                   {orderedTemplates.map(template => (
-                    <div key={template.id} onClick={() => onStartFromTemplate(template)}>
-                      <WorkoutTemplateCard
-                        template={template}
-                        onUpdate={onUpdateTemplate}
-                        onDelete={onDeleteTemplate}
-                      />
-                    </div>
+                    <WorkoutTemplateCard
+                      key={template.id}
+                      template={template}
+                      onUpdate={onUpdateTemplate}
+                      onDelete={onDeleteTemplate}
+                      onStart={onStartFromTemplate}
+                    />
                   ))}
                 </div>
               </SortableContext>
