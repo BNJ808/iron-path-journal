@@ -16,14 +16,28 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { WorkoutTemplate, ExerciseLog } from "@/hooks/useWorkoutTemplates";
 import { AddExerciseDialog } from "./AddExerciseDialog";
 import { Trash2 } from "lucide-react";
 
+const TEMPLATE_COLORS = [
+  'bg-blue-500',
+  'bg-green-500',
+  'bg-red-500',
+  'bg-yellow-500',
+  'bg-purple-500',
+  'bg-pink-500',
+  'bg-indigo-500',
+  'bg-orange-500',
+  'bg-teal-500',
+  'bg-cyan-500',
+];
+
 interface EditTemplateDialogProps {
   template: WorkoutTemplate;
-  onUpdate: (id: string, name: string, exercises: ExerciseLog[]) => void;
+  onUpdate: (id: string, name: string, exercises: ExerciseLog[], color?: string) => void;
   children: React.ReactNode;
 }
 
@@ -34,6 +48,7 @@ const formSchema = z.object({
 export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplateDialogProps) => {
   const [open, setOpen] = useState(false);
   const [exercises, setExercises] = useState<ExerciseLog[]>(template.exercises);
+  const [selectedColor, setSelectedColor] = useState(template.color || TEMPLATE_COLORS[0]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,7 +71,7 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
   };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    onUpdate(template.id, values.name, exercises);
+    onUpdate(template.id, values.name, exercises, selectedColor);
     form.reset({ name: values.name });
     setOpen(false);
   };
@@ -64,6 +79,7 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
   const resetState = () => {
     form.reset({ name: template.name });
     setExercises(template.exercises);
+    setSelectedColor(template.color || TEMPLATE_COLORS[0]);
   }
 
   return (
@@ -76,7 +92,7 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
         <DialogHeader>
           <DialogTitle>Modifier le modèle</DialogTitle>
           <DialogDescription>
-            Modifiez le nom et les exercices de votre modèle de séance.
+            Modifiez le nom, la couleur et les exercices de votre modèle de séance.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -88,12 +104,28 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
                 <FormItem>
                   <FormLabel>Nom du modèle</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Push Day" {...field} />
+                    <Input placeholder="Ex: Push Day" {...field} autoFocus={false} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="space-y-2">
+              <Label>Couleur du modèle</Label>
+              <div className="flex flex-wrap gap-2">
+                {TEMPLATE_COLORS.map(color => (
+                  <button
+                    key={color}
+                    type="button"
+                    className={`w-8 h-8 rounded-full ${color} border-2 ${
+                      selectedColor === color ? 'border-primary' : 'border-transparent'
+                    }`}
+                    onClick={() => setSelectedColor(color)}
+                  />
+                ))}
+              </div>
+            </div>
             
             <div className="space-y-2">
               <h4 className="font-medium">Exercices</h4>

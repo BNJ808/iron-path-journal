@@ -22,8 +22,8 @@ const WorkoutPage = () => {
   } = useCurrentWorkoutActions();
   const { handleSaveAsTemplate, handleStartFromTemplate } = useWorkoutTemplateActions();
 
-  const handleUpdateTemplate = async (id: string, name: string, exercises: ExerciseLog[]) => {
-    await updateTemplate({ id, name, exercises });
+  const handleUpdateTemplate = async (id: string, name: string, exercises: ExerciseLog[], color?: string) => {
+    await updateTemplate({ id, name, exercises, color });
   };
 
   if (isLoadingWorkout) {
