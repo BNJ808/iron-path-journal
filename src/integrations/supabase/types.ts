@@ -189,6 +189,7 @@ export type Database = {
       }
       workout_templates: {
         Row: {
+          color: string | null
           created_at: string
           exercises: Json
           id: string
@@ -197,6 +198,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          color?: string | null
           created_at?: string
           exercises: Json
           id?: string
@@ -205,6 +207,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          color?: string | null
           created_at?: string
           exercises?: Json
           id?: string
