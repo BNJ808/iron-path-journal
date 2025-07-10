@@ -47,7 +47,11 @@ export const useWorkoutTemplates = () => {
             if (!userId) throw new Error("User not authenticated");
             const { data, error } = await supabase
                 .from('workout_templates')
-                .insert({ ...newTemplate, user_id: userId })
+                .insert({ 
+                    ...newTemplate, 
+                    user_id: userId,
+                    exercises: newTemplate.exercises as any
+                })
                 .select()
                 .single();
             
