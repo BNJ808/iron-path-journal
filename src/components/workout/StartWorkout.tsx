@@ -4,7 +4,7 @@ import { List, PlusCircle } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
 import { WorkoutTemplateCard } from './WorkoutTemplateCard';
-import { DndContext, closestCenter, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useState, useEffect } from 'react';
 
@@ -28,28 +28,34 @@ export const StartWorkout = ({
   onCreateTemplate 
 }: StartWorkoutProps) => {
   const [orderedTemplates, setOrderedTemplates] = useState(templates);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     setOrderedTemplates(templates);
   }, [templates]);
 
-  // Configuration des capteurs pour un meilleur contrôle du drag
+  // Configuration des capteurs pour un meilleur contrôle du drag - optimisé pour la fluidité
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Distance minimale avant de commencer le drag
+        distance: 3, // Distance réduite pour une activation plus rapide
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 100, // Délai pour permettre le scroll et les taps
-        tolerance: 8, // Tolérance de mouvement
+        delay: 50, // Délai réduit pour une meilleure réactivité
+        tolerance: 3, // Tolérance réduite
       },
     })
   );
 
+  const handleDragStart = (event: any) => {
+    setActiveId(event.active.id);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
 
     if (over && active.id !== over.id) {
       const oldIndex = orderedTemplates.findIndex(t => t.id === active.id);
@@ -60,6 +66,8 @@ export const StartWorkout = ({
       }
     }
   };
+
+  const activeTemplate = activeId ? orderedTemplates.find(t => t.id === activeId) : null;
 
   return (
     <div className="text-center py-10 space-y-6">
@@ -76,6 +84,7 @@ export const StartWorkout = ({
           <>
             <DndContext 
               collisionDetection={closestCenter} 
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               sensors={sensors}
             >
@@ -92,6 +101,22 @@ export const StartWorkout = ({
                   ))}
                 </div>
               </SortableContext>
+              
+              <DragOverlay dropAnimation={{
+                duration: 150,
+                easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+              }}>
+                {activeTemplate ? (
+                  <div className={`${activeTemplate.color} text-white rounded-lg shadow-2xl p-3 min-h-[60px] flex flex-col gap-1.5 opacity-90 transform rotate-3 scale-105`}>
+                    <div className="font-semibold text-sm leading-tight">{activeTemplate.name}</div>
+                    {activeTemplate.exercises.length > 0 && (
+                      <div className="text-xs opacity-80 leading-tight">
+                        {activeTemplate.exercises.length} exercice{activeTemplate.exercises.length > 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
             
             <div className="max-w-md mx-auto mt-4">
