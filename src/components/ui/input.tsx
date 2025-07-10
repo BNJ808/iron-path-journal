@@ -13,7 +13,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         ref={ref}
-        autoFocus={autoFocus}
+        autoFocus={false}
         {...props}
       />
     )

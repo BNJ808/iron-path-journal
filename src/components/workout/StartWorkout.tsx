@@ -1,32 +1,51 @@
 
 import { Button } from '@/components/ui/button';
-import { List, Pencil, Trash2, PlusCircle } from 'lucide-react';
+import { List, PlusCircle } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
-import { EditTemplateDialog } from './EditTemplateDialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { CreateTemplateDialog } from './CreateTemplateDialog';
+import { WorkoutTemplateCard } from './WorkoutTemplateCard';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { useState, useEffect } from 'react';
 
 interface StartWorkoutProps {
   onStartWorkout: () => void;
   onStartFromTemplate: (template: WorkoutTemplate) => void;
   templates: WorkoutTemplate[];
   isLoadingTemplates: boolean;
-  onUpdateTemplate: (id: string, name: string, exercises: ExerciseLog[]) => void;
+  onUpdateTemplate: (id: string, name: string, exercises: ExerciseLog[], color?: string) => void;
   onDeleteTemplate: (id: string) => void;
   onCreateTemplate: (template: { name: string; exercises: ExerciseLog[] }) => Promise<any>;
 }
 
-export const StartWorkout = ({ onStartWorkout, onStartFromTemplate, templates, isLoadingTemplates, onUpdateTemplate, onDeleteTemplate, onCreateTemplate }: StartWorkoutProps) => {
+export const StartWorkout = ({ 
+  onStartWorkout, 
+  onStartFromTemplate, 
+  templates, 
+  isLoadingTemplates, 
+  onUpdateTemplate, 
+  onDeleteTemplate, 
+  onCreateTemplate 
+}: StartWorkoutProps) => {
+  const [orderedTemplates, setOrderedTemplates] = useState(templates);
+
+  useEffect(() => {
+    setOrderedTemplates(templates);
+  }, [templates]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = orderedTemplates.findIndex(t => t.id === active.id);
+      const newIndex = orderedTemplates.findIndex(t => t.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setOrderedTemplates(arrayMove(orderedTemplates, oldIndex, newIndex));
+      }
+    }
+  };
+
   return (
     <div className="text-center py-10 space-y-6">
       <Button onClick={onStartWorkout}>Démarrer un entraînement de zéro</Button>
@@ -40,48 +59,22 @@ export const StartWorkout = ({ onStartWorkout, onStartFromTemplate, templates, i
             <p className="text-gray-400">Chargement des modèles...</p>
         ) : (
           <>
-            <div className="space-y-2 max-w-md mx-auto">
-              {templates.map(template => (
-                <div key={template.id} className="flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-start flex-1"
-                    onClick={() => onStartFromTemplate(template)}
-                  >
-                    {template.name}
-                  </Button>
-                  <EditTemplateDialog template={template} onUpdate={onUpdateTemplate}>
-                    <Button variant="ghost" size="icon" aria-label="Modifier le modèle">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </EditTemplateDialog>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/90" aria-label="Supprimer le modèle">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Cette action est irréversible et supprimera définitivement ce modèle.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => onDeleteTemplate(template.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Supprimer
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={orderedTemplates.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-w-4xl mx-auto mb-4">
+                  {orderedTemplates.map(template => (
+                    <div key={template.id} onClick={() => onStartFromTemplate(template)}>
+                      <WorkoutTemplateCard
+                        template={template}
+                        onUpdate={onUpdateTemplate}
+                        onDelete={onDeleteTemplate}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
+            
             <div className="max-w-md mx-auto mt-4">
               <CreateTemplateDialog onCreate={onCreateTemplate}>
                 <Button variant="outline" className="w-full">
