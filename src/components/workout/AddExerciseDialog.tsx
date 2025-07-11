@@ -1,5 +1,4 @@
-
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,10 +32,18 @@ interface AddExerciseDialogProps {
 
 export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => {
   const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { workouts } = useWorkoutHistory();
   const { isFavorite, toggleFavorite } = useFavoriteExercises();
   const { addCustomExercise } = useSupabaseCustomExercises();
   const { allGroupedExercises: groupedExercises } = useExerciseDatabase();
+
+  // Désactiver l'auto-focus quand le dialog s'ouvre
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.blur();
+    }
+  }, [open]);
 
   const exerciseFrequencies = useMemo(() => {
     const frequencies = new Map<string, number>();
@@ -95,8 +102,18 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
             Recherchez un exercice ou parcourez les catégories. Les exercices favoris et les plus fréquents apparaissent en premier.
           </DialogDescription>
         </DialogHeader>
-        <Command>
-          <CommandInput placeholder="Rechercher un exercice..." autoFocus={false} />
+        <Command shouldFilter={false}>
+          <CommandInput 
+            ref={inputRef}
+            placeholder="Rechercher un exercice..." 
+            autoFocus={false}
+            onFocus={(e) => {
+              // Empêcher le focus automatique au début
+              if (!e.currentTarget.value) {
+                e.currentTarget.blur();
+              }
+            }}
+          />
           <div className="p-2 border-b space-y-2">
             <AddCustomExerciseDialog 
               addCustomExercise={addCustomExercise} 
