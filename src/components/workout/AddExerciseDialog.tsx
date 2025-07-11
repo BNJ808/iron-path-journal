@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Dialog,
@@ -32,16 +33,23 @@ interface AddExerciseDialogProps {
 
 export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [allowFocus, setAllowFocus] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { workouts } = useWorkoutHistory();
   const { isFavorite, toggleFavorite } = useFavoriteExercises();
   const { addCustomExercise } = useSupabaseCustomExercises();
   const { allGroupedExercises: groupedExercises } = useExerciseDatabase();
 
-  // Désactiver l'auto-focus quand le dialog s'ouvre
+  // Réinitialiser l'état quand le dialog s'ouvre/ferme
   useEffect(() => {
-    if (open && inputRef.current) {
-      inputRef.current.blur();
+    if (open) {
+      setAllowFocus(false);
+      // Petit délai pour s'assurer que le blur initial fonctionne
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.blur();
+        }
+      }, 100);
     }
   }, [open]);
 
@@ -107,9 +115,10 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
             ref={inputRef}
             placeholder="Rechercher un exercice..." 
             autoFocus={false}
+            onClick={() => setAllowFocus(true)}
             onFocus={(e) => {
-              // Empêcher le focus automatique au début
-              if (!e.currentTarget.value) {
+              // Empêcher le focus automatique uniquement au début
+              if (!allowFocus) {
                 e.currentTarget.blur();
               }
             }}
