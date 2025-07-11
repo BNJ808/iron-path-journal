@@ -33,16 +33,13 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
     isDragging,
   } = useSortable({ 
     id: template.id,
-    transition: {
-      duration: 200,
-      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-    },
+    transition: null, // Désactiver les transitions pour plus de fluidité
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: isDragging ? 'none' : transition,
-    opacity: isDragging ? 0.8 : 1,
+    transition: isDragging ? 'none' : undefined,
+    opacity: isDragging ? 0.7 : 1,
     zIndex: isDragging ? 1000 : 'auto',
   };
 
@@ -67,8 +64,8 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
       style={style}
       className={cn(
         `${template.color} text-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-150 cursor-pointer`,
-        isDragging && "shadow-2xl ring-2 ring-white/50 scale-105",
-        "p-2 min-h-[45px] flex flex-col gap-1",
+        isDragging && "shadow-2xl ring-2 ring-white/50",
+        "p-1.5 min-h-[32px] flex flex-col gap-0.5",
         "select-none relative will-change-transform"
       )}
       onClick={handleCardClick}
@@ -80,13 +77,13 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
           data-drag-handle
           className={cn(
             "cursor-grab active:cursor-grabbing flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-150",
-            isMobile ? "p-1.5 -m-1.5 touch-none" : "p-1 -m-1",
+            isMobile ? "p-1 -m-1 touch-none" : "p-0.5 -m-0.5",
             "will-change-transform"
           )}
           style={{ touchAction: 'none' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <GripVertical className={cn("text-white", isMobile ? "h-3.5 w-3.5" : "h-3 w-3")} />
+          <GripVertical className={cn("text-white", isMobile ? "h-2.5 w-2.5" : "h-2 w-2")} />
         </div>
         
         <div data-dropdown-menu onClick={(e) => e.stopPropagation()}>
@@ -97,10 +94,10 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
                 size="sm"
                 className={cn(
                   "hover:bg-white/20 flex-shrink-0 transition-colors duration-150",
-                  isMobile ? "h-6 w-6 p-0" : "h-5 w-5 p-0"
+                  isMobile ? "h-5 w-5 p-0" : "h-4 w-4 p-0"
                 )}
               >
-                <MoreVertical className={cn("text-white", isMobile ? "h-3 w-3" : "h-2.5 w-2.5")} />
+                <MoreVertical className={cn("text-white", isMobile ? "h-2.5 w-2.5" : "h-2 w-2")} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -126,7 +123,7 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
       </div>
 
       <div className="flex-1 min-w-0 select-none pointer-events-none">
-        <div className="font-semibold text-xs mb-0.5 select-none leading-tight truncate">{template.name}</div>
+        <div className="font-semibold text-xs mb-0 select-none leading-tight truncate">{template.name}</div>
         {template.exercises.length > 0 && (
           <div className="text-xs opacity-80 leading-tight select-none truncate">
             {template.exercises.length} exercice{template.exercises.length > 1 ? 's' : ''}

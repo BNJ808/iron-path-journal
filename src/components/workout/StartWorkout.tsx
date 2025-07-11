@@ -5,7 +5,7 @@ import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
 import { WorkoutTemplateCard } from './WorkoutTemplateCard';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useState, useEffect } from 'react';
 
 interface StartWorkoutProps {
@@ -27,36 +27,46 @@ export const StartWorkout = ({
   onDeleteTemplate, 
   onCreateTemplate 
 }: StartWorkoutProps) => {
-  const [orderedTemplates, setOrderedTemplates] = useState(templates);
+  const [orderedTemplates, setOrderedTemplates] = useState<WorkoutTemplate[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Charger l'ordre sauvegardé depuis le localStorage
   useEffect(() => {
-    // Conserver l'ordre existant si il y en a un, sinon utiliser l'ordre par défaut
-    if (orderedTemplates.length === 0 || orderedTemplates.length !== templates.length) {
-      setOrderedTemplates(templates);
+    const savedOrder = localStorage.getItem('workoutTemplatesOrder');
+    if (savedOrder && templates.length > 0) {
+      try {
+        const orderIds = JSON.parse(savedOrder);
+        const orderedList = orderIds
+          .map((id: string) => templates.find(t => t.id === id))
+          .filter(Boolean);
+        
+        // Ajouter les nouveaux templates qui ne sont pas dans l'ordre sauvegardé
+        const newTemplates = templates.filter(t => !orderIds.includes(t.id));
+        setOrderedTemplates([...orderedList, ...newTemplates]);
+      } catch {
+        setOrderedTemplates(templates);
+      }
     } else {
-      // Mettre à jour les données tout en conservant l'ordre
-      const updatedTemplates = orderedTemplates.map(orderedTemplate => {
-        const updatedTemplate = templates.find(t => t.id === orderedTemplate.id);
-        return updatedTemplate || orderedTemplate;
-      }).filter(template => templates.some(t => t.id === template.id));
-      
-      // Ajouter les nouveaux templates à la fin
-      const newTemplates = templates.filter(t => !orderedTemplates.some(ot => ot.id === t.id));
-      setOrderedTemplates([...updatedTemplates, ...newTemplates]);
+      setOrderedTemplates(templates);
     }
   }, [templates]);
+
+  // Sauvegarder l'ordre dans le localStorage
+  const saveOrder = (newOrder: WorkoutTemplate[]) => {
+    const orderIds = newOrder.map(t => t.id);
+    localStorage.setItem('workoutTemplatesOrder', JSON.stringify(orderIds));
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 3,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 100,
-        tolerance: 5,
+        delay: 50,
+        tolerance: 3,
       },
     })
   );
@@ -74,7 +84,16 @@ export const StartWorkout = ({
         const oldIndex = items.findIndex(item => item.id === active.id);
         const newIndex = items.findIndex(item => item.id === over.id);
         
-        return arrayMove(items, oldIndex, newIndex);
+        if (oldIndex === -1 || newIndex === -1) return items;
+        
+        // Échanger les positions directement
+        const newItems = [...items];
+        [newItems[oldIndex], newItems[newIndex]] = [newItems[newIndex], newItems[oldIndex]];
+        
+        // Sauvegarder le nouvel ordre
+        saveOrder(newItems);
+        
+        return newItems;
       });
     }
   };
@@ -100,8 +119,8 @@ export const StartWorkout = ({
               onDragEnd={handleDragEnd}
               sensors={sensors}
             >
-              <SortableContext items={orderedTemplates.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-w-6xl mx-auto mb-4">
+              <SortableContext items={orderedTemplates.map(t => t.id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 max-w-6xl mx-auto mb-4">
                   {orderedTemplates.map(template => (
                     <WorkoutTemplateCard
                       key={template.id}
@@ -114,12 +133,9 @@ export const StartWorkout = ({
                 </div>
               </SortableContext>
               
-              <DragOverlay dropAnimation={{
-                duration: 200,
-                easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-              }}>
+              <DragOverlay dropAnimation={null}>
                 {activeTemplate ? (
-                  <div className={`${activeTemplate.color} text-white rounded-lg shadow-2xl p-2 min-h-[45px] flex flex-col gap-1 opacity-90 transform rotate-2 scale-110`}>
+                  <div className={`${activeTemplate.color} text-white rounded-lg shadow-2xl p-1.5 min-h-[32px] flex flex-col gap-0.5 opacity-90 transform scale-105`}>
                     <div className="font-semibold text-xs leading-tight truncate">{activeTemplate.name}</div>
                     {activeTemplate.exercises.length > 0 && (
                       <div className="text-xs opacity-80 leading-tight truncate">

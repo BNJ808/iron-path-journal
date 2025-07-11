@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import {
   Dialog,
@@ -95,7 +96,7 @@ export const AddExerciseDialog = ({ onAddExercise }: AddExerciseDialogProps) => 
           </DialogDescription>
         </DialogHeader>
         <Command>
-          <CommandInput placeholder="Rechercher un exercice..." />
+          <CommandInput placeholder="Rechercher un exercice..." autoFocus={false} />
           <div className="p-2 border-b space-y-2">
             <AddCustomExerciseDialog 
               addCustomExercise={addCustomExercise} 
