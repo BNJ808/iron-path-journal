@@ -31,20 +31,32 @@ export const StartWorkout = ({
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    setOrderedTemplates(templates);
+    // Conserver l'ordre existant si il y en a un, sinon utiliser l'ordre par défaut
+    if (orderedTemplates.length === 0 || orderedTemplates.length !== templates.length) {
+      setOrderedTemplates(templates);
+    } else {
+      // Mettre à jour les données tout en conservant l'ordre
+      const updatedTemplates = orderedTemplates.map(orderedTemplate => {
+        const updatedTemplate = templates.find(t => t.id === orderedTemplate.id);
+        return updatedTemplate || orderedTemplate;
+      }).filter(template => templates.some(t => t.id === template.id));
+      
+      // Ajouter les nouveaux templates à la fin
+      const newTemplates = templates.filter(t => !orderedTemplates.some(ot => ot.id === t.id));
+      setOrderedTemplates([...updatedTemplates, ...newTemplates]);
+    }
   }, [templates]);
 
-  // Configuration des capteurs pour un meilleur contrôle du drag - optimisé pour la fluidité
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 3, // Distance réduite pour une activation plus rapide
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 50, // Délai réduit pour une meilleure réactivité
-        tolerance: 3, // Tolérance réduite
+        delay: 100,
+        tolerance: 5,
       },
     })
   );
@@ -58,12 +70,12 @@ export const StartWorkout = ({
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const oldIndex = orderedTemplates.findIndex(t => t.id === active.id);
-      const newIndex = orderedTemplates.findIndex(t => t.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        setOrderedTemplates(arrayMove(orderedTemplates, oldIndex, newIndex));
-      }
+      setOrderedTemplates((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        
+        return arrayMove(items, oldIndex, newIndex);
+      });
     }
   };
 
@@ -89,7 +101,7 @@ export const StartWorkout = ({
               sensors={sensors}
             >
               <SortableContext items={orderedTemplates.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-w-4xl mx-auto mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-w-6xl mx-auto mb-4">
                   {orderedTemplates.map(template => (
                     <WorkoutTemplateCard
                       key={template.id}
@@ -103,14 +115,14 @@ export const StartWorkout = ({
               </SortableContext>
               
               <DragOverlay dropAnimation={{
-                duration: 150,
+                duration: 200,
                 easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
               }}>
                 {activeTemplate ? (
-                  <div className={`${activeTemplate.color} text-white rounded-lg shadow-2xl p-3 min-h-[60px] flex flex-col gap-1.5 opacity-90 transform rotate-3 scale-105`}>
-                    <div className="font-semibold text-sm leading-tight">{activeTemplate.name}</div>
+                  <div className={`${activeTemplate.color} text-white rounded-lg shadow-2xl p-2 min-h-[45px] flex flex-col gap-1 opacity-90 transform rotate-2 scale-110`}>
+                    <div className="font-semibold text-xs leading-tight truncate">{activeTemplate.name}</div>
                     {activeTemplate.exercises.length > 0 && (
-                      <div className="text-xs opacity-80 leading-tight">
+                      <div className="text-xs opacity-80 leading-tight truncate">
                         {activeTemplate.exercises.length} exercice{activeTemplate.exercises.length > 1 ? 's' : ''}
                       </div>
                     )}
