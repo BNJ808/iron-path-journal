@@ -42,6 +42,11 @@ export const EXERCISES_DATABASE = {
     avancé: ['Barre au front', 'Extensions poulie haute'],
     finition: ['Kickback', 'Extensions au-dessus de la tête'],
   },
+  Abdos: {
+    base: ['Crunchs', 'Planche', 'Relevés de jambes'],
+    avancé: ['Russian twists', 'Mountain climbers', 'Bicycle crunches'],
+    finition: ['Dead bug', 'Hollow body hold'],
+  },
 };
 
 export const MUSCLE_GROUP_COLORS: Record<string, string> = {
@@ -51,6 +56,7 @@ export const MUSCLE_GROUP_COLORS: Record<string, string> = {
   'Jambes': 'text-orange-400',
   'Biceps': 'text-pink-400',
   'Triceps': 'text-teal-400',
+  'Abdos': 'text-green-400',
   'Autres': 'text-gray-400',
 };
 
@@ -61,6 +67,7 @@ export const MUSCLE_GROUP_COLORS_HEX: Record<string, string> = {
   'Jambes': '#fb923c', // text-orange-400
   'Biceps': '#f472b6', // text-pink-400
   'Triceps': '#2dd4bf', // text-teal-400
+  'Abdos': '#4ade80', // text-green-400
   'Autres': '#9ca3af', // text-gray-400
 };
 
