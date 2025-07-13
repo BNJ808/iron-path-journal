@@ -75,9 +75,33 @@ export const useWorkoutLifecycle = () => {
     }
   };
 
+  const handleValidateRunning = async () => {
+    try {
+      // Créer un entraînement vide pour la sortie running
+      const workout = await createWorkout({
+        exercises: [],
+        notes: "Sortie running validée"
+      });
+      
+      // Immédiatement le marquer comme terminé
+      await updateWorkout({ 
+        workoutId: workout.id, 
+        exercises: [], 
+        notes: "Sortie running validée", 
+        status: 'completed',
+        ended_at: new Date().toISOString()
+      });
+      
+      toast.success("Sortie running validée !");
+    } catch (error: any) {
+      toast.error("Erreur lors de la validation de la sortie running: " + error.message);
+    }
+  };
+
   return {
     handleStartWorkout,
     handleFinishWorkout,
     handleCancelWorkout,
+    handleValidateRunning,
   };
 };

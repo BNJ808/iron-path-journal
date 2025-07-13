@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
-import { List, PlusCircle } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { List, PlusCircle, Play } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
 import { WorkoutTemplateCard } from './WorkoutTemplateCard';
@@ -11,6 +12,7 @@ import { useState, useEffect } from 'react';
 interface StartWorkoutProps {
   onStartWorkout: () => void;
   onStartFromTemplate: (template: WorkoutTemplate) => void;
+  onValidateRunning: () => void;
   templates: WorkoutTemplate[];
   isLoadingTemplates: boolean;
   onUpdateTemplate: (id: string, name: string, exercises: ExerciseLog[], color?: string) => void;
@@ -21,6 +23,7 @@ interface StartWorkoutProps {
 export const StartWorkout = ({ 
   onStartWorkout, 
   onStartFromTemplate, 
+  onValidateRunning,
   templates, 
   isLoadingTemplates, 
   onUpdateTemplate, 
@@ -29,6 +32,7 @@ export const StartWorkout = ({
 }: StartWorkoutProps) => {
   const [orderedTemplates, setOrderedTemplates] = useState<WorkoutTemplate[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isValidateRunning, setIsValidateRunning] = useState(false);
 
   // Charger l'ordre sauvegardé depuis le localStorage
   useEffect(() => {
@@ -100,9 +104,36 @@ export const StartWorkout = ({
 
   const activeTemplate = activeId ? orderedTemplates.find(t => t.id === activeId) : null;
 
+  const handleStartWorkout = () => {
+    if (isValidateRunning) {
+      onValidateRunning();
+    } else {
+      onStartWorkout();
+    }
+  };
+
   return (
     <div className="text-center py-10 space-y-6">
-      <Button onClick={onStartWorkout}>Démarrer un entraînement de zéro</Button>
+      <div className="space-y-4">
+        <Button onClick={handleStartWorkout} className="w-full max-w-md">
+          <Play className="mr-2 h-4 w-4" />
+          {isValidateRunning ? 'Valider la sortie running' : 'Démarrer un entraînement de zéro'}
+        </Button>
+        
+        <div className="flex items-center justify-center space-x-2 text-sm">
+          <Checkbox 
+            id="validate-running" 
+            checked={isValidateRunning}
+            onCheckedChange={(checked) => setIsValidateRunning(checked === true)}
+          />
+          <label 
+            htmlFor="validate-running" 
+            className="text-muted-foreground cursor-pointer"
+          >
+            Valider une sortie running
+          </label>
+        </div>
+      </div>
 
       <div className="border-t border-border pt-6 mt-6">
         <h2 className="text-lg font-semibold mb-4 text-gray-200 flex items-center justify-center gap-2">

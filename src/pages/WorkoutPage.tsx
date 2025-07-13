@@ -13,7 +13,7 @@ import { useOfflineWorkouts } from '@/hooks/useOfflineWorkouts';
 const WorkoutPage = () => {
   const { todayWorkout, isLoadingWorkout } = useOfflineWorkouts();
   const { templates, isLoadingTemplates, updateTemplate, deleteTemplate, createTemplate } = useWorkoutTemplates();
-  const { handleStartWorkout, handleFinishWorkout, handleCancelWorkout } = useWorkoutLifecycle();
+  const { handleStartWorkout, handleFinishWorkout, handleCancelWorkout, handleValidateRunning } = useWorkoutLifecycle();
   const {
     handleAddExercise,
     handleUpdateExercise,
@@ -52,6 +52,7 @@ const WorkoutPage = () => {
         <StartWorkout
           onStartWorkout={handleStartWorkout}
           onStartFromTemplate={handleStartFromTemplate}
+          onValidateRunning={handleValidateRunning}
           templates={templates}
           isLoadingTemplates={isLoadingTemplates}
           onUpdateTemplate={handleUpdateTemplate}
