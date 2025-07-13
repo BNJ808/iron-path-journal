@@ -67,16 +67,18 @@ const StatsPage = () => {
   const { workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
   const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
   
-  // Utiliser les workouts appropriés selon le filtre de date
-  const workoutsForMuscleStats = dateRange?.from ? filteredWorkouts : (workouts || []);
+  // Utiliser les workouts filtrés (sans les sorties running) selon le filtre de date
+  const workoutsForMuscleStats = dateRange?.from ? filteredWorkouts : (filteredWorkouts || []);
   const { volumeByMuscleGroup, muscleGroupStats } = useMuscleGroupStats(workoutsForMuscleStats);
   
-  const selectedExerciseData = useExerciseProgress(selectedExerciseName, workouts);
+  const selectedExerciseData = useExerciseProgress(selectedExerciseName, filteredWorkouts);
   const { 
     personalRecordsTimeline, 
     progressionPredictions, 
-    exerciseProgressionRanking
-  } = useAdvancedStats(workouts, dateRange);
+    weightPerformanceCorrelation, 
+    exerciseProgressionRanking, 
+    strengthRatios 
+  } = useAdvancedStats(workouts, dateRange); // useAdvancedStats gère déjà le filtrage en interne
 
   const isLoading = isWorkoutsLoading || isLoadingSettings;
 

@@ -80,14 +80,14 @@ export const useWorkoutLifecycle = () => {
       // Créer un entraînement vide pour la sortie running
       const workout = await createWorkout({
         exercises: [],
-        notes: "Sortie running validée"
+        notes: "RUNNING_SESSION" // Marqueur spécial pour identifier les sorties running
       });
       
       // Immédiatement le marquer comme terminé
       await updateWorkout({ 
         workoutId: workout.id, 
         exercises: [], 
-        notes: "Sortie running validée", 
+        notes: "RUNNING_SESSION", // Garder le marqueur
         status: 'completed',
         ended_at: new Date().toISOString()
       });

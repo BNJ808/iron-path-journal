@@ -6,13 +6,17 @@ import { differenceInDays, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { calculateEstimated1RM } from '@/utils/calculations';
 import { useBodyMeasurements } from '@/hooks/useBodyMeasurements';
+import { filterWorkoutsForStats } from '@/utils/workoutFilters';
 
 export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: DateRange | undefined) => {
     const { measurements } = useBodyMeasurements();
+    
+    // Filtrer les workouts pour exclure les sorties running
+    const muscleWorkouts = useMemo(() => filterWorkoutsForStats(workouts), [workouts]);
 
     // Timeline des records personnels
     const personalRecordsTimeline = useMemo(() => {
-        if (!workouts) return [];
+        if (!muscleWorkouts) return [];
 
         const records = new Map<string, { weight: number; reps: number; date: string; workout_id: string }>();
         const timeline: Array<{
@@ -25,7 +29,7 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
         }> = [];
 
         // Trier les entraînements par date
-        const sortedWorkouts = [...workouts].sort((a, b) => 
+        const sortedWorkouts = [...muscleWorkouts].sort((a, b) => 
             new Date(a.date).getTime() - new Date(b.date).getTime()
         );
 
@@ -54,15 +58,15 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
         });
 
         return timeline.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }, [workouts]);
+    }, [muscleWorkouts]);
 
     // Prédictions de progression
     const progressionPredictions = useMemo(() => {
-        if (!workouts || workouts.length < 3) return [];
+        if (!muscleWorkouts || muscleWorkouts.length < 3) return [];
 
         const exerciseData = new Map<string, Array<{ date: string; maxWeight: number }>>();
 
-        workouts.forEach(workout => {
+        muscleWorkouts.forEach(workout => {
             workout.exercises.forEach(exercise => {
                 const maxWeight = Math.max(0, ...exercise.sets
                     .filter(s => s.completed)
@@ -136,15 +140,15 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
         });
 
         return predictions.sort((a, b) => b.confidence - a.confidence);
-    }, [workouts]);
+    }, [muscleWorkouts]);
 
     // Corrélation poids corporel vs performance
     const weightPerformanceCorrelation = useMemo(() => {
-        if (!workouts || !measurements || measurements.length < 3) return null;
+        if (!muscleWorkouts || !measurements || measurements.length < 3) return null;
 
         const exerciseMaxWeights = new Map<string, Array<{ date: string; maxWeight: number }>>();
         
-        workouts.forEach(workout => {
+        muscleWorkouts.forEach(workout => {
             workout.exercises.forEach(exercise => {
                 const maxWeight = Math.max(0, ...exercise.sets
                     .filter(s => s.completed)
@@ -214,11 +218,11 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
         });
 
         return correlations.sort((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation));
-    }, [workouts, measurements]);
+    }, [muscleWorkouts, measurements]);
 
     // Classement des exercices par progression
     const exerciseProgressionRanking = useMemo(() => {
-        if (!workouts || workouts.length < 2) return [];
+        if (!muscleWorkouts || muscleWorkouts.length < 2) return [];
 
         const exerciseProgression = new Map<string, {
             firstMax: number;
@@ -229,7 +233,7 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
             lastDate: string;
         }>();
 
-        const sortedWorkouts = [...workouts].sort((a, b) => 
+        const sortedWorkouts = [...muscleWorkouts].sort((a, b) => 
             new Date(a.date).getTime() - new Date(b.date).getTime()
         );
 
@@ -272,15 +276,15 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
             }))
             .filter(item => item.sessions >= 2)
             .sort((a, b) => b.progressionPercent - a.progressionPercent);
-    }, [workouts]);
+    }, [muscleWorkouts]);
 
     // Ratios de force
     const strengthRatios = useMemo(() => {
-        if (!workouts) return [];
+        if (!muscleWorkouts) return [];
 
         const exerciseMaxes = new Map<string, number>();
         
-        workouts.forEach(workout => {
+        muscleWorkouts.forEach(workout => {
             workout.exercises.forEach(exercise => {
                 const maxWeight = Math.max(0, ...exercise.sets
                     .filter(s => s.completed)
@@ -349,7 +353,7 @@ export const useAdvancedStats = (workouts: Workout[] | undefined, dateRange: Dat
         }
 
         return ratios;
-    }, [workouts]);
+    }, [muscleWorkouts]);
 
     return {
         personalRecordsTimeline,
