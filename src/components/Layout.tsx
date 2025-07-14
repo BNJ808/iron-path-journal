@@ -1,14 +1,16 @@
 
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Timer } from 'lucide-react';
+import { Timer, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BottomNav from './BottomNav';
 import { OfflineIndicator } from './OfflineIndicator';
 import { TimerDialog } from './timer/TimerDialog';
+import { useTimer } from '@/contexts/TimerContext';
 
 const Layout = () => {
   const [isTimerOpen, setIsTimerOpen] = useState(false);
+  const { isRunning, timeLeft, formatTime, reset } = useTimer();
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -17,6 +19,20 @@ const Layout = () => {
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <h1 className="text-lg font-semibold">Carnet Muscu</h1>
           <div className="flex items-center gap-2">
+            {isRunning && (
+              <div className="flex items-center gap-1 bg-accent-blue/20 text-accent-blue px-2 py-1 rounded-md text-sm font-mono">
+                <Timer className="h-3 w-3" />
+                <span>{formatTime(timeLeft)}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={reset}
+                  className="h-5 w-5 p-0 ml-1 hover:bg-accent-blue/30"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
             <Button
               variant="ghost"
               size="sm"
