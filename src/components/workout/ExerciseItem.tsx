@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,17 +18,54 @@ interface ExerciseItemProps {
 
 export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps) => {
   const [showNotes, setShowNotes] = useState(!!exercise.notes);
+  const [localNotes, setLocalNotes] = useState(exercise.notes || '');
+  const [localSets, setLocalSets] = useState<Record<string, { weight: string; reps: string }>>({});
   const { isFavorite, toggleFavorite } = useFavoriteExercises();
 
+  // Sync local state with props
+  useEffect(() => {
+    setLocalNotes(exercise.notes || '');
+    const setsData: Record<string, { weight: string; reps: string }> = {};
+    exercise.sets.forEach(set => {
+      setsData[set.id] = {
+        weight: set.weight?.toString() || '',
+        reps: set.reps?.toString() || ''
+      };
+    });
+    setLocalSets(setsData);
+  }, [exercise.notes, exercise.sets]);
+
   const handleSetChange = (setId: string, field: 'reps' | 'weight' | 'completed', value: string | boolean) => {
+    if (field === 'completed') {
+      const updatedSets = exercise.sets.map((set) =>
+        set.id === setId ? { ...set, [field]: value as boolean } : set
+      );
+      onUpdate({ ...exercise, sets: updatedSets });
+    } else {
+      // Update local state for text inputs
+      setLocalSets(prev => ({
+        ...prev,
+        [setId]: {
+          ...prev[setId],
+          [field]: value as string
+        }
+      }));
+    }
+  };
+
+  const handleSetBlur = (setId: string, field: 'reps' | 'weight') => {
     const updatedSets = exercise.sets.map((set) =>
-      set.id === setId ? { ...set, [field]: value } : set
+      set.id === setId ? { ...set, [field]: localSets[setId]?.[field] || '' } : set
     );
     onUpdate({ ...exercise, sets: updatedSets });
   };
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdate({ ...exercise, notes: e.target.value });
+    setLocalNotes(e.target.value);
+  };
+
+  const handleNoteBlur = () => {
+    onUpdate({ ...exercise, notes: localNotes });
   };
 
   const addSet = () => {
@@ -70,8 +107,9 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
       {showNotes && (
         <Textarea
             placeholder="Notes sur l'exercice (sensation, technique...)"
-            value={exercise.notes?.toString() || ''}
+            value={localNotes}
             onChange={handleNoteChange}
+            onBlur={handleNoteBlur}
             className="mt-2 text-base bg-background/50"
         />
       )}
@@ -92,8 +130,9 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             <div className="relative">
                 <Input
                   type="number"
-                  value={set.weight?.toString() || ''}
+                  value={localSets[set.id]?.weight || ''}
                   onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
+                  onBlur={() => handleSetBlur(set.id, 'weight')}
                   placeholder="-"
                   className="text-base text-center bg-transparent border-border/50 focus:border-primary pr-7"
                 />
@@ -104,8 +143,9 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
 
             <Input
               type="number"
-              value={set.reps?.toString() || ''}
+              value={localSets[set.id]?.reps || ''}
               onChange={(e) => handleSetChange(set.id, 'reps', e.target.value)}
+              onBlur={() => handleSetBlur(set.id, 'reps')}
               placeholder="-"
               className="text-base text-center bg-transparent border-border/50 focus:border-primary"
             />
