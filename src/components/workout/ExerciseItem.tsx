@@ -92,7 +92,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             <div className="relative">
                 <Input
                   type="number"
-                  value={set.weight || ''}
+                  value={set.weight}
                   onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
                   placeholder="-"
                   className="text-base text-center bg-transparent border-border/50 focus:border-primary pr-7"
@@ -104,7 +104,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
 
             <Input
               type="number"
-              value={set.reps || ''}
+              value={set.reps}
               onChange={(e) => handleSetChange(set.id, 'reps', e.target.value)}
               placeholder="-"
               className="text-base text-center bg-transparent border-border/50 focus:border-primary"
