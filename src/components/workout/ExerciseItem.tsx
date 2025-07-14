@@ -70,7 +70,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
       {showNotes && (
         <Textarea
             placeholder="Notes sur l'exercice (sensation, technique...)"
-            value={exercise.notes || ''}
+            value={exercise.notes?.toString() || ''}
             onChange={handleNoteChange}
             className="mt-2 text-base bg-background/50"
         />
@@ -92,7 +92,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             <div className="relative">
                 <Input
                   type="number"
-                  value={set.weight}
+                  value={set.weight?.toString() || ''}
                   onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
                   placeholder="-"
                   className="text-base text-center bg-transparent border-border/50 focus:border-primary pr-7"
@@ -104,7 +104,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
 
             <Input
               type="number"
-              value={set.reps}
+              value={set.reps?.toString() || ''}
               onChange={(e) => handleSetChange(set.id, 'reps', e.target.value)}
               placeholder="-"
               className="text-base text-center bg-transparent border-border/50 focus:border-primary"
