@@ -37,9 +37,20 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
 
   const handleSetChange = (setId: string, field: 'reps' | 'weight' | 'completed', value: string | boolean) => {
     if (field === 'completed') {
-      const updatedSets = exercise.sets.map((set) =>
-        set.id === setId ? { ...set, [field]: value as boolean } : set
-      );
+      // First save any pending local changes for this set
+      const currentLocalSet = localSets[setId];
+      const updatedSets = exercise.sets.map((set) => {
+        if (set.id === setId) {
+          return { 
+            ...set, 
+            [field]: value as boolean,
+            // Apply any pending local changes
+            weight: currentLocalSet?.weight || set.weight,
+            reps: currentLocalSet?.reps || set.reps
+          };
+        }
+        return set;
+      });
       onUpdate({ ...exercise, sets: updatedSets });
     } else {
       // Update local state for text inputs
