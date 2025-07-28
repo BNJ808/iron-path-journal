@@ -49,7 +49,8 @@ export const useExerciseLastPerformance = () => {
             .from('exercise_last_performance')
             .select('exercise_id, notes')
             .in('exercise_id', exerciseIds)
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .not('notes', 'is', null); // Only get exercises that have notes
 
         if (error) {
             console.error("Error fetching last notes:", error);
