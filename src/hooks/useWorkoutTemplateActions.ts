@@ -9,7 +9,7 @@ import type { ExerciseSet } from '@/types';
 export const useWorkoutTemplateActions = () => {
   const { todayWorkout, createWorkout } = useWorkouts();
   const { createTemplate } = useWorkoutTemplates();
-  const { getLastPerformances } = useExerciseLastPerformance();
+  const { getLastPerformances, getLastNotes } = useExerciseLastPerformance();
 
   const handleSaveAsTemplate = async (name:string) => {
     if(!todayWorkout || todayWorkout.exercises.length === 0) {
@@ -52,9 +52,11 @@ export const useWorkoutTemplateActions = () => {
     try {
         const exerciseIds = template.exercises.map(ex => ex.exerciseId);
         const lastPerformances = await getLastPerformances(exerciseIds);
+        const lastNotes = await getLastNotes(exerciseIds);
 
         const newExercises = template.exercises.map(exercise => {
             const lastSets = lastPerformances[exercise.exerciseId];
+            const previousNotes = lastNotes[exercise.exerciseId] || exercise.notes || '';
             
             let newSets: ExerciseSet[];
             if (lastSets && lastSets.length > 0) {
@@ -69,7 +71,7 @@ export const useWorkoutTemplateActions = () => {
                 id: nanoid(),
                 exerciseId: exercise.exerciseId,
                 name: exercise.name,
-                notes: exercise.notes || '',
+                notes: previousNotes,
                 sets: newSets
             };
         });
