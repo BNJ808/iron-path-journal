@@ -110,12 +110,12 @@ export const useExerciseLastPerformance = () => {
                         console.error(`Erreur lors de la mise à jour de l'exercice ${record.exercise_id}:`, error);
                         throw error;
                     }
-                } else if (record.notes) {
+                } else if (record.notes !== undefined) {
                     // Mise à jour seulement des notes, garder les sets existants
                     const { error } = await supabase
                         .from('exercise_last_performance')
                         .update({ 
-                            notes: record.notes,
+                            notes: record.notes || null, // Convertir chaîne vide en null
                             updated_at: record.updated_at 
                         })
                         .eq('user_id', record.user_id)
