@@ -32,11 +32,14 @@ export const useWorkoutLifecycle = () => {
               .filter(s => s.completed) // On met à jour les perfs seulement pour les séries cochées "Fait"
               .map(({ id, reps, weight }) => ({ id, reps, weight }));
 
-          if (completedSets.length > 0) {
+          // Toujours sauvegarder les notes, même si aucune série n'est complétée
+          if (completedSets.length > 0 || (ex.notes && ex.notes.trim())) {
               // Si l'exercice existe déjà, on fusionne les sets
               if (performanceMap.has(ex.exerciseId)) {
                   const existing = performanceMap.get(ex.exerciseId)!;
-                  existing.sets = [...existing.sets, ...completedSets];
+                  if (completedSets.length > 0) {
+                      existing.sets = [...existing.sets, ...completedSets];
+                  }
                   // Garder les notes les plus récentes (non vides)
                   if (ex.notes && ex.notes.trim()) {
                       existing.notes = ex.notes;
@@ -44,7 +47,7 @@ export const useWorkoutLifecycle = () => {
               } else {
                   performanceMap.set(ex.exerciseId, {
                       exerciseId: ex.exerciseId,
-                      sets: completedSets,
+                      sets: completedSets, // Peut être vide si seules les notes sont présentes
                       notes: ex.notes && ex.notes.trim() ? ex.notes : undefined
                   });
               }
