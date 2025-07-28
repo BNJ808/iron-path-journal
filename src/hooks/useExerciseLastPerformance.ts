@@ -97,16 +97,34 @@ export const useExerciseLastPerformance = () => {
 
             // Traiter les mises à jour une par une pour éviter les conflits
             for (const record of recordsToUpsert) {
-                const { error } = await supabase
-                    .from('exercise_last_performance')
-                    .upsert(record, { 
-                        onConflict: 'user_id,exercise_id',
-                        ignoreDuplicates: false 
-                    });
+                if (record.sets && record.sets.length > 0) {
+                    // Mise à jour complète avec sets et notes
+                    const { error } = await supabase
+                        .from('exercise_last_performance')
+                        .upsert(record, { 
+                            onConflict: 'user_id,exercise_id',
+                            ignoreDuplicates: false 
+                        });
 
-                if (error) {
-                    console.error(`Erreur lors de la mise à jour de l'exercice ${record.exercise_id}:`, error);
-                    throw error;
+                    if (error) {
+                        console.error(`Erreur lors de la mise à jour de l'exercice ${record.exercise_id}:`, error);
+                        throw error;
+                    }
+                } else if (record.notes) {
+                    // Mise à jour seulement des notes, garder les sets existants
+                    const { error } = await supabase
+                        .from('exercise_last_performance')
+                        .update({ 
+                            notes: record.notes,
+                            updated_at: record.updated_at 
+                        })
+                        .eq('user_id', record.user_id)
+                        .eq('exercise_id', record.exercise_id);
+
+                    if (error) {
+                        console.error(`Erreur lors de la mise à jour des notes de l'exercice ${record.exercise_id}:`, error);
+                        throw error;
+                    }
                 }
             }
         },

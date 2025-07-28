@@ -24,42 +24,55 @@ export const useWorkoutLifecycle = () => {
                      .filter(s => s.reps > 0 || s.weight > 0)
       })).filter(ex => ex.sets.length > 0);
 
-      // Créer un Map pour éviter les doublons d'exercices
-      const performanceMap = new Map<string, { exerciseId: string; sets: any[]; notes?: string }>();
+      // Créer deux Maps séparés pour les performances et les notes
+      const performanceMap = new Map<string, { exerciseId: string; sets: any[] }>();
+      const notesMap = new Map<string, { exerciseId: string; notes: string }>();
 
       cleanedExercises.forEach(ex => {
           const completedSets = ex.sets
               .filter(s => s.completed) // On met à jour les perfs seulement pour les séries cochées "Fait"
               .map(({ id, reps, weight }) => ({ id, reps, weight }));
 
-          // Toujours sauvegarder les notes, même si aucune série n'est complétée
-          if (completedSets.length > 0 || (ex.notes && ex.notes.trim())) {
-              // Si l'exercice existe déjà, on fusionne les sets
+          // Sauvegarder les performances si il y a des sets complétés
+          if (completedSets.length > 0) {
               if (performanceMap.has(ex.exerciseId)) {
                   const existing = performanceMap.get(ex.exerciseId)!;
-                  if (completedSets.length > 0) {
-                      existing.sets = [...existing.sets, ...completedSets];
-                  }
-                  // Garder les notes les plus récentes (non vides)
-                  if (ex.notes && ex.notes.trim()) {
-                      existing.notes = ex.notes;
-                  }
+                  existing.sets = [...existing.sets, ...completedSets];
               } else {
                   performanceMap.set(ex.exerciseId, {
                       exerciseId: ex.exerciseId,
-                      sets: completedSets, // Peut être vide si seules les notes sont présentes
-                      notes: ex.notes && ex.notes.trim() ? ex.notes : undefined
+                      sets: completedSets
                   });
               }
+          }
+
+          // Sauvegarder les notes si elles existent et ne sont pas vides
+          if (ex.notes && ex.notes.trim()) {
+              notesMap.set(ex.exerciseId, {
+                  exerciseId: ex.exerciseId,
+                  notes: ex.notes.trim()
+              });
           }
       });
 
       const performancesToUpdate = Array.from(performanceMap.values());
+      const notesToUpdate = Array.from(notesMap.values());
 
       try {
+        // Sauvegarder les performances avec sets
         if (performancesToUpdate.length > 0) {
-            console.log('Saving performances with notes:', performancesToUpdate);
+            console.log('Saving performances with sets:', performancesToUpdate);
             await updateLastPerformances(performancesToUpdate as any);
+        }
+        
+        // Sauvegarder seulement les notes pour les exercices qui en ont
+        if (notesToUpdate.length > 0) {
+            console.log('Saving notes only:', notesToUpdate);
+            await updateLastPerformances(notesToUpdate.map(note => ({
+                exerciseId: note.exerciseId,
+                sets: [], // Sets vides pour indiquer qu'on ne veut pas écraser les performances
+                notes: note.notes
+            })) as any);
         }
         await updateWorkout({ 
             workoutId: todayWorkout.id, 
