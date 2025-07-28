@@ -13,6 +13,7 @@ export interface UserSettings {
   // Préférences des statistiques
   statsCardOrder?: string[];
   statsDateRange?: DateRange;
+  hiddenStatsModules?: string[];
   
   // Autres préférences
   timerSettings?: {

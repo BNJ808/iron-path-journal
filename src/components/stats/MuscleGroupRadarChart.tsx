@@ -93,14 +93,23 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent className="pb-0">
-                        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[300px]">
-                            <RechartsRadarChart data={data}>
+                        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[350px] w-full">
+                            <RechartsRadarChart 
+                                data={data} 
+                                width={400} 
+                                height={400}
+                                margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+                            >
                                 <ChartTooltip
                                     cursor={false}
                                     content={<CustomTooltipContent />}
                                 />
                                 <PolarGrid stroke="hsl(var(--foreground))" />
-                                <PolarAngleAxis dataKey="subject" tick={renderColorfulTick} />
+                                <PolarAngleAxis 
+                                    dataKey="subject" 
+                                    tick={renderColorfulTick}
+                                    tickFormatter={(value) => value.length > 8 ? value.substring(0, 8) + '...' : value}
+                                />
                                 <PolarRadiusAxis angle={30} domain={[0, maxSets > 0 ? maxSets : 1]} tick={false} axisLine={false} />
                                 <Radar
                                     dataKey="sets"
@@ -109,10 +118,8 @@ export const MuscleGroupRadarChart = ({ data, maxSets }: MuscleGroupRadarChartPr
                                     stroke="var(--color-sets)"
                                     dot={(props: any) => {
                                         const { cx, cy, payload } = props;
-                                        // Essayons différentes façons d'accéder au nom du groupe musculaire
                                         const muscleGroup = payload?.subject || payload?.name || '';
                                         const color = MUSCLE_GROUP_COLORS_HEX[muscleGroup] || MUSCLE_GROUP_COLORS_HEX['Autres'];
-                                        console.log('Dot payload:', payload, 'muscleGroup:', muscleGroup, 'color:', color);
                                         return (
                                             <circle
                                                 cx={cx}

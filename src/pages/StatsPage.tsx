@@ -10,10 +10,14 @@ import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { DateRange } from 'react-day-picker';
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
+import { Settings, Eye, EyeOff } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const StatsPage = () => {
   const [isDndEnabled, setIsDndEnabled] = useState(false);
   const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
+  const [isModuleManagerOpen, setIsModuleManagerOpen] = useState(false);
   
   const { settings, updateSettings, isLoading: isLoadingSettings } = useUserSettings();
   
@@ -32,6 +36,7 @@ const StatsPage = () => {
 
   const [cardOrder, setCardOrder] = useState(defaultCardOrder);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [hiddenModules, setHiddenModules] = useState<string[]>([]);
 
   // Synchroniser avec les paramètres utilisateur
   useEffect(() => {
@@ -41,6 +46,9 @@ const StatsPage = () => {
       }
       if (settings.statsDateRange) {
         setDateRange(settings.statsDateRange);
+      }
+      if (settings.hiddenStatsModules) {
+        setHiddenModules(settings.hiddenStatsModules);
       }
     }
   }, [settings, isLoadingSettings]);
@@ -61,6 +69,19 @@ const StatsPage = () => {
       await updateSettings({ statsCardOrder: newOrder });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de l\'ordre des cartes:', error);
+    }
+  };
+
+  const handleModuleVisibilityChange = async (moduleId: string, isVisible: boolean) => {
+    const newHiddenModules = isVisible 
+      ? hiddenModules.filter(id => id !== moduleId)
+      : [...hiddenModules, moduleId];
+    
+    setHiddenModules(newHiddenModules);
+    try {
+      await updateSettings({ hiddenStatsModules: newHiddenModules });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des modules masqués:', error);
     }
   };
 
@@ -86,6 +107,20 @@ const StatsPage = () => {
     setSelectedExerciseName(exerciseName);
   };
 
+  const moduleLabels = {
+    'overview': 'Vue d\'ensemble',
+    'one-rm-calculator': 'Calculateur 1RM',
+    'volume': 'Volume par groupe musculaire',
+    'personalRecords': 'Records personnels',
+    'muscle-groups': 'Séries par groupe musculaire',
+    'exercise-progress': 'Progression des exercices',
+    'progression-predictions': 'Prédictions de progression',
+    'exercise-progression-ranking': 'Classement de progression',
+    'ai-analysis': 'Analyse IA'
+  };
+
+  const visibleCardOrder = cardOrder.filter(cardId => !hiddenModules.includes(cardId));
+
   return (
     <div className="p-2 sm:p-4 space-y-4 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
@@ -93,16 +128,52 @@ const StatsPage = () => {
           <BarChart3 className="h-6 w-6 text-accent-blue" />
           <h1 className="text-2xl font-bold text-foreground">Statistiques</h1>
         </div>
-        <button
-          onClick={() => setIsDndEnabled(!isDndEnabled)}
-          className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-            isDndEnabled 
-              ? 'bg-accent-blue text-white' 
-              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-          }`}
-        >
-          {isDndEnabled ? 'Terminer' : 'Réorganiser'}
-        </button>
+        <div className="flex items-center gap-2">
+          <Dialog open={isModuleManagerOpen} onOpenChange={setIsModuleManagerOpen}>
+            <DialogTrigger asChild>
+              <button className="px-3 py-1 rounded-md text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Modules
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Gérer les modules</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {defaultCardOrder.map((moduleId) => (
+                  <div key={moduleId} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={moduleId}
+                      checked={!hiddenModules.includes(moduleId)}
+                      onCheckedChange={(checked) => 
+                        handleModuleVisibilityChange(moduleId, checked as boolean)
+                      }
+                    />
+                    <label htmlFor={moduleId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2">
+                      {!hiddenModules.includes(moduleId) ? (
+                        <Eye className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-red-500" />
+                      )}
+                      {moduleLabels[moduleId as keyof typeof moduleLabels]}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+          <button
+            onClick={() => setIsDndEnabled(!isDndEnabled)}
+            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+              isDndEnabled 
+                ? 'bg-accent-blue text-white' 
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            }`}
+          >
+            {isDndEnabled ? 'Terminer' : 'Réorganiser'}
+          </button>
+        </div>
       </div>
 
       {/* Section de sélection de plage de dates */}
@@ -135,7 +206,7 @@ const StatsPage = () => {
         </div>
       ) : (
         <DraggableStatsCards
-          cardOrder={cardOrder}
+          cardOrder={visibleCardOrder}
           onCardOrderChange={handleCardOrderChange}
           isDndEnabled={isDndEnabled}
           stats={stats}
