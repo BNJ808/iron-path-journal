@@ -46,8 +46,8 @@ export const useWorkoutLifecycle = () => {
               }
           }
 
-          // Sauvegarder les notes si elles existent et ne sont pas vides
-          if (ex.notes && ex.notes.trim()) {
+          // Sauvegarder les notes si elles existent (même vides pour les effacer)
+          if (ex.notes !== undefined) {
               notesMap.set(ex.exerciseId, {
                   exerciseId: ex.exerciseId,
                   notes: ex.notes.trim()
