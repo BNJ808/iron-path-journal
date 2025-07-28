@@ -6,13 +6,15 @@ import type { ExerciseSet, ExerciseLog } from '@/types';
 
 export const useCurrentWorkoutActions = () => {
   const { todayWorkout, updateWorkout } = useOfflineWorkouts(); // Utiliser la version hors ligne
-  const { getLastPerformances } = useExerciseLastPerformance();
+  const { getLastPerformances, getLastNotes } = useExerciseLastPerformance();
 
   const handleAddExercise = async (exercise: { id: string; name: string }) => {
     if (!todayWorkout) return;
 
     const lastPerformances = await getLastPerformances([exercise.id]);
+    const lastNotes = await getLastNotes([exercise.id]);
     const lastSets = lastPerformances[exercise.id];
+    const previousNotes = lastNotes[exercise.id] || '';
 
     const newSets: ExerciseSet[] = lastSets && lastSets.length > 0
         ? lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight), completed: false }))
@@ -23,7 +25,7 @@ export const useCurrentWorkoutActions = () => {
       exerciseId: exercise.id,
       name: exercise.name,
       sets: newSets,
-      notes: '',
+      notes: previousNotes,
     };
 
     const updatedExercises = [...todayWorkout.exercises, newExerciseLog];

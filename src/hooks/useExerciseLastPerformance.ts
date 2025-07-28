@@ -7,6 +7,7 @@ export interface ExerciseLastPerformance {
     user_id: string;
     exercise_id: string;
     sets: ExerciseSet[];
+    notes?: string;
     updated_at: string;
 }
 
@@ -20,7 +21,7 @@ export const useExerciseLastPerformance = () => {
 
         const { data, error } = await supabase
             .from('exercise_last_performance')
-            .select('exercise_id, sets')
+            .select('exercise_id, sets, notes')
             .in('exercise_id', exerciseIds)
             .eq('user_id', userId);
 
@@ -41,8 +42,34 @@ export const useExerciseLastPerformance = () => {
         return performances;
     };
 
+    const getLastNotes = async (exerciseIds: string[]): Promise<Record<string, string>> => {
+        if (!userId || exerciseIds.length === 0) return {};
+
+        const { data, error } = await supabase
+            .from('exercise_last_performance')
+            .select('exercise_id, notes')
+            .in('exercise_id', exerciseIds)
+            .eq('user_id', userId);
+
+        if (error) {
+            console.error("Error fetching last notes:", error);
+            return {};
+        }
+
+        const notes: Record<string, string> = {};
+        if (data) {
+            data.forEach(item => {
+                if (item.exercise_id && item.notes) {
+                    notes[item.exercise_id] = item.notes;
+                }
+            });
+        }
+
+        return notes;
+    };
+
     const updateLastPerformancesMutation = useMutation({
-        mutationFn: async (performances: { exerciseId: string; sets: ExerciseSet[] }[]) => {
+        mutationFn: async (performances: { exerciseId: string; sets: ExerciseSet[]; notes?: string }[]) => {
             if (!userId) throw new Error("User not authenticated");
 
             // Éliminer les doublons par exerciceId pour éviter l'erreur ON CONFLICT
@@ -61,6 +88,7 @@ export const useExerciseLastPerformance = () => {
                 user_id: userId,
                 exercise_id: p.exerciseId,
                 sets: p.sets as any,
+                notes: p.notes,
                 updated_at: new Date().toISOString()
             }));
 
@@ -88,6 +116,7 @@ export const useExerciseLastPerformance = () => {
 
     return {
         getLastPerformances,
+        getLastNotes,
         updateLastPerformances: updateLastPerformancesMutation.mutateAsync,
     };
 };

@@ -65,18 +65,21 @@ export type Database = {
       exercise_last_performance: {
         Row: {
           exercise_id: string
+          notes: string | null
           sets: Json
           updated_at: string
           user_id: string
         }
         Insert: {
           exercise_id: string
+          notes?: string | null
           sets: Json
           updated_at?: string
           user_id: string
         }
         Update: {
           exercise_id?: string
+          notes?: string | null
           sets?: Json
           updated_at?: string
           user_id?: string

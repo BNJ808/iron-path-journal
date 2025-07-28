@@ -25,7 +25,7 @@ export const useWorkoutLifecycle = () => {
       })).filter(ex => ex.sets.length > 0);
 
       // Créer un Map pour éviter les doublons d'exercices
-      const performanceMap = new Map<string, { exerciseId: string; sets: any[] }>();
+      const performanceMap = new Map<string, { exerciseId: string; sets: any[]; notes?: string }>();
 
       cleanedExercises.forEach(ex => {
           const completedSets = ex.sets
@@ -37,10 +37,15 @@ export const useWorkoutLifecycle = () => {
               if (performanceMap.has(ex.exerciseId)) {
                   const existing = performanceMap.get(ex.exerciseId)!;
                   existing.sets = [...existing.sets, ...completedSets];
+                  // Garder les notes les plus récentes (non vides)
+                  if (ex.notes && ex.notes.trim()) {
+                      existing.notes = ex.notes;
+                  }
               } else {
                   performanceMap.set(ex.exerciseId, {
                       exerciseId: ex.exerciseId,
-                      sets: completedSets
+                      sets: completedSets,
+                      notes: ex.notes && ex.notes.trim() ? ex.notes : undefined
                   });
               }
           }
