@@ -11,10 +11,18 @@ export const useCurrentWorkoutActions = () => {
   const handleAddExercise = async (exercise: { id: string; name: string }) => {
     if (!todayWorkout) return;
 
+    console.log('Adding exercise:', exercise.id, exercise.name);
+    
     const lastPerformances = await getLastPerformances([exercise.id]);
     const lastNotes = await getLastNotes([exercise.id]);
+    
+    console.log('Last performances for', exercise.id, ':', lastPerformances);
+    console.log('Last notes for', exercise.id, ':', lastNotes);
+    
     const lastSets = lastPerformances[exercise.id];
     const previousNotes = lastNotes[exercise.id] || '';
+    
+    console.log('Previous notes found:', previousNotes);
 
     const newSets: ExerciseSet[] = lastSets && lastSets.length > 0
         ? lastSets.map(set => ({ id: nanoid(), reps: String(set.reps), weight: String(set.weight), completed: false }))
@@ -27,6 +35,8 @@ export const useCurrentWorkoutActions = () => {
       sets: newSets,
       notes: previousNotes,
     };
+    
+    console.log('New exercise log created with notes:', newExerciseLog.notes);
 
     const updatedExercises = [...todayWorkout.exercises, newExerciseLog];
     

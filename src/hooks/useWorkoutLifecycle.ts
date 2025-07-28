@@ -55,6 +55,7 @@ export const useWorkoutLifecycle = () => {
 
       try {
         if (performancesToUpdate.length > 0) {
+            console.log('Saving performances with notes:', performancesToUpdate);
             await updateLastPerformances(performancesToUpdate as any);
         }
         await updateWorkout({ 
