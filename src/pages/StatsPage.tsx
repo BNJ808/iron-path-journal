@@ -8,6 +8,7 @@ import { useExerciseProgress } from '@/hooks/useExerciseProgress';
 import { useAdvancedStats } from '@/hooks/useAdvancedStats';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { useUserSettings } from '@/hooks/useUserSettings';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { DateRange } from 'react-day-picker';
 import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { Settings, Eye, EyeOff } from 'lucide-react';
@@ -18,6 +19,7 @@ const StatsPage = () => {
   const [isDndEnabled, setIsDndEnabled] = useState(false);
   const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
   const [isModuleManagerOpen, setIsModuleManagerOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   const { settings, updateSettings, isLoading: isLoadingSettings } = useUserSettings();
   
@@ -123,17 +125,17 @@ const StatsPage = () => {
 
   return (
     <div className="p-2 sm:p-4 space-y-4 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between'}`}>
         <div className="flex items-center gap-2">
           <BarChart3 className="h-6 w-6 text-accent-blue" />
-          <h1 className="text-2xl font-bold text-foreground">Statistiques</h1>
+          <h1 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-foreground`}>Statistiques</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
           <Dialog open={isModuleManagerOpen} onOpenChange={setIsModuleManagerOpen}>
             <DialogTrigger asChild>
-              <button className="px-3 py-1 rounded-md text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors flex items-center gap-2">
+              <button className={`${isMobile ? 'px-2 py-1' : 'px-3 py-1'} rounded-md text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors flex items-center gap-1`}>
                 <Settings className="h-4 w-4" />
-                Modules
+                {!isMobile && 'Modules'}
               </button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
@@ -165,7 +167,7 @@ const StatsPage = () => {
           </Dialog>
           <button
             onClick={() => setIsDndEnabled(!isDndEnabled)}
-            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+            className={`${isMobile ? 'px-2 py-1' : 'px-3 py-1'} rounded-md text-sm font-medium transition-colors ${
               isDndEnabled 
                 ? 'bg-accent-blue text-white' 
                 : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
