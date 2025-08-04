@@ -52,15 +52,26 @@ const StatsPage = () => {
         setCardOrder(settings.statsCardOrder);
       }
       if (settings.statsDateRange) {
-        // Mettre à jour automatiquement la date de fin au jour actuel
         const today = new Date();
-        const updatedRange = {
-          from: settings.statsDateRange.from,
-          to: today
-        };
-        setDateRange(updatedRange);
-        // Sauvegarder la nouvelle période avec la date de fin mise à jour
-        handleDateRangeChange(updatedRange);
+        const savedToDate = new Date(settings.statsDateRange.to || today);
+        
+        // Comparer seulement les dates (pas les heures)
+        const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const savedDateOnly = new Date(savedToDate.getFullYear(), savedToDate.getMonth(), savedToDate.getDate());
+        
+        // Mettre à jour la date de fin seulement si elle est antérieure à aujourd'hui
+        if (savedDateOnly < todayDateOnly) {
+          const updatedRange = {
+            from: settings.statsDateRange.from,
+            to: today
+          };
+          setDateRange(updatedRange);
+          // Sauvegarder la nouvelle période avec la date de fin mise à jour
+          handleDateRangeChange(updatedRange);
+        } else {
+          // Garder la date de fin choisie par l'utilisateur
+          setDateRange(settings.statsDateRange);
+        }
       } else {
         // Si aucune période n'est sauvegardée, sauvegarder la période par défaut
         const today = new Date();
