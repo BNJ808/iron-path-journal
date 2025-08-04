@@ -64,12 +64,12 @@ export const WeightTracker = () => {
             <CardContent className="space-y-4">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="flex flex-col sm:flex-row gap-4 items-start">
+                        <div className="flex flex-col sm:flex-row gap-4 items-end">
                              <FormField
                                 control={form.control}
                                 name="weight"
                                 render={({ field }) => (
-                                    <FormItem className="flex-grow w-full sm:w-auto">
+                                    <FormItem className="flex-1">
                                         <FormLabel>Poids (kg)</FormLabel>
                                         <FormControl>
                                             <Input type="number" step="0.1" placeholder="70.5" {...field} value={field.value ?? ''} />
@@ -82,7 +82,7 @@ export const WeightTracker = () => {
                                 control={form.control}
                                 name="date"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col flex-grow w-full sm:w-auto">
+                                    <FormItem className="flex-1">
                                         <FormLabel>Date</FormLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -114,6 +114,7 @@ export const WeightTracker = () => {
                                                         date > new Date() || date < new Date("1900-01-01")
                                                     }
                                                     initialFocus
+                                                    className="pointer-events-auto"
                                                 />
                                             </PopoverContent>
                                         </Popover>
