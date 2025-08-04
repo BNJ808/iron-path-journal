@@ -1,6 +1,6 @@
 
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BarChart3, CalendarDays } from 'lucide-react';
 import { useStatsCalculations } from '@/hooks/useStatsCalculations';
 import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
@@ -20,6 +20,7 @@ const StatsPage = () => {
   const [selectedExerciseName, setSelectedExerciseName] = useState<string | null>(null);
   const [isModuleManagerOpen, setIsModuleManagerOpen] = useState(false);
   const isMobile = useIsMobile();
+  const hasAutoUpdatedToday = useRef(false);
   
   const { settings, updateSettings, isLoading: isLoadingSettings } = useUserSettings();
   
@@ -47,7 +48,7 @@ const StatsPage = () => {
 
   // Synchroniser avec les paramètres utilisateur
   useEffect(() => {
-    if (!isLoadingSettings && settings) {
+    if (!isLoadingSettings && settings && !hasAutoUpdatedToday.current) {
       if (settings.statsCardOrder) {
         setCardOrder(settings.statsCardOrder);
       }
@@ -60,6 +61,7 @@ const StatsPage = () => {
         const savedDateOnly = new Date(savedToDate.getFullYear(), savedToDate.getMonth(), savedToDate.getDate());
         
         // Mettre à jour la date de fin seulement si elle est antérieure à aujourd'hui
+        // ET seulement lors du premier chargement de la page
         if (savedDateOnly < todayDateOnly) {
           const updatedRange = {
             from: settings.statsDateRange.from,
@@ -68,6 +70,7 @@ const StatsPage = () => {
           setDateRange(updatedRange);
           // Sauvegarder la nouvelle période avec la date de fin mise à jour
           handleDateRangeChange(updatedRange);
+          hasAutoUpdatedToday.current = true;
         } else {
           // Garder la date de fin choisie par l'utilisateur
           setDateRange(settings.statsDateRange);
@@ -78,6 +81,7 @@ const StatsPage = () => {
         const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const defaultRange = { from: startOfMonth, to: today };
         handleDateRangeChange(defaultRange);
+        hasAutoUpdatedToday.current = true;
       }
       if (settings.hiddenStatsModules) {
         setHiddenModules(settings.hiddenStatsModules);
