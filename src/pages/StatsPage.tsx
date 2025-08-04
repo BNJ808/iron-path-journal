@@ -37,7 +37,12 @@ const StatsPage = () => {
   ];
 
   const [cardOrder, setCardOrder] = useState(defaultCardOrder);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    // Par défaut, définir la période sur le mois courant
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return { from: startOfMonth, to: today };
+  });
   const [hiddenModules, setHiddenModules] = useState<string[]>([]);
 
   // Synchroniser avec les paramètres utilisateur
@@ -48,6 +53,12 @@ const StatsPage = () => {
       }
       if (settings.statsDateRange) {
         setDateRange(settings.statsDateRange);
+      } else {
+        // Si aucune période n'est sauvegardée, sauvegarder la période par défaut
+        const today = new Date();
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const defaultRange = { from: startOfMonth, to: today };
+        handleDateRangeChange(defaultRange);
       }
       if (settings.hiddenStatsModules) {
         setHiddenModules(settings.hiddenStatsModules);
