@@ -52,7 +52,15 @@ const StatsPage = () => {
         setCardOrder(settings.statsCardOrder);
       }
       if (settings.statsDateRange) {
-        setDateRange(settings.statsDateRange);
+        // Mettre à jour automatiquement la date de fin au jour actuel
+        const today = new Date();
+        const updatedRange = {
+          from: settings.statsDateRange.from,
+          to: today
+        };
+        setDateRange(updatedRange);
+        // Sauvegarder la nouvelle période avec la date de fin mise à jour
+        handleDateRangeChange(updatedRange);
       } else {
         // Si aucune période n'est sauvegardée, sauvegarder la période par défaut
         const today = new Date();
