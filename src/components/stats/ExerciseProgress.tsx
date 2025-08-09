@@ -7,8 +7,8 @@
     import { LineChart as LineChartIcon } from 'lucide-react';
 
     const exerciseChartConfig = {
-      volume: {
-        label: "Volume (kg)",
+      sets: {
+        label: "Séries",
         color: "hsl(var(--accent-purple))",
       },
       maxWeight: {
@@ -20,6 +20,7 @@
     interface HistoryItem {
         date: string;
         displayDate: string;
+        sets?: number;
         volume: number;
         maxWeight: number;
     }
@@ -67,7 +68,7 @@
                                     <YAxis yAxisId="right" orientation="right" tickLine={false} axisLine={false} tickMargin={10} fontSize={12} />
                                     <Tooltip content={<ChartTooltipContent />} />
                                     <Legend />
-                                    <Line yAxisId="left" type="monotone" dataKey="volume" stroke={exerciseChartConfig.volume.color} name="Volume (kg)" dot={false} />
+                                    <Line yAxisId="left" type="monotone" dataKey="sets" stroke={exerciseChartConfig.sets.color} name="Séries" dot={false} />
                                     <Line yAxisId="right" type="monotone" dataKey="maxWeight" stroke={exerciseChartConfig.maxWeight.color} name="Poids Max (kg)" dot={false} />
                                 </LineChart>
                             </ChartContainer>
