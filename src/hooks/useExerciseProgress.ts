@@ -17,6 +17,7 @@ export const useExerciseProgress = (selectedExerciseName: string | null, workout
                     totalVol + log.sets.filter(s => s.completed).reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0), 0);
                 
                 const sets = exerciseLogs.reduce((count, log) => count + log.sets.filter(s => s.completed).length, 0);
+                const reps = exerciseLogs.reduce((count, log) => count + log.sets.filter(s => s.completed).reduce((acc, set) => acc + (Number(set.reps) || 0), 0), 0);
                 
                 const maxWeight = Math.max(0, ...exerciseLogs.flatMap(log => log.sets.filter(s => s.completed).map(set => Number(set.weight) || 0)));
     
@@ -24,6 +25,7 @@ export const useExerciseProgress = (selectedExerciseName: string | null, workout
                     date: workout.date,
                     displayDate: format(new Date(workout.date), 'd MMM', { locale: fr }),
                     sets,
+                    reps,
                     volume,
                     maxWeight,
                 };
