@@ -41,6 +41,16 @@ const Layout = () => {
             >
               <Timer className="h-4 w-4" />
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <a
+                href="https://musclewiki.com/fr-fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ouvrir MuscleWiki dans un nouvel onglet"
+              >
+                MuscleWiki
+              </a>
+            </Button>
             <OfflineIndicator />
           </div>
         </div>
