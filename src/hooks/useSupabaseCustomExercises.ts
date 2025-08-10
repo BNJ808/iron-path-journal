@@ -108,6 +108,33 @@ const useSupabaseCustomExercises = () => {
     },
   });
 
+  // Mutation pour renommer un exercice personnalisé
+  const updateExerciseMutation = useMutation({
+    mutationFn: async ({ exerciseId, name }: { exerciseId: string; name: string }) => {
+      if (!user?.id) {
+        throw new Error('Utilisateur non connecté');
+      }
+
+      const { data, error } = await supabase
+        .from('custom_exercises')
+        .update({ name })
+        .eq('id', exerciseId)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) {
+        handleSupabaseError(error, 'mise à jour de l\'exercice personnalisé');
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['custom-exercises', user?.id] });
+    },
+  });
+
   const migrateFromLocalStorage = useCallback(async () => {
     if (!user?.id || migrationCompleted) return;
 
@@ -209,10 +236,34 @@ const useSupabaseCustomExercises = () => {
     }
   }, [customExercises, deleteExerciseMutation]);
 
+  const updateCustomExerciseName = useCallback(async (exerciseId: string, name: string) => {
+    const exercise = customExercises.find(ex => ex.id === exerciseId);
+    if (!exercise) {
+      toast.error("Exercice introuvable.");
+      return false;
+    }
+    if (!name.trim()) {
+      toast.error("Le nom ne peut pas être vide.");
+      return false;
+    }
+    if (exercise.name === name.trim()) {
+      return true;
+    }
+    try {
+      await updateExerciseMutation.mutateAsync({ exerciseId, name: name.trim() });
+      toast.success('Nom de l\'exercice mis à jour');
+      return true;
+    } catch (error: any) {
+      toast.error("Erreur lors de la mise à jour de l'exercice: " + error.message);
+      return false;
+    }
+  }, [customExercises, updateExerciseMutation]);
+
   return { 
     customExercises, 
     addCustomExercise,
     deleteCustomExercise,
+    updateCustomExerciseName,
     isLoading,
     error
   };
