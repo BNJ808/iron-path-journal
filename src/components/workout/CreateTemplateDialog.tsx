@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddExerciseDialog } from "./AddExerciseDialog";
 import type { ExerciseLog } from "@/types";
+import { useExerciseOverrides } from "@/hooks/useExerciseOverrides";
 import { Trash2 } from "lucide-react";
 
 interface CreateTemplateDialogProps {
@@ -28,6 +29,7 @@ export const CreateTemplateDialog = ({ children, onCreate }: CreateTemplateDialo
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [exercises, setExercises] = useState<ExerciseLog[]>([]);
+  const { overridesMap } = useExerciseOverrides();
 
   const handleAddExercise = (exercise: { id: string; name: string }) => {
     if (exercises.some(e => e.exerciseId === exercise.id)) {
@@ -107,7 +109,7 @@ export const CreateTemplateDialog = ({ children, onCreate }: CreateTemplateDialo
               ) : (
                 exercises.map(ex => (
                   <div key={ex.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded-md">
-                    <span>{ex.name}</span>
+                    <span>{overridesMap.get(ex.exerciseId)?.override_name ?? ex.name}</span>
                     <Button variant="ghost" size="icon" onClick={() => handleRemoveExercise(ex.id)} aria-label="Supprimer l'exercice">
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>

@@ -1,6 +1,6 @@
 
 import { DraggableStatsCards } from '@/components/stats/DraggableStatsCards';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { BarChart3, CalendarDays } from 'lucide-react';
 import { useStatsCalculations } from '@/hooks/useStatsCalculations';
 import { useMuscleGroupStats } from '@/hooks/useMuscleGroupStats';
@@ -14,6 +14,7 @@ import { DateRangePicker } from '@/components/stats/DateRangePicker';
 import { Settings, Eye, EyeOff } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useExerciseOverrides } from '@/hooks/useExerciseOverrides';
 
 const StatsPage = () => {
   const [isDndEnabled, setIsDndEnabled] = useState(false);
@@ -122,7 +123,18 @@ const StatsPage = () => {
   };
 
   const { workouts, isLoading: isWorkoutsLoading } = useWorkoutHistory();
-  const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(workouts, dateRange);
+  const { overridesMap } = useExerciseOverrides();
+  const normalizedWorkouts = useMemo(() => {
+    if (!workouts) return [] as typeof workouts;
+    return workouts.map(w => ({
+      ...w,
+      exercises: w.exercises.map(ex => {
+        const ov = overridesMap.get(ex.exerciseId);
+        return ov?.override_name ? { ...ex, name: ov.override_name } : ex;
+      })
+    }));
+  }, [workouts, overridesMap]);
+  const { filteredWorkouts, stats, estimated1RMs, uniqueExercises } = useStatsCalculations(normalizedWorkouts, dateRange);
   
   // Utiliser les workouts filtrés (sans les sorties running) selon le filtre de date
   const workoutsForMuscleStats = dateRange?.from ? filteredWorkouts : (filteredWorkouts || []);
@@ -135,7 +147,7 @@ const StatsPage = () => {
     weightPerformanceCorrelation, 
     exerciseProgressionRanking, 
     strengthRatios 
-  } = useAdvancedStats(workouts, dateRange); // useAdvancedStats gère déjà le filtrage en interne
+  } = useAdvancedStats(normalizedWorkouts, dateRange); // useAdvancedStats gère déjà le filtrage en interne
 
   const isLoading = isWorkoutsLoading || isLoadingSettings;
 
@@ -252,7 +264,7 @@ const StatsPage = () => {
           selectedExerciseName={selectedExerciseName}
           onSelectedExerciseChange={setSelectedExerciseName}
           selectedExerciseData={selectedExerciseData}
-          workouts={workouts}
+          workouts={normalizedWorkouts}
           dateRange={dateRange}
           estimated1RMs={estimated1RMs}
           onViewProgression={handleViewProgression}

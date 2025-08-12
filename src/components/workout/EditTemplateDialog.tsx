@@ -21,6 +21,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { WorkoutTemplate, ExerciseLog } from "@/hooks/useWorkoutTemplates";
 import { AddExerciseDialog } from "./AddExerciseDialog";
 import { Trash2 } from "lucide-react";
+import { useExerciseOverrides } from "@/hooks/useExerciseOverrides";
 
 const TEMPLATE_COLORS = [
   'bg-blue-500',
@@ -49,6 +50,7 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
   const [open, setOpen] = useState(false);
   const [exercises, setExercises] = useState<ExerciseLog[]>(template.exercises);
   const [selectedColor, setSelectedColor] = useState(template.color || TEMPLATE_COLORS[0]);
+  const { overridesMap } = useExerciseOverrides();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -132,7 +134,7 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
               <div className="space-y-2">
                 {exercises.map(ex => (
                   <div key={ex.id} className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
-                    <span>{ex.name}</span>
+                    <span>{overridesMap.get(ex.exerciseId)?.override_name ?? ex.name}</span>
                     <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveExercise(ex.id)}>
                       <Trash2 className="h-4 w-4 text-destructive"/>
                     </Button>
