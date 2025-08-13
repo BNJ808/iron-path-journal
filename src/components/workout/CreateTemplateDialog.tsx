@@ -39,7 +39,7 @@ export const CreateTemplateDialog = ({ children, onCreate }: CreateTemplateDialo
     const newExerciseLog: ExerciseLog = {
       id: nanoid(),
       exerciseId: exercise.id,
-      name: exercise.name,
+      name: overridesMap.get(exercise.id)?.override_name ?? exercise.name,
       sets: [],
       notes: '',
     };

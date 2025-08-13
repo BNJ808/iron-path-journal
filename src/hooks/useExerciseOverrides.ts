@@ -69,8 +69,46 @@ export const useExerciseOverrides = () => {
     },
   });
 
+  const updateTemplatesExerciseName = async (exerciseId: string, newName: string) => {
+    if (!user?.id) return;
+    try {
+      const { data: templates, error } = await supabase
+        .from('workout_templates')
+        .select('id, exercises')
+        .eq('user_id', user.id);
+      if (error) throw error;
+
+      const updates = (templates || []).map(async (t: any) => {
+        const exercises = (t.exercises as any[]) || [];
+        let changed = false;
+        const newExercises = exercises.map((ex: any) => {
+          if (ex.exerciseId === exerciseId && ex.name !== newName) {
+            changed = true;
+            return { ...ex, name: newName };
+          }
+          return ex;
+        });
+        if (changed) {
+          const { error: updError } = await supabase
+            .from('workout_templates')
+            .update({ exercises: newExercises as any })
+            .eq('id', t.id);
+          if (updError) throw updError;
+        }
+      });
+
+      if (updates.length) {
+        await Promise.all(updates);
+        queryClient.invalidateQueries({ queryKey: ['workout_templates', user.id] });
+      }
+    } catch (e) {
+      console.error('Erreur lors de la propagation du nom dans les modèles:', e);
+    }
+  };
+
   const setOverrideName = async (exerciseId: string, name: string) => {
     await upsertMutation.mutateAsync({ exercise_id: exerciseId, override_name: name });
+    await updateTemplatesExerciseName(exerciseId, name);
     toast.success('Nom de l\'exercice mis à jour');
   };
 

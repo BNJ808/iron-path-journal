@@ -61,7 +61,7 @@ export const EditTemplateDialog = ({ template, onUpdate, children }: EditTemplat
     const newExerciseLog: ExerciseLog = {
       id: nanoid(),
       exerciseId: exercise.id,
-      name: exercise.name,
+      name: overridesMap.get(exercise.id)?.override_name ?? exercise.name,
       sets: [{ id: nanoid(), reps: '8', weight: '10', completed: false }], // Default set
       notes: '',
     };
