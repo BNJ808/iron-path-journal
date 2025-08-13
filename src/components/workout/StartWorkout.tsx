@@ -1,10 +1,11 @@
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { List, PlusCircle, Play } from 'lucide-react';
+import { List, PlusCircle, Play, Settings } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
 import { WorkoutTemplateCard } from './WorkoutTemplateCard';
+import { CustomExerciseManagement } from './CustomExerciseManagement';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useState, useEffect } from 'react';
@@ -188,6 +189,12 @@ export const StartWorkout = ({
             </div>
           </>
         )}
+      </div>
+
+      <div className="border-t border-border pt-6 mt-6">
+        <div className="max-w-md mx-auto">
+          <CustomExerciseManagement />
+        </div>
       </div>
     </div>
   );
