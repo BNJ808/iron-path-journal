@@ -179,23 +179,20 @@ export const StartWorkout = ({
               </DragOverlay>
             </DndContext>
             
-            <div className="max-w-md mx-auto mt-4">
+            <div className="max-w-md mx-auto mt-4 space-y-3">
               <CreateTemplateDialog onCreate={onCreateTemplate}>
                 <Button variant="outline" className="w-full">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Créer un nouveau modèle
                 </Button>
               </CreateTemplateDialog>
+              
+              <CustomExerciseManagement />
             </div>
           </>
         )}
       </div>
 
-      <div className="border-t border-border pt-6 mt-6">
-        <div className="max-w-md mx-auto">
-          <CustomExerciseManagement />
-        </div>
-      </div>
     </div>
   );
 };
