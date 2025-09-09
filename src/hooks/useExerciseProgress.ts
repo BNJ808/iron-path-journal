@@ -32,19 +32,18 @@ export const useExerciseProgress = (selectedExerciseName: string | null, workout
                     });
                 });
 
-                // Filtrer les sets valides (completed ET avec des valeurs numériques valides)
+                // Filtrer les sets valides (avec des valeurs numériques valides, peu importe le statut completed)
                 const validSets = exerciseLogs.flatMap(log => 
                     log.sets.filter(set => {
                         const weight = Number(set.weight);
                         const reps = Number(set.reps);
-                        const isValid = set.completed && !isNaN(weight) && !isNaN(reps) && weight > 0 && reps > 0;
+                        const isValid = !isNaN(weight) && !isNaN(reps) && weight > 0 && reps > 0;
                         if (!isValid) {
                             console.log(`    Invalid set:`, {
                                 completed: set.completed,
                                 weight: set.weight,
                                 reps: set.reps,
-                                reason: !set.completed ? 'not completed' : 
-                                       isNaN(weight) ? 'invalid weight' :
+                                reason: isNaN(weight) ? 'invalid weight' :
                                        isNaN(reps) ? 'invalid reps' :
                                        weight <= 0 ? 'weight <= 0' :
                                        reps <= 0 ? 'reps <= 0' : 'unknown'
