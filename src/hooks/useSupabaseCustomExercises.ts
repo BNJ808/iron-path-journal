@@ -236,78 +236,28 @@ const useSupabaseCustomExercises = () => {
     }
   }, [customExercises, deleteExerciseMutation]);
 
-  const updateTemplatesExerciseName = async (exerciseId: string, newName: string) => {
-    if (!user?.id) return;
-    try {
-      const { data: templates, error } = await supabase
-        .from('workout_templates')
-        .select('id, exercises')
-        .eq('user_id', user.id);
-      if (error) throw error;
-
-      const updates = (templates || []).map(async (t: any) => {
-        const exercises = (t.exercises as any[]) || [];
-        let changed = false;
-        const newExercises = exercises.map((ex: any) => {
-          if (ex.exerciseId === exerciseId && ex.name !== newName) {
-            changed = true;
-            return { ...ex, name: newName };
-          }
-          return ex;
-        });
-        if (changed) {
-          const { error: updError } = await supabase
-            .from('workout_templates')
-            .update({ exercises: newExercises as any })
-            .eq('id', t.id);
-          if (updError) throw updError;
-        }
-      });
-
-      if (updates.length) {
-        await Promise.all(updates);
-        queryClient.invalidateQueries({ queryKey: ['workout_templates', user.id] });
-      }
-    } catch (e) {
-      console.error('Erreur lors de la propagation du nom dans les modèles:', e);
-    }
-  };
-
   const updateCustomExerciseName = useCallback(async (exerciseId: string, name: string) => {
-    console.log('updateCustomExerciseName called with:', { exerciseId, name });
     const exercise = customExercises.find(ex => ex.id === exerciseId);
-    console.log('Found exercise:', exercise);
-    
     if (!exercise) {
-      console.log('Exercise not found');
       toast.error("Exercice introuvable.");
       return false;
     }
     if (!name.trim()) {
-      console.log('Empty name');
       toast.error("Le nom ne peut pas être vide.");
       return false;
     }
     if (exercise.name === name.trim()) {
-      console.log('Name unchanged');
       return true;
     }
-    
     try {
-      console.log('Starting mutation...');
       await updateExerciseMutation.mutateAsync({ exerciseId, name: name.trim() });
-      console.log('Mutation successful, updating templates...');
-      // Propager le changement dans les modèles
-      await updateTemplatesExerciseName(exerciseId, name.trim());
-      console.log('Templates updated successfully');
       toast.success('Nom de l\'exercice mis à jour');
       return true;
     } catch (error: any) {
-      console.error('Error updating custom exercise:', error);
       toast.error("Erreur lors de la mise à jour de l'exercice: " + error.message);
       return false;
     }
-  }, [customExercises, updateExerciseMutation, user?.id, queryClient]);
+  }, [customExercises, updateExerciseMutation]);
 
   return { 
     customExercises, 

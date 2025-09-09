@@ -160,12 +160,7 @@ export const CustomExerciseManagement = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={async () => {
-                                console.log('Save button clicked for exercise:', exercise.id);
-                                const newName = (editedCustomNames[exercise.id] ?? exercise.name).trim();
-                                console.log('New name:', newName);
-                                await updateCustomExerciseName(exercise.id, newName);
-                              }}
+                              onClick={() => updateCustomExerciseName(exercise.id, (editedCustomNames[exercise.id] ?? exercise.name).trim())}
                               title="Enregistrer"
                             >
                               <Save className="h-4 w-4" />
