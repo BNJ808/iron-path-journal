@@ -13,13 +13,27 @@ export const useExerciseProgress = (selectedExerciseName: string | null, workout
                 const exerciseLogs = workout.exercises.filter(ex => ex.name === selectedExerciseName);
                 if (exerciseLogs.length === 0) return null;
 
-                const volume = exerciseLogs.reduce((totalVol, log) => 
-                    totalVol + log.sets.filter(s => s.completed).reduce((acc, set) => acc + (Number(set.reps) || 0) * (Number(set.weight) || 0), 0), 0);
+                // Filtrer les sets valides (completed ET avec des valeurs numériques valides)
+                const validSets = exerciseLogs.flatMap(log => 
+                    log.sets.filter(set => {
+                        const weight = Number(set.weight);
+                        const reps = Number(set.reps);
+                        return set.completed && !isNaN(weight) && !isNaN(reps) && weight > 0 && reps > 0;
+                    })
+                );
+
+                // Si aucun set valide, on ignore cette entrée
+                if (validSets.length === 0) return null;
+
+                const volume = validSets.reduce((acc, set) => {
+                    const weight = Number(set.weight);
+                    const reps = Number(set.reps);
+                    return acc + (weight * reps);
+                }, 0);
                 
-                const sets = exerciseLogs.reduce((count, log) => count + log.sets.filter(s => s.completed).length, 0);
-                const reps = exerciseLogs.reduce((count, log) => count + log.sets.filter(s => s.completed).reduce((acc, set) => acc + (Number(set.reps) || 0), 0), 0);
-                
-                const maxWeight = Math.max(0, ...exerciseLogs.flatMap(log => log.sets.filter(s => s.completed).map(set => Number(set.weight) || 0)));
+                const sets = validSets.length;
+                const reps = validSets.reduce((acc, set) => acc + Number(set.reps), 0);
+                const maxWeight = Math.max(...validSets.map(set => Number(set.weight)));
     
                 return {
                     date: workout.date,
