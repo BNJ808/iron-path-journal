@@ -274,25 +274,36 @@ const useSupabaseCustomExercises = () => {
   };
 
   const updateCustomExerciseName = useCallback(async (exerciseId: string, name: string) => {
+    console.log('updateCustomExerciseName called with:', { exerciseId, name });
     const exercise = customExercises.find(ex => ex.id === exerciseId);
+    console.log('Found exercise:', exercise);
+    
     if (!exercise) {
+      console.log('Exercise not found');
       toast.error("Exercice introuvable.");
       return false;
     }
     if (!name.trim()) {
+      console.log('Empty name');
       toast.error("Le nom ne peut pas être vide.");
       return false;
     }
     if (exercise.name === name.trim()) {
+      console.log('Name unchanged');
       return true;
     }
+    
     try {
+      console.log('Starting mutation...');
       await updateExerciseMutation.mutateAsync({ exerciseId, name: name.trim() });
+      console.log('Mutation successful, updating templates...');
       // Propager le changement dans les modèles
       await updateTemplatesExerciseName(exerciseId, name.trim());
+      console.log('Templates updated successfully');
       toast.success('Nom de l\'exercice mis à jour');
       return true;
     } catch (error: any) {
+      console.error('Error updating custom exercise:', error);
       toast.error("Erreur lors de la mise à jour de l'exercice: " + error.message);
       return false;
     }
