@@ -68,7 +68,7 @@ export const createCardComponents = (props: CardComponentsProps): Record<string,
             />
         ),
         'one-rm-calculator': <OneRMCalculator />,
-        volume: <VolumeChart allWorkouts={props.workouts} />,
+        volume: <VolumeChart allWorkouts={props.workouts} dateRange={props.dateRange} />,
         personalRecords: (
             <InteractivePersonalRecords
                 personalRecords={props.stats.personalRecords}

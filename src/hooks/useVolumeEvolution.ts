@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import type { Workout } from '@/types';
 import { useExerciseDatabase } from '@/hooks/useExerciseDatabase';
-import { subDays, subMonths, subYears, isAfter, parseISO } from 'date-fns';
+import { isAfter, parseISO } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
-export type EvolutionPeriod = '7d' | '1m' | '3m' | '6m' | '1y';
-
-export const useVolumeEvolution = (allWorkouts: Workout[] | undefined, selectedPeriod: EvolutionPeriod = '1m') => {
+export const useVolumeEvolution = (allWorkouts: Workout[] | undefined, dateRange: DateRange | undefined) => {
     const { allGroupedExercises } = useExerciseDatabase();
     
     const exerciseToGroupMap = useMemo(() => {
@@ -22,46 +21,30 @@ export const useVolumeEvolution = (allWorkouts: Workout[] | undefined, selectedP
     }, [allGroupedExercises]);
 
     const volumeEvolution = useMemo(() => {
-        if (!allWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
+        if (!allWorkouts || !exerciseToGroupMap.size || !allGroupedExercises || !dateRange?.from || !dateRange?.to) {
             return [];
         }
 
-        const now = new Date();
-        let periodStartDate: Date;
-        let previousPeriodStartDate: Date;
-
-        switch (selectedPeriod) {
-            case '7d':
-                periodStartDate = subDays(now, 7);
-                previousPeriodStartDate = subDays(now, 14);
-                break;
-            case '1m':
-                periodStartDate = subMonths(now, 1);
-                previousPeriodStartDate = subMonths(now, 2);
-                break;
-            case '3m':
-                periodStartDate = subMonths(now, 3);
-                previousPeriodStartDate = subMonths(now, 6);
-                break;
-            case '6m':
-                periodStartDate = subMonths(now, 6);
-                previousPeriodStartDate = subYears(now, 1);
-                break;
-            case '1y':
-                periodStartDate = subYears(now, 1);
-                previousPeriodStartDate = subYears(now, 2);
-                break;
-        }
+        const periodStartDate = dateRange.from;
+        const periodEndDate = dateRange.to;
+        
+        // Calculer la durée de la période actuelle
+        const periodDurationMs = periodEndDate.getTime() - periodStartDate.getTime();
+        
+        // Calculer les dates de la période précédente (même durée)
+        const previousPeriodEndDate = new Date(periodStartDate.getTime() - 1); // 1 jour avant le début de la période actuelle
+        const previousPeriodStartDate = new Date(periodStartDate.getTime() - periodDurationMs);
 
         // Calculer le volume pour la période actuelle
-        const currentPeriodWorkouts = allWorkouts.filter(workout => 
-            isAfter(parseISO(workout.date), periodStartDate)
-        );
+        const currentPeriodWorkouts = allWorkouts.filter(workout => {
+            const workoutDate = parseISO(workout.date);
+            return workoutDate >= periodStartDate && workoutDate <= periodEndDate;
+        });
 
         // Calculer le volume pour la période précédente
         const previousPeriodWorkouts = allWorkouts.filter(workout => {
             const workoutDate = parseISO(workout.date);
-            return isAfter(workoutDate, previousPeriodStartDate) && !isAfter(workoutDate, periodStartDate);
+            return workoutDate >= previousPeriodStartDate && workoutDate <= previousPeriodEndDate;
         });
 
         const calculateVolumeByGroup = (workouts: Workout[]) => {
@@ -113,20 +96,9 @@ export const useVolumeEvolution = (allWorkouts: Workout[] | undefined, selectedP
 
         return evolution;
 
-    }, [allWorkouts, exerciseToGroupMap, allGroupedExercises, selectedPeriod]);
-
-    const getPeriodLabel = (period: EvolutionPeriod): string => {
-        switch (period) {
-            case '7d': return '7 derniers jours';
-            case '1m': return '1 mois';
-            case '3m': return '3 mois';
-            case '6m': return '6 mois';
-            case '1y': return '1 an';
-        }
-    };
+    }, [allWorkouts, exerciseToGroupMap, allGroupedExercises, dateRange]);
 
     return {
-        volumeEvolution,
-        getPeriodLabel
+        volumeEvolution
     };
 };

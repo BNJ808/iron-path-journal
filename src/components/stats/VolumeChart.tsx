@@ -4,14 +4,15 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
-import { useVolumeEvolution, type EvolutionPeriod } from '@/hooks/useVolumeEvolution';
+import { useVolumeEvolution } from '@/hooks/useVolumeEvolution';
 import type { Workout } from '@/types';
-import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import { format } from 'date-fns';
 
 interface VolumeChartProps {
     allWorkouts: Workout[] | undefined;
+    dateRange: DateRange | undefined;
 }
 
 const chartConfig = {
@@ -73,9 +74,8 @@ const TrendIcon = ({ trend }: { trend: 'positive' | 'negative' | 'stable' }) => 
     }
 };
 
-export const VolumeChart = ({ allWorkouts }: VolumeChartProps) => {
-    const [selectedPeriod, setSelectedPeriod] = useState<EvolutionPeriod>('1m');
-    const { volumeEvolution, getPeriodLabel } = useVolumeEvolution(allWorkouts, selectedPeriod);
+export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
+    const { volumeEvolution } = useVolumeEvolution(allWorkouts, dateRange);
 
     if (volumeEvolution.length === 0) {
         return null;
@@ -97,23 +97,13 @@ export const VolumeChart = ({ allWorkouts }: VolumeChartProps) => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent className="pt-0 pb-4 pl-6">
-                        <div className="mb-4">
-                            <Select value={selectedPeriod} onValueChange={(value: EvolutionPeriod) => setSelectedPeriod(value)}>
-                                <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Sélectionner une période" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="7d">7 derniers jours</SelectItem>
-                                    <SelectItem value="1m">1 mois</SelectItem>
-                                    <SelectItem value="3m">3 mois</SelectItem>
-                                    <SelectItem value="6m">6 mois</SelectItem>
-                                    <SelectItem value="1y">1 an</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <p className="text-sm text-muted-foreground mt-2">
-                                Évolution comparée à la période précédente ({getPeriodLabel(selectedPeriod)})
-                            </p>
-                        </div>
+                        {dateRange?.from && dateRange?.to && (
+                            <div className="mb-4">
+                                <p className="text-sm text-muted-foreground">
+                                    Évolution comparée à la période précédente ({format(dateRange.from, 'dd/MM/yyyy')} - {format(dateRange.to, 'dd/MM/yyyy')})
+                                </p>
+                            </div>
+                        )}
                         
                         <ChartContainer config={chartConfig} className="h-[320px] w-full">
                             <BarChart 
