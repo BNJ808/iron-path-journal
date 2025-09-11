@@ -29,6 +29,8 @@ const StatsPage = () => {
   const defaultCardOrder = [
     'overview',
     'one-rm-calculator',
+    'weight-tracker',
+    'weight-evolution',
     'volume',
     'personalRecords',
     'muscle-groups',
@@ -158,6 +160,8 @@ const StatsPage = () => {
   const moduleLabels = {
     'overview': 'Vue d\'ensemble',
     'one-rm-calculator': 'Calculateur 1RM',
+    'weight-tracker': 'Suivi du poids',
+    'weight-evolution': 'Évolution du poids',
     'volume': 'Volume par groupe musculaire',
     'personalRecords': 'Records personnels',
     'muscle-groups': 'Séries par groupe musculaire',

@@ -9,6 +9,8 @@ import { OneRMCalculator } from '@/components/stats/OneRMCalculator';
 import { ProgressionPredictions } from '@/components/stats/ProgressionPredictions';
 import { ExerciseProgressionRanking } from '@/components/stats/ExerciseProgressionRanking';  
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
+import { WeightTracker } from '@/components/stats/WeightTracker';
+import { WeightEvolutionChart } from '@/components/stats/WeightEvolutionChart';
 import type { Workout } from '@/types';
 import { DateRange } from 'react-day-picker';
 
@@ -105,5 +107,7 @@ export const createCardComponents = (props: CardComponentsProps): Record<string,
                 currentDateRange={props.dateRange}
             />
         ),
+        'weight-tracker': <WeightTracker />,
+        'weight-evolution': <WeightEvolutionChart dateRange={props.dateRange} />,
     };
 };

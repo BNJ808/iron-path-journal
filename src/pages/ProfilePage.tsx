@@ -7,7 +7,6 @@ import { AvatarUploader } from '@/components/AvatarUploader';
 import { useProfile } from '@/hooks/useProfile';
 import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
 import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
-import { WeightTracker } from '@/components/profile/WeightTracker';
 import { SyncStatus } from '@/components/profile/SyncStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -104,13 +103,6 @@ const ProfilePage = () => {
           <CardContent className="space-y-6">
             <ThemeSwitcher />
             <ColorSoftnessSlider />
-          </CardContent>
-        </Card>
-
-        {/* Weight Tracker Card */}
-        <Card className="app-card mb-6">
-          <CardContent className="p-6">
-            <WeightTracker />
           </CardContent>
         </Card>
 
