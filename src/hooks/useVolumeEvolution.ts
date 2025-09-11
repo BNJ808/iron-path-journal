@@ -13,6 +13,8 @@ export const useVolumeEvolution = (allWorkouts: Workout[] | undefined, selectedP
         if (!allGroupedExercises) return map;
         allGroupedExercises.forEach(group => {
             group.exercises.forEach(ex => {
+                // Map both by ID and by name for compatibility
+                map.set(ex.id, group.group);
                 map.set(ex.name, group.group);
             });
         });
