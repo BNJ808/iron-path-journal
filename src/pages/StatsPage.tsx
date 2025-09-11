@@ -35,7 +35,6 @@ const StatsPage = () => {
     'personalRecords',
     'muscle-groups',
     'exercise-progress',
-    'progression-predictions',
     'exercise-progression-ranking',
     'ai-analysis'
   ];
@@ -166,7 +165,6 @@ const StatsPage = () => {
     'personalRecords': 'Records personnels',
     'muscle-groups': 'Séries par groupe musculaire',
     'exercise-progress': 'Progression des exercices',
-    'progression-predictions': 'Prédictions de progression',
     'exercise-progression-ranking': 'Classement de progression',
     'ai-analysis': 'Analyse IA'
   };

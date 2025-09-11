@@ -93,9 +93,6 @@ export const createCardComponents = (props: CardComponentsProps): Record<string,
                 selectedExerciseData={props.selectedExerciseData}
             />
         ),
-        'progression-predictions': (
-            <ProgressionPredictions predictions={props.progressionPredictions || []} />
-        ),
         'exercise-progression-ranking': (
             <ExerciseProgressionRanking progressions={props.exerciseProgressionRanking || []} />
         ),
