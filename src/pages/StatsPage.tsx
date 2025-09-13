@@ -30,7 +30,6 @@ const StatsPage = () => {
     'overview',
     'one-rm-calculator',
     'weight-tracker',
-    'weight-evolution',
     'volume',
     'personalRecords',
     'muscle-groups',
