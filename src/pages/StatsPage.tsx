@@ -52,7 +52,18 @@ const StatsPage = () => {
   useEffect(() => {
     if (!isLoadingSettings && settings && !hasAutoUpdatedToday.current) {
       if (settings.statsCardOrder) {
-        setCardOrder(settings.statsCardOrder);
+        // Nettoyer l'ordre sauvegardé: retirer les anciennes cartes supprimées et ajouter les nouvelles cartes manquantes
+        const savedOrder = settings.statsCardOrder;
+        const cleanedOrder = savedOrder.filter((id: string) => defaultCardOrder.includes(id));
+        const missing = defaultCardOrder.filter((id) => !cleanedOrder.includes(id));
+        const mergedOrder = [...cleanedOrder, ...missing];
+        setCardOrder(mergedOrder);
+        // Optionnel: persister l'ordre corrigé si différent
+        if (JSON.stringify(mergedOrder) !== JSON.stringify(savedOrder)) {
+          updateSettings({ statsCardOrder: mergedOrder }).catch((e) =>
+            console.error('Erreur lors de la normalisation de l\'ordre des cartes:', e)
+          );
+        }
       }
       if (settings.statsDateRange) {
         const today = new Date();
