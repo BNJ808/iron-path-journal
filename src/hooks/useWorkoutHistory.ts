@@ -76,11 +76,44 @@ export const useWorkoutHistory = () => {
         },
     });
 
+    const updateWorkoutDurationMutation = useMutation({
+        mutationFn: async ({ workoutId, newDurationMinutes }: { workoutId: string; newDurationMinutes: number }) => {
+            if (!userId) throw new Error("User not authenticated");
+            
+            // Récupérer l'entraînement pour obtenir la date de début
+            const { data: workout, error: fetchError } = await supabase
+                .from('workouts')
+                .select('date')
+                .eq('id', workoutId)
+                .eq('user_id', userId)
+                .single();
+                
+            if (fetchError) throw new Error(fetchError.message);
+            
+            // Calculer la nouvelle date de fin
+            const startDate = new Date(workout.date);
+            const endDate = new Date(startDate.getTime() + newDurationMinutes * 60 * 1000);
+            
+            const { error } = await supabase
+                .from('workouts')
+                .update({ ended_at: endDate.toISOString() })
+                .eq('id', workoutId)
+                .eq('user_id', userId);
+                
+            if (error) throw new Error(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
+        },
+    });
+
     return {
         workouts,
         isLoading,
         addWorkout: addWorkoutMutation.mutate,
         deleteWorkout: deleteWorkoutMutation.mutate,
         clearHistory: clearHistoryMutation.mutate,
+        updateWorkoutDuration: updateWorkoutDurationMutation.mutate,
+        isUpdatingDuration: updateWorkoutDurationMutation.isPending,
     };
 };

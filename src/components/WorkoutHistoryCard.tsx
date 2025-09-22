@@ -3,7 +3,8 @@ import type { Workout } from '@/types';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Clock, Copy, List, StickyNote, Trash2 } from 'lucide-react';
+import { Clock, Copy, List, StickyNote, Trash2, Edit3 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
@@ -16,14 +17,18 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import EditWorkoutDurationDialog from '@/components/workout/EditWorkoutDurationDialog';
 
 interface WorkoutHistoryCardProps {
     workout: Workout;
     onDelete: () => void;
     onCopy: () => void;
+    onUpdateDuration: (workoutId: string, newDurationMinutes: number) => void;
+    isUpdatingDuration?: boolean;
 }
 
-const WorkoutHistoryCard = ({ workout, onDelete, onCopy }: WorkoutHistoryCardProps) => {
+const WorkoutHistoryCard = ({ workout, onDelete, onCopy, onUpdateDuration, isUpdatingDuration = false }: WorkoutHistoryCardProps) => {
+    const [isEditDurationOpen, setIsEditDurationOpen] = useState(false);
     const workoutDate = new Date(workout.date);
     const workoutEndDate = workout.ended_at ? new Date(workout.ended_at) : null;
 
@@ -89,6 +94,16 @@ const WorkoutHistoryCard = ({ workout, onDelete, onCopy }: WorkoutHistoryCardPro
                         <Button variant="outline" size="sm" onClick={onCopy}>
                            <Copy /> Copier
                         </Button>
+                        {durationInMinutes !== null && (
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setIsEditDurationOpen(true)}
+                                disabled={isUpdatingDuration}
+                            >
+                                <Edit3 /> Durée
+                            </Button>
+                        )}
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive-outline" size="sm">
@@ -114,6 +129,19 @@ const WorkoutHistoryCard = ({ workout, onDelete, onCopy }: WorkoutHistoryCardPro
                     </div>
                 </div>
             </AccordionContent>
+            
+            {durationInMinutes !== null && (
+                <EditWorkoutDurationDialog
+                    open={isEditDurationOpen}
+                    onOpenChange={setIsEditDurationOpen}
+                    currentDuration={durationInMinutes}
+                    onSave={(newDuration) => {
+                        onUpdateDuration(workout.id, newDuration);
+                        setIsEditDurationOpen(false);
+                    }}
+                    isLoading={isUpdatingDuration}
+                />
+            )}
         </AccordionItem>
     );
 };
