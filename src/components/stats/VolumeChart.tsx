@@ -8,7 +8,9 @@ import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
 import { useVolumeEvolution } from '@/hooks/useVolumeEvolution';
 import type { Workout } from '@/types';
 import { DateRange } from 'react-day-picker';
-import { format } from 'date-fns';
+import { format, subDays, subMonths, subYears } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
 
 interface VolumeChartProps {
     allWorkouts: Workout[] | undefined;
@@ -75,7 +77,22 @@ const TrendIcon = ({ trend }: { trend: 'positive' | 'negative' | 'stable' }) => 
 };
 
 export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
-    const { volumeEvolution } = useVolumeEvolution(allWorkouts, dateRange);
+    const [selectedPeriod, setSelectedPeriod] = useState<string>('30');
+    
+    // Calculer la dateRange basée sur la période sélectionnée
+    const effectiveDateRange: DateRange | undefined = selectedPeriod === 'custom' && dateRange 
+        ? dateRange 
+        : {
+            from: selectedPeriod === '7' ? subDays(new Date(), 7) :
+                  selectedPeriod === '30' ? subDays(new Date(), 30) :
+                  selectedPeriod === '90' ? subMonths(new Date(), 3) :
+                  selectedPeriod === '180' ? subMonths(new Date(), 6) :
+                  selectedPeriod === '365' ? subYears(new Date(), 1) :
+                  undefined,
+            to: new Date()
+        };
+    
+    const { volumeEvolution } = useVolumeEvolution(allWorkouts, effectiveDateRange);
 
     if (volumeEvolution.length === 0) {
         return null;
@@ -97,13 +114,29 @@ export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent className="pt-0 pb-4 pl-6">
-                        {dateRange?.from && dateRange?.to && (
-                            <div className="mb-4">
-                                <p className="text-sm text-muted-foreground">
-                                    Évolution comparée à la période précédente ({format(dateRange.from, 'dd/MM/yyyy')} - {format(dateRange.to, 'dd/MM/yyyy')})
-                                </p>
+                        <div className="mb-4 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium">Période:</label>
+                                <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="7">7 derniers jours</SelectItem>
+                                        <SelectItem value="30">30 derniers jours</SelectItem>
+                                        <SelectItem value="90">3 derniers mois</SelectItem>
+                                        <SelectItem value="180">6 derniers mois</SelectItem>
+                                        <SelectItem value="365">1 dernière année</SelectItem>
+                                        <SelectItem value="all">Tout l'historique</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
-                        )}
+                            {effectiveDateRange?.from && effectiveDateRange?.to && (
+                                <p className="text-sm text-muted-foreground">
+                                    Évolution comparée à la période précédente ({format(effectiveDateRange.from, 'dd/MM/yyyy')} - {format(effectiveDateRange.to, 'dd/MM/yyyy')})
+                                </p>
+                            )}
+                        </div>
                         
                         <ChartContainer config={chartConfig} className="h-[320px] w-full">
                             <BarChart 
