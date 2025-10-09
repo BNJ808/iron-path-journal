@@ -11,7 +11,10 @@ interface CalendarGridProps {
   plans: WorkoutPlan[];
   onRemovePlan: (planId: string, dateKey: string) => void;
   isDeleteMode: boolean;
-  completedWorkouts?: string[]; // Array of completed workout date keys
+  completedWorkouts?: string[];
+  manuallyValidatedDates?: string[];
+  onManualValidate?: (date: Date, note?: string) => void;
+  onRemoveManualValidation?: (date: Date) => void;
 }
 
 export const CalendarGrid = ({
@@ -21,7 +24,10 @@ export const CalendarGrid = ({
   plans,
   onRemovePlan,
   isDeleteMode,
-  completedWorkouts = []
+  completedWorkouts = [],
+  manuallyValidatedDates = [],
+  onManualValidate,
+  onRemoveManualValidation,
 }: CalendarGridProps) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -58,6 +64,9 @@ export const CalendarGrid = ({
                   onRemovePlan={onRemovePlan}
                   isDeleteMode={isDeleteMode}
                   completedWorkouts={completedWorkouts}
+                  manuallyValidatedDates={manuallyValidatedDates}
+                  onManualValidate={onManualValidate}
+                  onRemoveManualValidation={onRemoveManualValidation}
                 />
               );
             })}

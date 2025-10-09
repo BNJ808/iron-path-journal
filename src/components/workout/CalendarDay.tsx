@@ -1,11 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Badge } from 'lucide-react';
+import { Badge, Check, X } from 'lucide-react';
 import { WorkoutPlan } from '@/types/workout-calendar';
 import { cn } from '@/lib/utils';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import { ManualValidationDialog } from './ManualValidationDialog';
 
 interface CalendarDayProps {
   day: Date;
@@ -16,7 +23,10 @@ interface CalendarDayProps {
   isCurrentDay: boolean;
   onRemovePlan: (planId: string, dateKey: string) => void;
   isDeleteMode: boolean;
-  completedWorkouts?: string[]; // Array of date keys where workouts were completed
+  completedWorkouts?: string[];
+  manuallyValidatedDates?: string[];
+  onManualValidate?: (date: Date, note?: string) => void;
+  onRemoveManualValidation?: (date: Date) => void;
 }
 
 export const CalendarDay = ({
@@ -28,8 +38,12 @@ export const CalendarDay = ({
   isCurrentDay,
   onRemovePlan,
   isDeleteMode,
-  completedWorkouts = []
+  completedWorkouts = [],
+  manuallyValidatedDates = [],
+  onManualValidate,
+  onRemoveManualValidation,
 }: CalendarDayProps) => {
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
     id: `day-${dateKey}`,
   });
@@ -37,28 +51,21 @@ export const CalendarDay = ({
   const dayNumber = format(day, 'd');
   const hasScheduledPlans = scheduledPlans.length > 0;
   const isWorkoutCompleted = completedWorkouts.includes(dateKey);
-  
-  // Debug logs
-  console.log(`Day ${dateKey}:`, {
-    hasScheduledPlans,
-    isWorkoutCompleted,
-    completedWorkouts: completedWorkouts.filter(date => date === dateKey),
-    scheduledPlans
-  });
+  const isManuallyValidated = manuallyValidatedDates.includes(dateKey);
   
   // Determine border color based on workout status
   const getBorderColor = () => {
     if (!isCurrentMonth) {
-      return "border-border"; // Default state for non-current month
+      return "border-border";
     }
     
-    // Si un entrainement a été validé, bordure verte
-    if (isWorkoutCompleted) {
+    // Si un entrainement a été validé OU validé manuellement, bordure verte
+    if (isWorkoutCompleted || isManuallyValidated) {
       return "border-green-500 border-2";
     }
     
     // Si il y a des plans programmés mais pas d'entrainement validé, bordure rouge
-    if (hasScheduledPlans && !isWorkoutCompleted) {
+    if (hasScheduledPlans && !isWorkoutCompleted && !isManuallyValidated) {
       return "border-red-500 border-2";
     }
     
@@ -66,7 +73,15 @@ export const CalendarDay = ({
     return "border-border";
   };
 
-  return (
+  const handleManualValidate = (date: Date, note?: string) => {
+    onManualValidate?.(date, note);
+  };
+
+  const handleRemoveManualValidation = () => {
+    onRemoveManualValidation?.(day);
+  };
+
+  const calendarDayContent = (
     <div
       ref={setNodeRef}
       className={cn(
@@ -77,15 +92,18 @@ export const CalendarDay = ({
         isCurrentDay && "ring-1 ring-primary/20"
       )}
       style={{
-        touchAction: 'pan-y', // Permet le scroll vertical mais optimise pour le drop
+        touchAction: 'pan-y',
       }}
     >
-      {/* Numéro du jour - centré */}
+      {/* Numéro du jour avec indicateur de validation manuelle */}
       <div className={cn(
-        "text-xs font-medium mb-1 flex-shrink-0 text-center",
+        "text-xs font-medium mb-1 flex-shrink-0 text-center flex items-center justify-center gap-1",
         isCurrentDay && "text-primary font-bold"
       )}>
         {dayNumber}
+        {isManuallyValidated && (
+          <Check className="h-3 w-3 text-green-500" />
+        )}
       </div>
       
       {/* Plans programmés */}
@@ -162,5 +180,36 @@ export const CalendarDay = ({
         </div>
       )}
     </div>
+  );
+
+  return (
+    <>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          {calendarDayContent}
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          {!isManuallyValidated && onManualValidate && (
+            <ContextMenuItem onClick={() => setShowValidationDialog(true)}>
+              <Check className="mr-2 h-4 w-4" />
+              Valider manuellement
+            </ContextMenuItem>
+          )}
+          {isManuallyValidated && onRemoveManualValidation && (
+            <ContextMenuItem onClick={handleRemoveManualValidation} className="text-destructive">
+              <X className="mr-2 h-4 w-4" />
+              Retirer la validation manuelle
+            </ContextMenuItem>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+
+      <ManualValidationDialog
+        open={showValidationDialog}
+        onOpenChange={setShowValidationDialog}
+        date={day}
+        onValidate={handleManualValidate}
+      />
+    </>
   );
 };

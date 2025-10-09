@@ -11,6 +11,7 @@ import { CalendarGrid } from './calendar/CalendarGrid';
 import { useDragAndDropSync } from './calendar/useDragAndDropSync';
 import { useWorkoutCalendarSync } from '@/hooks/useWorkoutCalendarSync';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
+import { useManualDayValidations } from '@/hooks/useManualDayValidations';
 
 // Re-export types for backward compatibility
 export type { WorkoutPlan } from '@/types/workout-calendar';
@@ -30,6 +31,7 @@ export const WorkoutCalendar = () => {
   } = useWorkoutCalendarSync();
 
   const { workouts } = useWorkoutHistory();
+  const { validatedDates, addValidation, removeValidation } = useManualDayValidations();
 
   console.log('Raw workouts from useWorkoutHistory:', workouts);
 
@@ -129,6 +131,9 @@ export const WorkoutCalendar = () => {
               onRemovePlan={removePlanFromDate}
               isDeleteMode={isDeleteMode}
               completedWorkouts={completedWorkouts}
+              manuallyValidatedDates={validatedDates}
+              onManualValidate={(date, note) => addValidation({ date, note })}
+              onRemoveManualValidation={(date) => removeValidation(date)}
             />
 
             <DragOverlay>
