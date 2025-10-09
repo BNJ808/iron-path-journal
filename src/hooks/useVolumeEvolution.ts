@@ -21,23 +21,43 @@ export const useVolumeEvolution = (allWorkouts: Workout[] | undefined, dateRange
     }, [allGroupedExercises]);
 
     const volumeEvolution = useMemo(() => {
-        if (!allWorkouts || !exerciseToGroupMap.size || !allGroupedExercises || !dateRange?.from || !dateRange?.to) {
+        if (!allWorkouts || !exerciseToGroupMap.size || !allGroupedExercises) {
             return [];
         }
 
-        const periodStartDate = dateRange.from;
-        const periodEndDate = dateRange.to;
+        // Si pas de dateRange, utiliser tout l'historique
+        const periodStartDate = dateRange?.from;
+        const periodEndDate = dateRange?.to || new Date();
         
         // Calculer la durée de la période actuelle
-        const periodDurationMs = periodEndDate.getTime() - periodStartDate.getTime();
+        let periodDurationMs: number;
+        let previousPeriodEndDate: Date;
+        let previousPeriodStartDate: Date;
         
-        // Calculer les dates de la période précédente (même durée)
-        const previousPeriodEndDate = new Date(periodStartDate.getTime() - 1); // 1 jour avant le début de la période actuelle
-        const previousPeriodStartDate = new Date(periodStartDate.getTime() - periodDurationMs);
+        if (!periodStartDate) {
+            // Tout l'historique : comparer avec une période équivalente avant
+            const allDates = allWorkouts
+                .map(w => parseISO(w.date))
+                .sort((a, b) => a.getTime() - b.getTime());
+            
+            if (allDates.length === 0) return [];
+            
+            const firstDate = allDates[0];
+            const lastDate = periodEndDate;
+            
+            periodDurationMs = lastDate.getTime() - firstDate.getTime();
+            previousPeriodEndDate = new Date(firstDate.getTime() - 1);
+            previousPeriodStartDate = new Date(firstDate.getTime() - periodDurationMs);
+        } else {
+            periodDurationMs = periodEndDate.getTime() - periodStartDate.getTime();
+            previousPeriodEndDate = new Date(periodStartDate.getTime() - 1);
+            previousPeriodStartDate = new Date(periodStartDate.getTime() - periodDurationMs);
+        }
 
         // Calculer le volume pour la période actuelle
         const currentPeriodWorkouts = allWorkouts.filter(workout => {
             const workoutDate = parseISO(workout.date);
+            if (!periodStartDate) return workoutDate <= periodEndDate;
             return workoutDate >= periodStartDate && workoutDate <= periodEndDate;
         });
 
