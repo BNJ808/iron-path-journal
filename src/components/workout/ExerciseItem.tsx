@@ -99,10 +99,10 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
     <div className="p-4 rounded-lg bg-secondary/60 backdrop-blur-sm space-y-4 border border-border/30 shadow-lg">
       <div className="flex justify-between items-center gap-4">
         <div className="flex items-center gap-1 flex-shrink min-w-0">
-            <Button variant="ghost" size="icon" className="-ml-2" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
+            <Button variant="ghost" size="icon" className="-ml-2 flex-shrink-0" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
                 <Star className={`h-5 w-5 transition-colors ${isFavorite(exercise.exerciseId) ? 'text-accent-yellow fill-accent-yellow' : 'text-foreground/60 hover:text-accent-yellow'}`} />
             </Button>
-            <h3 className="font-semibold text-lg text-foreground truncate">{exercise.name}</h3>
+            <h3 className="font-semibold text-lg text-foreground break-words">{exercise.name}</h3>
         </div>
         <div className="flex items-center flex-shrink-0">
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
