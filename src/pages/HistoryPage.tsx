@@ -22,7 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { nanoid } from 'nanoid';
 
 const HistoryPage = () => {
-    const { workouts, clearHistory, deleteWorkout, updateWorkoutDuration, isUpdatingDuration, isLoading } = useWorkoutHistory();
+    const { workouts, clearHistory, deleteWorkout, updateWorkoutDuration, updateWorkoutExercise, isUpdatingDuration, isUpdatingExercise, isLoading } = useWorkoutHistory();
     const { createWorkout, todayWorkout, isLoadingWorkout } = useWorkouts();
     const navigate = useNavigate();
 
@@ -44,6 +44,13 @@ const HistoryPage = () => {
     const handleUpdateDuration = (workoutId: string, newDurationMinutes: number) => {
         updateWorkoutDuration({ workoutId, newDurationMinutes }, {
             onSuccess: () => toast.success("Durée de l'entraînement mise à jour."),
+            onError: (error) => toast.error(`Erreur: ${error.message}`),
+        });
+    };
+
+    const handleUpdateExercise = (workoutId: string, exerciseId: string, updatedExercise: any) => {
+        updateWorkoutExercise({ workoutId, exerciseId, updatedExercise }, {
+            onSuccess: () => toast.success("Exercice mis à jour."),
             onError: (error) => toast.error(`Erreur: ${error.message}`),
         });
     };
@@ -151,7 +158,9 @@ const HistoryPage = () => {
                             onDelete={() => handleDeleteWorkout(workout.id)}
                             onCopy={() => handleCopyWorkout(workout)}
                             onUpdateDuration={handleUpdateDuration}
+                            onUpdateExercise={handleUpdateExercise}
                             isUpdatingDuration={isUpdatingDuration}
+                            isUpdatingExercise={isUpdatingExercise}
                         />
                     ))}
                 </Accordion>

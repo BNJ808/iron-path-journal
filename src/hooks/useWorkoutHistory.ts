@@ -107,6 +107,43 @@ export const useWorkoutHistory = () => {
         },
     });
 
+    const updateWorkoutExerciseMutation = useMutation({
+        mutationFn: async ({ workoutId, exerciseId, updatedExercise }: { 
+            workoutId: string; 
+            exerciseId: string; 
+            updatedExercise: any 
+        }) => {
+            if (!userId) throw new Error("User not authenticated");
+            
+            // Récupérer l'entraînement complet
+            const { data: workout, error: fetchError } = await supabase
+                .from('workouts')
+                .select('exercises')
+                .eq('id', workoutId)
+                .eq('user_id', userId)
+                .single();
+                
+            if (fetchError) throw new Error(fetchError.message);
+            
+            // Mettre à jour l'exercice dans le tableau
+            const exercises = workout.exercises as any[];
+            const updatedExercises = exercises.map(ex => 
+                ex.id === exerciseId ? updatedExercise : ex
+            );
+            
+            const { error } = await supabase
+                .from('workouts')
+                .update({ exercises: updatedExercises as any })
+                .eq('id', workoutId)
+                .eq('user_id', userId);
+                
+            if (error) throw new Error(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workouts', userId] });
+        },
+    });
+
     return {
         workouts,
         isLoading,
@@ -115,5 +152,7 @@ export const useWorkoutHistory = () => {
         clearHistory: clearHistoryMutation.mutate,
         updateWorkoutDuration: updateWorkoutDurationMutation.mutate,
         isUpdatingDuration: updateWorkoutDurationMutation.isPending,
+        updateWorkoutExercise: updateWorkoutExerciseMutation.mutate,
+        isUpdatingExercise: updateWorkoutExerciseMutation.isPending,
     };
 };

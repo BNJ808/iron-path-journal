@@ -1,9 +1,9 @@
 
-import type { Workout } from '@/types';
+import type { Workout, ExerciseLog } from '@/types';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Clock, Copy, List, StickyNote, Trash2, Edit3 } from 'lucide-react';
+import { Clock, Copy, List, StickyNote, Trash2, Edit3, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,17 +18,29 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import EditWorkoutDurationDialog from '@/components/workout/EditWorkoutDurationDialog';
+import EditExerciseSetsDialog from '@/components/workout/EditExerciseSetsDialog';
 
 interface WorkoutHistoryCardProps {
     workout: Workout;
     onDelete: () => void;
     onCopy: () => void;
     onUpdateDuration: (workoutId: string, newDurationMinutes: number) => void;
+    onUpdateExercise: (workoutId: string, exerciseId: string, updatedExercise: ExerciseLog) => void;
     isUpdatingDuration?: boolean;
+    isUpdatingExercise?: boolean;
 }
 
-const WorkoutHistoryCard = ({ workout, onDelete, onCopy, onUpdateDuration, isUpdatingDuration = false }: WorkoutHistoryCardProps) => {
+const WorkoutHistoryCard = ({ 
+    workout, 
+    onDelete, 
+    onCopy, 
+    onUpdateDuration, 
+    onUpdateExercise,
+    isUpdatingDuration = false,
+    isUpdatingExercise = false
+}: WorkoutHistoryCardProps) => {
     const [isEditDurationOpen, setIsEditDurationOpen] = useState(false);
+    const [editingExercise, setEditingExercise] = useState<ExerciseLog | null>(null);
     const workoutDate = new Date(workout.date);
     const workoutEndDate = workout.ended_at ? new Date(workout.ended_at) : null;
 
@@ -72,7 +84,18 @@ const WorkoutHistoryCard = ({ workout, onDelete, onCopy, onUpdateDuration, isUpd
                         <ul className="space-y-3">
                             {workout.exercises.map(exercise => (
                                 <li key={exercise.id} className="text-sm app-card-content p-3">
-                                    <p className="font-semibold text-base mb-2">{exercise.name}</p>
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                        <p className="font-semibold text-base break-words flex-1">{exercise.name}</p>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 flex-shrink-0"
+                                            onClick={() => setEditingExercise(exercise)}
+                                            disabled={isUpdatingExercise}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                     <ul className="space-y-1 pl-2 border-l-2 border-border">
                                         {exercise.sets.map((set) => (
                                             <li key={set.id} className="text-gray-300">
@@ -140,6 +163,19 @@ const WorkoutHistoryCard = ({ workout, onDelete, onCopy, onUpdateDuration, isUpd
                         setIsEditDurationOpen(false);
                     }}
                     isLoading={isUpdatingDuration}
+                />
+            )}
+            
+            {editingExercise && (
+                <EditExerciseSetsDialog
+                    open={!!editingExercise}
+                    onOpenChange={(open) => !open && setEditingExercise(null)}
+                    exercise={editingExercise}
+                    onSave={(updatedExercise) => {
+                        onUpdateExercise(workout.id, editingExercise.id, updatedExercise);
+                        setEditingExercise(null);
+                    }}
+                    isLoading={isUpdatingExercise}
                 />
             )}
         </AccordionItem>

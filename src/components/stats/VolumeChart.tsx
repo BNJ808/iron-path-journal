@@ -1,11 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, ChevronDown } from 'lucide-react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { TrendingUp, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { MUSCLE_GROUP_COLORS_HEX } from '@/data/exercises';
-import { useVolumeEvolution } from '@/hooks/useVolumeEvolution';
+import { useVolumeTimeline } from '@/hooks/useVolumeTimeline';
 import type { Workout } from '@/types';
 import { DateRange } from 'react-day-picker';
 import { format, subDays, subMonths, subYears } from 'date-fns';
@@ -17,84 +17,35 @@ interface VolumeChartProps {
     dateRange: DateRange | undefined;
 }
 
-const chartConfig = {
-    evolutionPercent: {
-        label: "Évolution (%)",
-        color: "hsl(var(--chart-1))",
-    },
-};
-
-// Custom tooltip component
-const CustomTooltipContent = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-        const data = payload[0].payload;
-        const muscleGroup = label;
-        const color = MUSCLE_GROUP_COLORS_HEX[muscleGroup] || MUSCLE_GROUP_COLORS_HEX['Autres'];
-        
-        return (
-            <div className="grid min-w-[12rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
-                <div className="grid gap-1.5">
-                    <div className="flex w-full flex-wrap items-stretch gap-2 items-center">
-                        <div
-                            className="shrink-0 rounded-[2px] h-2.5 w-2.5"
-                            style={{ backgroundColor: color }}
-                        />
-                        <div className="flex flex-1 justify-between leading-none items-center">
-                            <span className="text-muted-foreground">
-                                Évolution
-                            </span>
-                            <span className={`font-mono font-medium tabular-nums ${
-                                data.evolutionPercent > 0 ? 'text-green-500' : 
-                                data.evolutionPercent < 0 ? 'text-red-500' : 'text-muted-foreground'
-                            }`}>
-                                {data.evolutionPercent > 0 ? '+' : ''}{data.evolutionPercent}%
-                            </span>
-                        </div>
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                        {muscleGroup}
-                    </div>
-                    <div className="text-xs">
-                        <div>Volume actuel: {data.currentVolume} kg</div>
-                        <div>Volume précédent: {data.previousVolume} kg</div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-    return null;
-};
-
-const TrendIcon = ({ trend }: { trend: 'positive' | 'negative' | 'stable' }) => {
-    switch (trend) {
-        case 'positive':
-            return <TrendingUp className="h-4 w-4 text-green-500" />;
-        case 'negative':
-            return <TrendingDown className="h-4 w-4 text-red-500" />;
-        case 'stable':
-            return <Minus className="h-4 w-4 text-muted-foreground" />;
-    }
-};
 
 export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
     const [selectedPeriod, setSelectedPeriod] = useState<string>('30');
     
     // Calculer la dateRange basée sur la période sélectionnée
-    const effectiveDateRange: DateRange | undefined = selectedPeriod === 'custom' && dateRange 
-        ? dateRange 
+    const effectiveDateRange: DateRange | undefined = selectedPeriod === 'all' 
+        ? undefined 
         : {
             from: selectedPeriod === '7' ? subDays(new Date(), 7) :
                   selectedPeriod === '30' ? subDays(new Date(), 30) :
                   selectedPeriod === '90' ? subMonths(new Date(), 3) :
                   selectedPeriod === '180' ? subMonths(new Date(), 6) :
                   selectedPeriod === '365' ? subYears(new Date(), 1) :
-                  undefined,
+                  dateRange?.from,
             to: new Date()
         };
     
-    const { volumeEvolution } = useVolumeEvolution(allWorkouts, effectiveDateRange);
+    const { data: volumeData, muscleGroups } = useVolumeTimeline(allWorkouts, effectiveDateRange);
 
-    if (volumeEvolution.length === 0) {
+    // Créer la config du chart dynamiquement
+    const chartConfig: ChartConfig = muscleGroups.reduce((acc, group, index) => {
+        acc[group] = {
+            label: group,
+            color: MUSCLE_GROUP_COLORS_HEX[group] || MUSCLE_GROUP_COLORS_HEX['Autres']
+        };
+        return acc;
+    }, {} as ChartConfig);
+
+    if (volumeData.length === 0 || muscleGroups.length === 0) {
         return null;
     }
 
@@ -131,87 +82,48 @@ export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {effectiveDateRange?.from && effectiveDateRange?.to && (
+                            {effectiveDateRange?.from && (
                                 <p className="text-sm text-muted-foreground">
-                                    Évolution comparée à la période précédente ({format(effectiveDateRange.from, 'dd/MM/yyyy')} - {format(effectiveDateRange.to, 'dd/MM/yyyy')})
+                                    Volume en kg par semaine ({format(effectiveDateRange.from, 'dd/MM/yyyy')} - {format(effectiveDateRange.to || new Date(), 'dd/MM/yyyy')})
                                 </p>
                             )}
                         </div>
                         
-                        <ChartContainer config={chartConfig} className="h-[320px] w-full">
-                            <BarChart 
-                                data={volumeEvolution} 
-                                margin={{ top: 10, right: 5, left: 50, bottom: 20 }}
-                                barCategoryGap="8%"
+                        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                            <LineChart 
+                                data={volumeData} 
+                                margin={{ top: 10, right: 20, left: 0, bottom: 5 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
+                                <CartesianGrid vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
                                 <XAxis 
-                                    dataKey="group" 
-                                    tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
-                                    axisLine={false}
+                                    dataKey="week" 
                                     tickLine={false}
-                                    angle={-45}
-                                    textAnchor="end"
-                                    height={40}
-                                    interval={0}
+                                    axisLine={false}
+                                    tickMargin={10}
+                                    fontSize={12}
                                 />
                                 <YAxis 
-                                    tick={{ fontSize: 11, fill: "hsl(var(--foreground))" }}
-                                    axisLine={false}
                                     tickLine={false}
-                                    width={50}
-                                    label={{ value: '%', angle: 0, position: 'insideLeft' }}
+                                    axisLine={false}
+                                    tickMargin={10}
+                                    fontSize={12}
+                                    label={{ value: 'Volume (kg)', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
                                 />
-                                <ChartTooltip content={<CustomTooltipContent />} />
-                                <Bar 
-                                    dataKey="evolutionPercent" 
-                                    radius={[6, 6, 0, 0]}
-                                    maxBarSize={80}
-                                >
-                                    {volumeEvolution.map((entry, index) => {
-                                        let color = MUSCLE_GROUP_COLORS_HEX[entry.group] || MUSCLE_GROUP_COLORS_HEX['Autres'];
-                                        
-                                        // Modifier l'opacité selon la tendance
-                                        if (entry.trend === 'negative') {
-                                            color = color + '80'; // 50% d'opacité pour les valeurs négatives
-                                        }
-                                        
-                                        return (
-                                            <Cell 
-                                                key={`cell-${index}`} 
-                                                fill={color}
-                                            />
-                                        );
-                                    })}
-                                </Bar>
-                            </BarChart>
-                        </ChartContainer>
-
-                        <div className="mt-4 space-y-2">
-                            <h4 className="text-sm font-medium mb-2">Résumé des évolutions</h4>
-                            <div className="grid gap-2 max-h-32 overflow-y-auto">
-                                {volumeEvolution.slice(0, 5).map((item) => (
-                                    <div key={item.group} className="flex items-center justify-between text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <div
-                                                className="w-3 h-3 rounded"
-                                                style={{ backgroundColor: MUSCLE_GROUP_COLORS_HEX[item.group] || MUSCLE_GROUP_COLORS_HEX['Autres'] }}
-                                            />
-                                            <span className="text-muted-foreground">{item.group}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <TrendIcon trend={item.trend} />
-                                            <span className={`font-mono ${
-                                                item.evolutionPercent > 0 ? 'text-green-500' : 
-                                                item.evolutionPercent < 0 ? 'text-red-500' : 'text-muted-foreground'
-                                            }`}>
-                                                {item.evolutionPercent > 0 ? '+' : ''}{item.evolutionPercent}%
-                                            </span>
-                                        </div>
-                                    </div>
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <Legend />
+                                {muscleGroups.map((group) => (
+                                    <Line
+                                        key={group}
+                                        type="monotone"
+                                        dataKey={group}
+                                        stroke={chartConfig[group]?.color || MUSCLE_GROUP_COLORS_HEX['Autres']}
+                                        strokeWidth={2}
+                                        dot={false}
+                                        name={group}
+                                    />
                                 ))}
-                            </div>
-                        </div>
+                            </LineChart>
+                        </ChartContainer>
                     </CardContent>
                 </CollapsibleContent>
             </Card>
