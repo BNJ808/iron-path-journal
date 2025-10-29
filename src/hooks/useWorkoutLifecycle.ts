@@ -21,7 +21,7 @@ export const useWorkoutLifecycle = () => {
       const cleanedExercises = todayWorkout.exercises.map(ex => ({
           ...ex,
           sets: ex.sets.map(s => ({...s, id: s.id, reps: Number(s.reps) || 0, weight: Number(s.weight) || 0, completed: !!s.completed}))
-                     .filter(s => s.reps > 0 || s.weight > 0)
+                     .filter(s => s.completed && (s.reps > 0 || s.weight > 0))
       })).filter(ex => ex.sets.length > 0);
 
       // Créer deux Maps séparés pour les performances et les notes
