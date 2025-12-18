@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
 import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
 import { SyncStatus } from '@/components/profile/SyncStatus';
+import { DataExport } from '@/components/profile/DataExport';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -105,6 +105,11 @@ const ProfilePage = () => {
             <ColorSoftnessSlider />
           </CardContent>
         </Card>
+
+        {/* Data Export Card */}
+        <div className="mb-6">
+          <DataExport />
+        </div>
 
         {/* Sync Status Card - moved to bottom */}
         <div className="mb-6">
