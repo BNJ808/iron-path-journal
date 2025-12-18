@@ -45,9 +45,7 @@ export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
         return acc;
     }, {} as ChartConfig);
 
-    if (volumeData.length === 0 || muscleGroups.length === 0) {
-        return null;
-    }
+    const hasData = volumeData.length > 0 && muscleGroups.length > 0;
 
     return (
         <Collapsible defaultOpen={false}>
@@ -89,41 +87,48 @@ export const VolumeChart = ({ allWorkouts, dateRange }: VolumeChartProps) => {
                             )}
                         </div>
                         
-                        <ChartContainer config={chartConfig} className="h-[350px] w-full">
-                            <LineChart 
-                                data={volumeData} 
-                                margin={{ top: 10, right: 20, left: 0, bottom: 5 }}
-                            >
-                                <CartesianGrid vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
-                                <XAxis 
-                                    dataKey="week" 
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={10}
-                                    fontSize={12}
-                                />
-                                <YAxis 
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={10}
-                                    fontSize={12}
-                                    label={{ value: 'Volume (kg)', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
-                                />
-                                <ChartTooltip content={<ChartTooltipContent />} />
-                                <Legend />
-                                {muscleGroups.map((group) => (
-                                    <Line
-                                        key={group}
-                                        type="monotone"
-                                        dataKey={group}
-                                        stroke={chartConfig[group]?.color || MUSCLE_GROUP_COLORS_HEX['Autres']}
-                                        strokeWidth={2}
-                                        dot={false}
-                                        name={group}
+                        {hasData ? (
+                            <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                                <LineChart 
+                                    data={volumeData} 
+                                    margin={{ top: 10, right: 20, left: 0, bottom: 5 }}
+                                >
+                                    <CartesianGrid vertical={false} stroke="hsl(var(--muted-foreground) / 0.2)" />
+                                    <XAxis 
+                                        dataKey="week" 
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={10}
+                                        fontSize={12}
                                     />
-                                ))}
-                            </LineChart>
-                        </ChartContainer>
+                                    <YAxis 
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={10}
+                                        fontSize={12}
+                                        label={{ value: 'Volume (kg)', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+                                    />
+                                    <ChartTooltip content={<ChartTooltipContent />} />
+                                    <Legend />
+                                    {muscleGroups.map((group) => (
+                                        <Line
+                                            key={group}
+                                            type="monotone"
+                                            dataKey={group}
+                                            stroke={chartConfig[group]?.color || MUSCLE_GROUP_COLORS_HEX['Autres']}
+                                            strokeWidth={2}
+                                            dot={false}
+                                            connectNulls={true}
+                                            name={group}
+                                        />
+                                    ))}
+                                </LineChart>
+                            </ChartContainer>
+                        ) : (
+                            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
+                                Aucune donnée disponible pour cette période
+                            </div>
+                        )}
                     </CardContent>
                 </CollapsibleContent>
             </Card>
