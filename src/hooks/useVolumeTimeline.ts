@@ -34,32 +34,41 @@ export const useVolumeTimeline = (allWorkouts: Workout[] | undefined, dateRange:
             return workoutDate >= periodStartDate && workoutDate <= periodEndDate;
         });
 
-        if (filteredWorkouts.length === 0) {
+        // Calculer le volume par jour plutôt que par semaine pour les courtes périodes
+        const daysDiff = Math.ceil((periodEndDate.getTime() - periodStartDate.getTime()) / (1000 * 60 * 60 * 24));
+        const useDaily = daysDiff <= 14;
+
+        // Obtenir les groupes actifs d'abord
+        const activeGroups = Array.from(
+            new Set(
+                filteredWorkouts.flatMap(workout =>
+                    workout.exercises
+                        .map(ex => exerciseToGroupMap.get(ex.name))
+                        .filter(Boolean)
+                )
+            )
+        ) as string[];
+
+        if (filteredWorkouts.length === 0 || activeGroups.length === 0) {
             return { data: [], muscleGroups: [] };
         }
 
-        // Grouper par semaine
-        const weeks = eachWeekOfInterval(
-            { start: periodStartDate, end: periodEndDate },
-            { locale: fr }
-        );
+        let timelineData: Array<{ week: string; fullDate: string; [key: string]: string | number }>;
 
-        // Calculer le volume pour chaque semaine et chaque groupe musculaire
-        const timelineData = weeks.map(weekStart => {
-            const weekEnd = endOfWeek(weekStart, { locale: fr });
+        if (useDaily) {
+            // Pour les courtes périodes, grouper par jour avec des données
+            const volumeByDay = new Map<string, { [key: string]: number }>();
             
-            const weekWorkouts = filteredWorkouts.filter(workout => {
-                const workoutDate = parseISO(workout.date);
-                return workoutDate >= weekStart && workoutDate <= weekEnd;
-            });
-
-            const volumeByGroup: { [key: string]: number } = {};
-            
-            allGroupedExercises.forEach(groupData => {
-                volumeByGroup[groupData.group] = 0;
-            });
-
-            weekWorkouts.forEach(workout => {
+            filteredWorkouts.forEach(workout => {
+                const dateKey = format(parseISO(workout.date), 'dd/MM', { locale: fr });
+                const fullDate = workout.date;
+                
+                if (!volumeByDay.has(dateKey)) {
+                    volumeByDay.set(dateKey, { fullDate } as any);
+                }
+                
+                const dayData = volumeByDay.get(dateKey)!;
+                
                 workout.exercises.forEach(exercise => {
                     const group = exerciseToGroupMap.get(exercise.name);
                     if (group) {
@@ -69,31 +78,62 @@ export const useVolumeTimeline = (allWorkouts: Workout[] | undefined, dateRange:
                             }
                             return vol;
                         }, 0);
-                        volumeByGroup[group] = (volumeByGroup[group] || 0) + exerciseVolume;
+                        dayData[group] = (dayData[group] || 0) + exerciseVolume;
                     }
                 });
             });
 
-            return {
-                week: format(weekStart, 'dd/MM', { locale: fr }),
-                fullDate: weekStart.toISOString(),
-                ...volumeByGroup
-            };
-        });
+            timelineData = Array.from(volumeByDay.entries())
+                .map(([week, data]) => ({
+                    week,
+                    fullDate: (data as any).fullDate || '',
+                    ...data
+                }))
+                .sort((a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime());
+        } else {
+            // Grouper par semaine pour les longues périodes
+            const weeks = eachWeekOfInterval(
+                { start: periodStartDate, end: periodEndDate },
+                { locale: fr }
+            );
 
-        // Obtenir la liste des groupes musculaires qui ont du volume
-        const activeGroups = Array.from(
-            new Set(
-                filteredWorkouts.flatMap(workout =>
-                    workout.exercises
-                        .map(ex => exerciseToGroupMap.get(ex.name))
-                        .filter(Boolean)
-                )
-            )
-        ).filter(group => {
-            // Vérifier que le groupe a du volume sur au moins une semaine
-            return timelineData.some(week => (week as any)[group as string] > 0);
-        }) as string[];
+            timelineData = weeks.map(weekStart => {
+                const weekEnd = endOfWeek(weekStart, { locale: fr });
+                
+                const weekWorkouts = filteredWorkouts.filter(workout => {
+                    const workoutDate = parseISO(workout.date);
+                    return workoutDate >= weekStart && workoutDate <= weekEnd;
+                });
+
+                const volumeByGroup: { [key: string]: number } = {};
+
+                weekWorkouts.forEach(workout => {
+                    workout.exercises.forEach(exercise => {
+                        const group = exerciseToGroupMap.get(exercise.name);
+                        if (group) {
+                            const exerciseVolume = exercise.sets.reduce((vol, set) => {
+                                if (set.completed) {
+                                    return vol + (Number(set.weight) || 0) * (Number(set.reps) || 0);
+                                }
+                                return vol;
+                            }, 0);
+                            volumeByGroup[group] = (volumeByGroup[group] || 0) + exerciseVolume;
+                        }
+                    });
+                });
+
+                return {
+                    week: format(weekStart, 'dd/MM', { locale: fr }),
+                    fullDate: weekStart.toISOString(),
+                    ...volumeByGroup
+                };
+            });
+
+            // Filtrer les semaines sans données (tous les groupes à 0 ou undefined)
+            timelineData = timelineData.filter(weekData => {
+                return activeGroups.some(group => (weekData[group] as number) > 0);
+            });
+        }
 
         return {
             data: timelineData,
