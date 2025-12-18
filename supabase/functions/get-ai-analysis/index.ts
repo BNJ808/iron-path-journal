@@ -1,13 +1,10 @@
-
-import 'https://deno.land/x/xhr@0.1.0/mod.ts'
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY')
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 function createGeneralPrompt(stats: any) {
   const periodDescription = stats.periodDescription || 'la période sélectionnée';
@@ -29,12 +26,15 @@ function createGeneralPrompt(stats: any) {
     2.  **Gains en Force**: Analysez les records personnels. Sont-ils équilibrés ? Suggérez des domaines d'amélioration en vous basant sur les records.
     3.  **Analyse de la Période**: En regardant les données de la période, quelles sont les tendances ? Y a-t-il des signes de fatigue (baisse de volume) ou de stagnation ?
     4.  **Conseils Actionnables**: Donnez 3 conseils clairs et détaillés pour les prochaines étapes. Par exemple, suggérez des schémas de répétitions/séries spécifiques, des exercices à ajouter pour équilibrer, des stratégies de récupération, ou comment ajuster l'intensité/volume.
-    `
+    `;
 }
 
 function createExercisePrompt(data: { exerciseName: string; history: any[] }) {
-    const historyString = data.history.map(h => `Date: ${h.date}, Sets: ${h.sets.map(s => `${s.reps}reps @ ${s.weight}kg`).join(' | ')}`).join('\n');
-    return `
+  const historyString = data.history.map(h => 
+    `Date: ${h.date}, Sets: ${h.sets.map((s: any) => `${s.reps}reps @ ${s.weight}kg`).join(' | ')}`
+  ).join('\n');
+  
+  return `
     Analyze the user's performance for the exercise: "${data.exerciseName}".
     The response should be in French, encouraging, and actionable. Structure it with markdown.
 
@@ -46,90 +46,89 @@ function createExercisePrompt(data: { exerciseName: string; history: any[] }) {
     2.  **Suggestions for Next Session**: Give a concrete, challenging but achievable goal for the next time they do this exercise (e.g., "Essayez de faire 1 rep de plus sur votre première série, ou d'augmenter le poids de 2.5kg sur toutes les séries").
     3.  **Technique Tip**: Provide a general technique tip relevant to "${data.exerciseName}" that could help improve form or efficiency.
     4.  **Plateau Breaker Idea**: Suggest one strategy to break a potential future plateau for this exercise (e.g., drop sets, tempo training, variation of the exercise).
-    `
+    `;
 }
 
-
-async function handler(req: Request): Promise<Response> {
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
-
-  if (!geminiApiKey) {
-    return new Response(JSON.stringify({ error: 'Missing GEMINI_API_KEY' }), {
-      status: 200, // Always return 200 to pass detailed error in body
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { type, data } = await req.json()
-    let prompt;
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY is not set');
+      return new Response(
+        JSON.stringify({ error: 'Clé API non configurée. Veuillez activer Lovable AI.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
 
+    const { type, data } = await req.json();
+    console.log('Request received:', { type, dataKeys: Object.keys(data || {}) });
+
+    let prompt: string;
     if (type === 'general') {
       prompt = createGeneralPrompt(data);
     } else if (type === 'exercise') {
       prompt = createExercisePrompt(data);
     } else {
-      return new Response(JSON.stringify({ error: 'Invalid analysis type' }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Type d\'analyse invalide' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`;
-
-    const response = await fetch(apiUrl, {
+    console.log('Calling Lovable AI Gateway...');
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-            parts: [{ text: prompt }]
-        }],
-        systemInstruction: {
-            parts: { text: "You are a friendly and knowledgeable AI fitness coach. You provide clear, concise, and encouraging advice in French." }
-        },
-        generationConfig: {
-            temperature: 0.7,
-        }
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'Tu es un coach sportif professionnel, amical et encourageant. Tu donnes des conseils clairs, concis et motivants en français.' 
+          },
+          { role: 'user', content: prompt }
+        ],
       }),
     });
 
     if (!response.ok) {
-        const errorBody = await response.json();
-        const errorMessage = `Gemini API error: ${errorBody.error?.message || response.statusText}`;
-        console.error(errorMessage, errorBody);
-        return new Response(JSON.stringify({ error: errorMessage }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200, // Return 200 and pass error in body
-        });
+      const errorText = await response.text();
+      console.error('Lovable AI Gateway error:', response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: `Erreur du service IA: ${response.status}` }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
     }
 
-    const completion = await response.json();
+    const result = await response.json();
+    console.log('AI response received successfully');
     
-    if (!completion.candidates || completion.candidates.length === 0 || !completion.candidates[0].content?.parts[0]?.text) {
-        console.error('Invalid response from Gemini API:', completion);
-        return new Response(JSON.stringify({ error: 'Invalid or empty response from Gemini API.' }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-        });
+    const analysis = result.choices?.[0]?.message?.content;
+    if (!analysis) {
+      console.error('No content in AI response:', result);
+      return new Response(
+        JSON.stringify({ error: 'Aucune analyse générée par l\'IA' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
     }
 
-    const analysis = completion.candidates[0].content.parts[0].text;
+    return new Response(
+      JSON.stringify({ analysis }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
-    return new Response(JSON.stringify({ analysis }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
   } catch (error) {
-    console.error('Error in get-ai-analysis function:', error);
-    // Return 200 and pass error in body
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error('Error in get-ai-analysis:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    );
   }
-}
-
-serve(handler)
+});
