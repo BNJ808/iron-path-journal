@@ -1,13 +1,63 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-function createGeneralPrompt(stats: any) {
-  const periodDescription = stats.periodDescription || 'la période sélectionnée';
+// Input validation schemas
+const SetSchema = z.object({
+  reps: z.union([z.string(), z.number()]),
+  weight: z.union([z.string(), z.number()])
+}).passthrough();
+
+const ChartDataPointSchema = z.object({
+  date: z.string().max(50),
+  volume: z.number().min(0).max(1000000000)
+}).passthrough();
+
+const PersonalRecordSchema = z.object({
+  weight: z.number().min(0).max(10000),
+  reps: z.number().int().min(0).max(1000)
+}).passthrough();
+
+const GeneralStatsSchema = z.object({
+  totalWorkouts: z.number().int().min(0).max(100000).optional().default(0),
+  totalVolume: z.number().min(0).max(1000000000).optional().default(0),
+  totalSets: z.number().int().min(0).max(1000000).optional().default(0),
+  personalRecords: z.record(PersonalRecordSchema).optional().default({}),
+  chartData: z.array(ChartDataPointSchema).max(1000).optional().default([]),
+  periodDescription: z.string().max(200).optional().default('la période sélectionnée')
+}).passthrough();
+
+const ExerciseHistorySchema = z.object({
+  date: z.string().max(50),
+  sets: z.array(SetSchema).max(100)
+}).passthrough();
+
+const ExerciseDataSchema = z.object({
+  exerciseName: z.string().max(200),
+  history: z.array(ExerciseHistorySchema).max(200)
+});
+
+const RequestSchema = z.object({
+  type: z.enum(['general', 'exercise']),
+  data: z.unknown()
+});
+
+// Sanitize strings to prevent prompt injection
+function sanitizeString(str: string): string {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/[<>]/g, '') // Remove HTML-like tags
+    .replace(/\n{3,}/g, '\n\n') // Limit consecutive newlines
+    .slice(0, 1000); // Limit length
+}
+
+function createGeneralPrompt(stats: z.infer<typeof GeneralStatsSchema>) {
+  const periodDescription = sanitizeString(stats.periodDescription || 'la période sélectionnée');
 
   return `
     Analysez les statistiques d'entraînement de l'utilisateur suivantes pour ${periodDescription} et fournissez des conseils personnalisés et approfondis.
@@ -19,7 +69,7 @@ function createGeneralPrompt(stats: any) {
     - Volume total (kg): ${stats.totalVolume}
     - Total des séries: ${stats.totalSets}
     - Records Personnels (Poids max en kg, sur toute la période): ${JSON.stringify(stats.personalRecords, null, 2)}
-    - Volume par entraînement (sessions de la période): ${JSON.stringify(stats.chartData, null, 2)}
+    - Volume par entraînement (sessions de la période): ${JSON.stringify(stats.chartData?.slice(0, 50), null, 2)}
 
     Fournir une analyse approfondie sur:
     1.  **Consistance et Volume**: Commentez la fréquence des entraînements et la progression du volume sur la période. Est-ce régulier ? Y a-t-il une surcharge progressive visible ?
@@ -29,13 +79,14 @@ function createGeneralPrompt(stats: any) {
     `;
 }
 
-function createExercisePrompt(data: { exerciseName: string; history: any[] }) {
-  const historyString = data.history.map(h => 
-    `Date: ${h.date}, Sets: ${h.sets.map((s: any) => `${s.reps}reps @ ${s.weight}kg`).join(' | ')}`
+function createExercisePrompt(data: z.infer<typeof ExerciseDataSchema>) {
+  const exerciseName = sanitizeString(data.exerciseName);
+  const historyString = data.history.slice(0, 50).map(h => 
+    `Date: ${sanitizeString(h.date)}, Sets: ${h.sets.slice(0, 20).map((s) => `${s.reps}reps @ ${s.weight}kg`).join(' | ')}`
   ).join('\n');
   
   return `
-    Analyze the user's performance for the exercise: "${data.exerciseName}".
+    Analyze the user's performance for the exercise: "${exerciseName}".
     The response should be in French, encouraging, and actionable. Structure it with markdown.
 
     User's Performance History (recent sessions):
@@ -44,7 +95,7 @@ function createExercisePrompt(data: { exerciseName: string; history: any[] }) {
     Provide analysis on:
     1.  **Progression**: Comment on the user's progress in terms of weight, reps, and volume. Are they progressing, stagnating, or regressing?
     2.  **Suggestions for Next Session**: Give a concrete, challenging but achievable goal for the next time they do this exercise (e.g., "Essayez de faire 1 rep de plus sur votre première série, ou d'augmenter le poids de 2.5kg sur toutes les séries").
-    3.  **Technique Tip**: Provide a general technique tip relevant to "${data.exerciseName}" that could help improve form or efficiency.
+    3.  **Technique Tip**: Provide a general technique tip relevant to "${exerciseName}" that could help improve form or efficiency.
     4.  **Plateau Breaker Idea**: Suggest one strategy to break a potential future plateau for this exercise (e.g., drop sets, tempo training, variation of the exercise).
     `;
 }
@@ -64,14 +115,52 @@ serve(async (req) => {
       );
     }
 
-    const { type, data } = await req.json();
+    // Parse and validate request structure
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch {
+      console.error('Invalid JSON in request body');
+      return new Response(
+        JSON.stringify({ error: 'Format de requête invalide' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
+    const requestValidation = RequestSchema.safeParse(requestBody);
+    if (!requestValidation.success) {
+      console.error('Request validation failed:', requestValidation.error.message);
+      return new Response(
+        JSON.stringify({ error: 'Type d\'analyse invalide ou données manquantes' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
+    const { type, data } = requestValidation.data;
     console.log('Request received:', { type, dataKeys: Object.keys(data || {}) });
 
     let prompt: string;
+    
     if (type === 'general') {
-      prompt = createGeneralPrompt(data);
+      const dataValidation = GeneralStatsSchema.safeParse(data);
+      if (!dataValidation.success) {
+        console.error('General stats validation failed:', dataValidation.error.message);
+        return new Response(
+          JSON.stringify({ error: 'Données statistiques invalides' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
+      }
+      prompt = createGeneralPrompt(dataValidation.data);
     } else if (type === 'exercise') {
-      prompt = createExercisePrompt(data);
+      const dataValidation = ExerciseDataSchema.safeParse(data);
+      if (!dataValidation.success) {
+        console.error('Exercise data validation failed:', dataValidation.error.message);
+        return new Response(
+          JSON.stringify({ error: 'Données d\'exercice invalides' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
+      }
+      prompt = createExercisePrompt(dataValidation.data);
     } else {
       return new Response(
         JSON.stringify({ error: 'Type d\'analyse invalide' }),
@@ -127,7 +216,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in get-ai-analysis:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Erreur interne du serveur' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   }
