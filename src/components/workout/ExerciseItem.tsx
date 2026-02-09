@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ExerciseLog, ExerciseSet } from '@/types';
 import { Trash2, Plus, MessageSquare, Star, X, Check } from 'lucide-react';
 import { AiExerciseAnalysisDialog } from './AiExerciseAnalysisDialog';
+import { ExerciseRecordsDialog } from './ExerciseRecordsDialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useFavoriteExercises } from '@/hooks/useFavoriteExercises';
 import { cn } from '@/lib/utils';
@@ -108,6 +109,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             <Button variant="ghost" size="icon" onClick={() => setShowNotes(!showNotes)} aria-label="Toggle exercise notes">
                 <MessageSquare className="h-5 w-5 text-foreground/80 hover:text-foreground" />
             </Button>
+            <ExerciseRecordsDialog exerciseName={exercise.name} />
             <AiExerciseAnalysisDialog exerciseId={exercise.exerciseId} exerciseName={exercise.name} />
             <Button variant="ghost" size="icon" onClick={() => onRemove(exercise.id)} aria-label="Remove exercise">
               <Trash2 className="text-destructive/80 hover:text-destructive" />
