@@ -152,7 +152,7 @@ export const StartWorkout = ({
               sensors={sensors}
             >
               <SortableContext items={orderedTemplates.map(t => t.id)} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 max-w-6xl mx-auto mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-w-4xl mx-auto mb-4">
                   {orderedTemplates.map(template => (
                     <WorkoutTemplateCard
                       key={template.id}
@@ -167,11 +167,20 @@ export const StartWorkout = ({
               
               <DragOverlay dropAnimation={null}>
                 {activeTemplate ? (
-                  <div className={`${activeTemplate.color} text-white rounded-lg shadow-2xl p-1.5 min-h-[32px] flex flex-col gap-0.5 opacity-90 transform scale-105`}>
+                  <div className={`${activeTemplate.color} text-white rounded-xl shadow-2xl p-2 min-h-[56px] flex flex-col gap-0.5 opacity-90 transform scale-105 ring-1 ring-white/10`}>
                     <div className="font-semibold text-xs leading-tight truncate">{activeTemplate.name}</div>
                     {activeTemplate.exercises.length > 0 && (
-                      <div className="text-xs opacity-80 leading-tight truncate">
-                        {activeTemplate.exercises.length} exercice{activeTemplate.exercises.length > 1 ? 's' : ''}
+                      <div className="space-y-px">
+                        {activeTemplate.exercises.slice(0, 3).map((ex, i) => (
+                          <div key={i} className="text-[9px] opacity-75 leading-tight truncate">
+                            • {ex.name}
+                          </div>
+                        ))}
+                        {activeTemplate.exercises.length > 3 && (
+                          <div className="text-[9px] opacity-60 leading-tight">
+                            +{activeTemplate.exercises.length - 3} autres
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
