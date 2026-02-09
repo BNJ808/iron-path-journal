@@ -63,9 +63,9 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
       ref={setNodeRef}
       style={style}
       className={cn(
-        `${template.color} text-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-150 cursor-pointer`,
+        `${template.color} text-white rounded-xl shadow-md hover:shadow-xl transition-all duration-150 cursor-pointer ring-1 ring-white/10 hover:ring-white/30`,
         isDragging && "shadow-2xl ring-2 ring-white/50",
-        "p-1.5 min-h-[32px] flex flex-col gap-0.5",
+        "p-2 min-h-[56px] flex flex-col gap-0.5",
         "select-none relative will-change-transform"
       )}
       onClick={handleCardClick}
@@ -123,10 +123,19 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
       </div>
 
       <div className="flex-1 min-w-0 select-none pointer-events-none">
-        <div className="font-semibold text-xs mb-0 select-none leading-tight truncate">{template.name}</div>
+        <div className="font-semibold text-xs mb-0.5 select-none leading-tight truncate">{template.name}</div>
         {template.exercises.length > 0 && (
-          <div className="text-xs opacity-80 leading-tight select-none truncate">
-            {template.exercises.length} exercice{template.exercises.length > 1 ? 's' : ''}
+          <div className="space-y-px">
+            {template.exercises.slice(0, 3).map((ex, i) => (
+              <div key={i} className="text-[9px] opacity-75 leading-tight select-none truncate">
+                • {ex.name}
+              </div>
+            ))}
+            {template.exercises.length > 3 && (
+              <div className="text-[9px] opacity-60 leading-tight select-none">
+                +{template.exercises.length - 3} autres
+              </div>
+            )}
           </div>
         )}
       </div>
