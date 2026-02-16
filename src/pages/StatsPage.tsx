@@ -237,7 +237,7 @@ const StatsPage = () => {
       </div>
 
       {/* Section de sélection de plage de dates */}
-      <div className="bg-card rounded-lg p-4 border">
+      <div className="app-card p-4">
         <div className="flex items-center gap-2 mb-3">
           <CalendarDays className="h-5 w-5 text-accent-blue" />
           <h3 className="font-medium">Période d'analyse</h3>

@@ -92,11 +92,11 @@
   
   /* Unified card styles for consistency across the app */
   .app-card {
-    @apply bg-card border-2 border-border rounded-lg shadow-lg;
+    @apply bg-card border border-border rounded-xl shadow-md;
   }
   
   .app-card-content {
-    @apply bg-card/90 border-2 border-border/70 rounded-md;
+    @apply bg-card/90 border border-border/70 rounded-xl;
   }
   
   /* Legacy custom-card class now uses unified styles */

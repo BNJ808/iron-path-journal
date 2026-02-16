@@ -142,12 +142,12 @@ const HistoryPage = () => {
                 )}
             </div>
             
-            <p className="text-gray-400 mt-2 mb-6">Retrouvez toutes vos séances passées.</p>
+            <p className="text-muted-foreground mt-2 mb-6">Retrouvez toutes vos séances passées.</p>
 
             {workouts.length === 0 ? (
                 <div className="text-center py-16">
-                    <p className="text-gray-500">Aucun historique de séance pour le moment.</p>
-                    <p className="text-sm text-gray-600 mt-2">Terminez une séance pour la voir apparaître ici.</p>
+                     <p className="text-muted-foreground">Aucun historique de séance pour le moment.</p>
+                     <p className="text-sm text-muted-foreground/70 mt-2">Terminez une séance pour la voir apparaître ici.</p>
                 </div>
             ) : (
                 <Accordion type="multiple" className="space-y-4">

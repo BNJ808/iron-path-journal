@@ -57,9 +57,9 @@ export const WeightTracker = () => {
     };
 
     return (
-        <Card className="bg-gray-800/50 border-gray-700">
+        <Card className="app-card">
             <CardHeader>
-                <CardTitle className="text-gray-100">Suivi du poids</CardTitle>
+                <CardTitle className="text-foreground">Suivi du poids</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <Form {...form}>
@@ -130,7 +130,7 @@ export const WeightTracker = () => {
                 </Form>
                 
                 <div className="space-y-2 pt-4">
-                    <h3 className="font-semibold text-gray-200">Historique</h3>
+                    <h3 className="font-semibold text-foreground">Historique</h3>
                     {isLoading ? (
                         <div className="space-y-2">
                            <Skeleton className="h-8 w-full" />
@@ -140,11 +140,11 @@ export const WeightTracker = () => {
                     ) : measurements && measurements.length > 0 ? (
                         <ul className="space-y-2 max-h-48 overflow-y-auto">
                             {measurements.map((m) => (
-                                <li key={m.id} className="flex justify-between items-center p-2 bg-gray-700/50 rounded-md">
-                                    <div>
-                                        <span className="text-sm text-gray-300">{format(new Date(m.date + 'T00:00:00'), "d MMMM yyyy", { locale: fr })}</span>
-                                        <span className="font-bold text-gray-100 ml-4">{m.weight} kg</span>
-                                    </div>
+                                 <li key={m.id} className="flex justify-between items-center p-2 bg-secondary/50 rounded-xl">
+                                     <div>
+                                         <span className="text-sm text-muted-foreground">{format(new Date(m.date + 'T00:00:00'), "d MMMM yyyy", { locale: fr })}</span>
+                                         <span className="font-bold text-foreground ml-4">{m.weight} kg</span>
+                                     </div>
                                     <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)} className="h-8 w-8 hover:bg-destructive/20">
                                         <Trash2 className="h-4 w-4 text-destructive" />
                                     </Button>
@@ -152,7 +152,7 @@ export const WeightTracker = () => {
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-sm text-gray-400 text-center py-4">Aucune mesure de poids enregistrée.</p>
+                        <p className="text-sm text-muted-foreground text-center py-4">Aucune mesure de poids enregistrée.</p>
                     )}
                 </div>
             </CardContent>
