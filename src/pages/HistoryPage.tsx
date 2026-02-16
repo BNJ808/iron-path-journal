@@ -1,3 +1,4 @@
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { Button } from '@/components/ui/button';
 import { Accordion } from '@/components/ui/accordion';
@@ -151,17 +152,18 @@ const HistoryPage = () => {
                 </div>
             ) : (
                 <Accordion type="multiple" className="space-y-4">
-                    {workouts.map(workout => (
-                        <WorkoutHistoryCard 
-                            key={workout.id} 
-                            workout={workout} 
-                            onDelete={() => handleDeleteWorkout(workout.id)}
-                            onCopy={() => handleCopyWorkout(workout)}
-                            onUpdateDuration={handleUpdateDuration}
-                            onUpdateExercise={handleUpdateExercise}
-                            isUpdatingDuration={isUpdatingDuration}
-                            isUpdatingExercise={isUpdatingExercise}
-                        />
+                    {workouts.map((workout, index) => (
+                        <AnimatedCard key={workout.id} index={index}>
+                            <WorkoutHistoryCard 
+                                workout={workout} 
+                                onDelete={() => handleDeleteWorkout(workout.id)}
+                                onCopy={() => handleCopyWorkout(workout)}
+                                onUpdateDuration={handleUpdateDuration}
+                                onUpdateExercise={handleUpdateExercise}
+                                isUpdatingDuration={isUpdatingDuration}
+                                isUpdatingExercise={isUpdatingExercise}
+                            />
+                        </AnimatedCard>
                     ))}
                 </Accordion>
             )}
