@@ -1,3 +1,4 @@
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -66,55 +67,59 @@ const ProfilePage = () => {
           <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
         </div>
 
-        {/* Profile Info Card */}
-        <Card className="app-card mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
-              Informations personnelles
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col items-center space-y-4">
-              <AvatarUploader
-                avatarUrl={profile?.avatar_url}
-                username={profile?.username}
-                onUpload={handleAvatarUpload}
-                isLoading={isLoading}
-              />
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-foreground">
-                  {profile?.username || user?.email?.split('@')[0] || 'Utilisateur'}
-                </h3>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
+        <AnimatedCard index={0}>
+          <Card className="app-card mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Informations personnelles
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col items-center space-y-4">
+                <AvatarUploader
+                  avatarUrl={profile?.avatar_url}
+                  username={profile?.username}
+                  onUpload={handleAvatarUpload}
+                  isLoading={isLoading}
+                />
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {profile?.username || user?.email?.split('@')[0] || 'Utilisateur'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{user?.email}</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </AnimatedCard>
 
-        {/* Theme Settings Card */}
-        <Card className="app-card mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
-              Paramètres d'apparence
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <ThemeSwitcher />
-            <ColorSoftnessSlider />
-          </CardContent>
-        </Card>
+        <AnimatedCard index={1}>
+          <Card className="app-card mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-primary" />
+                Paramètres d'apparence
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <ThemeSwitcher />
+              <ColorSoftnessSlider />
+            </CardContent>
+          </Card>
+        </AnimatedCard>
 
-        {/* Data Export Card */}
-        <div className="mb-6">
-          <DataExport />
-        </div>
+        <AnimatedCard index={2}>
+          <div className="mb-6">
+            <DataExport />
+          </div>
+        </AnimatedCard>
 
-        {/* Sync Status Card - moved to bottom */}
-        <div className="mb-6">
-          <SyncStatus />
-        </div>
+        <AnimatedCard index={3}>
+          <div className="mb-6">
+            <SyncStatus />
+          </div>
+        </AnimatedCard>
 
         {/* Sign Out Button */}
         <div className="flex justify-center">

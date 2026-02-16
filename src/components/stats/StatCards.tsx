@@ -1,5 +1,6 @@
 
 import StatCard from '@/components/StatCard';
+import { AnimatedCard } from '@/components/AnimatedCard';
 import { Dumbbell, Repeat, TrendingUp, Clock, ChevronDown, LayoutGrid } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -28,10 +29,10 @@ export const StatCards = ({ totalWorkouts, totalVolume, totalSets, averageDurati
             <CollapsibleContent>
                 <CardContent>
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                        <StatCard title="Séances totales" value={totalWorkouts} icon={Dumbbell} />
-                        <StatCard title="Volume total" value={`${totalVolume.toLocaleString('fr-FR')} kg`} icon={TrendingUp} />
-                        <StatCard title="Séries totales" value={totalSets} icon={Repeat} />
-                        <StatCard title="Durée moyenne" value={averageDuration > 0 ? `${Math.round(averageDuration)} min` : '-'} icon={Clock} />
+                        <AnimatedCard index={0}><StatCard title="Séances totales" value={totalWorkouts} icon={Dumbbell} /></AnimatedCard>
+                        <AnimatedCard index={1}><StatCard title="Volume total" value={`${totalVolume.toLocaleString('fr-FR')} kg`} icon={TrendingUp} /></AnimatedCard>
+                        <AnimatedCard index={2}><StatCard title="Séries totales" value={totalSets} icon={Repeat} /></AnimatedCard>
+                        <AnimatedCard index={3}><StatCard title="Durée moyenne" value={averageDuration > 0 ? `${Math.round(averageDuration)} min` : '-'} icon={Clock} /></AnimatedCard>
                     </div>
                 </CardContent>
             </CollapsibleContent>
