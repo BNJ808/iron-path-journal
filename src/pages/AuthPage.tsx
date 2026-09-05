@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import Seo from '@/components/Seo';
 import { z } from 'zod';
+
 
 const AuthPage = () => {
     const [email, setEmail] = useState('');
