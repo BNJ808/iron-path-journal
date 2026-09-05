@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import Seo from '@/components/Seo';
 import { z } from 'zod';
+
 
 const AuthPage = () => {
     const [email, setEmail] = useState('');
@@ -61,13 +63,28 @@ const AuthPage = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen p-4">
-            <Tabs defaultValue="signin" className="w-[400px]">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 gap-6">
+            <Seo
+                title="Carnet Muscu — application de suivi de musculation"
+                description="Suivez vos séances de musculation : exercices, séries, charges, records personnels, statistiques de progression et calendrier d'entraînement."
+                path="/auth"
+            />
+            <header className="max-w-md text-center space-y-3">
+                <h1 className="text-3xl font-bold">Bienvenue sur Carnet Muscu</h1>
+                <p className="text-muted-foreground">
+                    Votre carnet d'entraînement de musculation : enregistrez vos séances
+                    (exercices, séries, charges et répétitions), suivez vos records
+                    personnels, visualisez votre progression avec des statistiques
+                    détaillées et planifiez vos séances dans le calendrier.
+                </p>
+            </header>
+            <Tabs defaultValue="signin" className="w-full max-w-[400px]">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="signin">Se connecter</TabsTrigger>
                     <TabsTrigger value="signup">S'inscrire</TabsTrigger>
                 </TabsList>
                 <TabsContent value="signin">
+
                     <Card>
                         <CardHeader>
                             <CardTitle>Connexion</CardTitle>

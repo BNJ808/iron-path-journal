@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import BottomNav from './BottomNav';
 import { OfflineIndicator } from './OfflineIndicator';
 import { TimerDialog } from './timer/TimerDialog';
+import RouteSeo from './RouteSeo';
 import { useTimer } from '@/contexts/TimerContext';
 
 const Layout = () => {
@@ -16,6 +17,8 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <RouteSeo />
+
       {/* Header avec indicateur hors ligne et timer */}
       <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">

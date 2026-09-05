@@ -37,7 +37,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
   const startTimeRef = useRef<number | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Check notification permission
   useEffect(() => {
