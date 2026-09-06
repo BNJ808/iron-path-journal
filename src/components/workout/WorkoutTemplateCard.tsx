@@ -31,9 +31,9 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
     transform,
     transition,
     isDragging,
-  } = useSortable({ 
+  } = useSortable({
     id: template.id,
-    transition: null, // Désactiver les transitions pour plus de fluidité
+    transition: null,
   });
 
   const style = {
@@ -49,12 +49,12 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
       e.stopPropagation();
       return;
     }
-    
+
     const target = e.target as HTMLElement;
     if (target.closest('[data-dropdown-menu]') || target.closest('[data-drag-handle]')) {
       return;
     }
-    
+
     onStart(template);
   };
 
@@ -63,29 +63,35 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
       ref={setNodeRef}
       style={style}
       className={cn(
-        `${template.color} text-white rounded-xl shadow-md hover:shadow-xl transition-all duration-150 cursor-pointer ring-1 ring-white/10 hover:ring-white/30`,
-        isDragging && "shadow-2xl ring-2 ring-white/50",
-        "p-2 min-h-[56px] flex flex-col gap-0.5",
-        "select-none relative will-change-transform"
+        "bg-card text-card-foreground rounded-3xl shadow-[0_4px_20px_-4px_hsl(var(--foreground)_/_0.08)] hover:shadow-[0_12px_30px_-8px_hsl(var(--foreground)_/_0.12)] transition-all duration-200 cursor-pointer ring-1 ring-border/60 hover:ring-primary/30",
+        isDragging && "shadow-2xl ring-2 ring-primary/40",
+        "p-3 min-h-[72px] flex flex-col gap-1",
+        "select-none relative will-change-transform overflow-hidden"
       )}
       onClick={handleCardClick}
     >
-      <div className="flex items-start justify-between">
+      {/* Subtle color accent bar */}
+      <div
+        className={cn("absolute left-0 top-3 bottom-3 w-1 rounded-full", template.color)}
+        style={{ opacity: 0.8 }}
+      />
+
+      <div className="flex items-start justify-between pl-2.5">
         <div
           {...attributes}
           {...listeners}
           data-drag-handle
           className={cn(
-            "cursor-grab active:cursor-grabbing flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-150",
+            "cursor-grab active:cursor-grabbing flex-shrink-0 text-muted-foreground hover:text-foreground transition-opacity duration-150",
             isMobile ? "p-1 -m-1 touch-none" : "p-0.5 -m-0.5",
             "will-change-transform"
           )}
           style={{ touchAction: 'none' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <GripVertical className={cn("text-white", isMobile ? "h-2.5 w-2.5" : "h-2 w-2")} />
+          <GripVertical className={cn(isMobile ? "h-3 w-3" : "h-2.5 w-2.5")} />
         </div>
-        
+
         <div data-dropdown-menu onClick={(e) => e.stopPropagation()}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -93,11 +99,11 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "hover:bg-white/20 flex-shrink-0 transition-colors duration-150",
-                  isMobile ? "h-5 w-5 p-0" : "h-4 w-4 p-0"
+                  "hover:bg-secondary flex-shrink-0 transition-colors duration-150 text-muted-foreground",
+                  isMobile ? "h-6 w-6 p-0" : "h-5 w-5 p-0"
                 )}
               >
-                <MoreVertical className={cn("text-white", isMobile ? "h-2.5 w-2.5" : "h-2 w-2")} />
+                <MoreVertical className={cn(isMobile ? "h-3 w-3" : "h-2.5 w-2.5")} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -112,7 +118,7 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
               </EditTemplateDialog>
               <DropdownMenuItem
                 onClick={() => onDelete(template.id)}
-                className="text-red-600"
+                className="text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Supprimer
@@ -122,17 +128,17 @@ export const WorkoutTemplateCard = ({ template, onUpdate, onDelete, onStart }: W
         </div>
       </div>
 
-      <div className="flex-1 min-w-0 select-none pointer-events-none">
-        <div className="font-semibold text-xs mb-0.5 select-none leading-tight truncate">{template.name}</div>
+      <div className="flex-1 min-w-0 select-none pointer-events-none pl-2.5">
+        <div className="font-bold text-sm text-foreground mb-1 select-none leading-tight truncate">{template.name}</div>
         {template.exercises.length > 0 && (
-          <div className="space-y-px">
+          <div className="space-y-0.5">
             {template.exercises.slice(0, 3).map((ex, i) => (
-              <div key={i} className="text-[9px] opacity-75 leading-tight select-none truncate">
+              <div key={i} className="text-[10px] text-muted-foreground leading-tight select-none truncate">
                 • {ex.name}
               </div>
             ))}
             {template.exercises.length > 3 && (
-              <div className="text-[9px] opacity-60 leading-tight select-none">
+              <div className="text-[10px] text-muted-foreground/70 leading-tight select-none">
                 +{template.exercises.length - 3} autres
               </div>
             )}
