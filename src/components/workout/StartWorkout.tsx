@@ -9,6 +9,7 @@ import { CustomExerciseManagement } from './CustomExerciseManagement';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
 interface StartWorkoutProps {
   onStartWorkout: () => void;
@@ -21,15 +22,15 @@ interface StartWorkoutProps {
   onCreateTemplate: (template: { name: string; exercises: ExerciseLog[] }) => Promise<any>;
 }
 
-export const StartWorkout = ({ 
-  onStartWorkout, 
-  onStartFromTemplate, 
+export const StartWorkout = ({
+  onStartWorkout,
+  onStartFromTemplate,
   onValidateRunning,
-  templates, 
-  isLoadingTemplates, 
-  onUpdateTemplate, 
-  onDeleteTemplate, 
-  onCreateTemplate 
+  templates,
+  isLoadingTemplates,
+  onUpdateTemplate,
+  onDeleteTemplate,
+  onCreateTemplate
 }: StartWorkoutProps) => {
   const [orderedTemplates, setOrderedTemplates] = useState<WorkoutTemplate[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export const StartWorkout = ({
         const orderedList = orderIds
           .map((id: string) => templates.find(t => t.id === id))
           .filter(Boolean);
-        
+
         // Ajouter les nouveaux templates qui ne sont pas dans l'ordre sauvegardé
         const newTemplates = templates.filter(t => !orderIds.includes(t.id));
         setOrderedTemplates([...orderedList, ...newTemplates]);
@@ -88,16 +89,16 @@ export const StartWorkout = ({
       setOrderedTemplates((items) => {
         const oldIndex = items.findIndex(item => item.id === active.id);
         const newIndex = items.findIndex(item => item.id === over.id);
-        
+
         if (oldIndex === -1 || newIndex === -1) return items;
-        
+
         // Échanger les positions directement
         const newItems = [...items];
         [newItems[oldIndex], newItems[newIndex]] = [newItems[newIndex], newItems[oldIndex]];
-        
+
         // Sauvegarder le nouvel ordre
         saveOrder(newItems);
-        
+
         return newItems;
       });
     }
@@ -114,45 +115,62 @@ export const StartWorkout = ({
   };
 
   return (
-    <div className="text-center py-10 space-y-6">
-      <div className="space-y-4">
-        <Button onClick={handleStartWorkout} className="w-full max-w-md">
-          <Play className="mr-2 h-4 w-4" />
+    <div className="py-6 space-y-8 max-w-2xl mx-auto px-2 sm:px-4">
+      {/* Primary CTA */}
+      <div className="primary-surface p-6 space-y-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-foreground/70">Nouvelle séance</p>
+            <h2 className="text-2xl font-bold text-primary-foreground mt-1 font-['Space_Grotesk']">Prêt à t'entraîner ?</h2>
+          </div>
+          <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl">
+            <Play className="h-6 w-6 text-primary-foreground fill-primary-foreground" />
+          </div>
+        </div>
+
+        <Button
+          onClick={handleStartWorkout}
+          className="w-full bg-white text-primary hover:bg-white/90 rounded-xl h-12 text-base font-bold shadow-lg shadow-primary/20"
+        >
+          <Play className="mr-2 h-5 w-5 fill-current" />
           {isValidateRunning ? 'Valider la sortie running' : 'Démarrer un entraînement de zéro'}
         </Button>
-        
-        <div className="flex items-center justify-center space-x-2 text-sm">
-          <Checkbox 
-            id="validate-running" 
+
+        <div className="flex items-center gap-2 text-sm text-primary-foreground/90">
+          <Checkbox
+            id="validate-running"
             checked={isValidateRunning}
             onCheckedChange={(checked) => setIsValidateRunning(checked === true)}
+            className="border-white/40 data-[state=checked]:bg-white data-[state=checked]:text-primary"
           />
-          <label 
-            htmlFor="validate-running" 
-            className="text-muted-foreground cursor-pointer"
+          <label
+            htmlFor="validate-running"
+            className="cursor-pointer"
           >
             Valider une sortie running
           </label>
         </div>
       </div>
 
-      <div className="border-t border-border pt-6 mt-6">
-        <h2 className="text-lg font-semibold mb-4 text-gray-200 flex items-center justify-center gap-2">
-            <List className="h-5 w-5" />
-            Démarrer depuis un modèle
-        </h2>
+      {/* Templates section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 px-1">
+          <List className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-bold text-foreground font-['Space_Grotesk']">Démarrer depuis un modèle</h2>
+        </div>
+
         {isLoadingTemplates ? (
-            <p className="text-gray-400">Chargement des modèles...</p>
+          <p className="text-muted-foreground text-center py-8">Chargement des modèles...</p>
         ) : (
           <>
-            <DndContext 
-              collisionDetection={closestCenter} 
+            <DndContext
+              collisionDetection={closestCenter}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               sensors={sensors}
             >
               <SortableContext items={orderedTemplates.map(t => t.id)} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-w-4xl mx-auto mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {orderedTemplates.map(template => (
                     <WorkoutTemplateCard
                       key={template.id}
@@ -164,20 +182,24 @@ export const StartWorkout = ({
                   ))}
                 </div>
               </SortableContext>
-              
+
               <DragOverlay dropAnimation={null}>
                 {activeTemplate ? (
-                  <div className={`${activeTemplate.color} text-white rounded-xl shadow-2xl p-2 min-h-[56px] flex flex-col gap-0.5 opacity-90 transform scale-105 ring-1 ring-white/10`}>
-                    <div className="font-semibold text-xs leading-tight truncate">{activeTemplate.name}</div>
+                  <div className={cn(
+                    "bg-card text-card-foreground rounded-3xl shadow-2xl p-3 min-h-[72px] flex flex-col gap-1 opacity-95 transform scale-105 ring-2 ring-primary/30",
+                    "relative overflow-hidden"
+                  )}>
+                    <div className={cn("absolute left-0 top-3 bottom-3 w-1 rounded-full", activeTemplate.color)} style={{ opacity: 0.8 }} />
+                    <div className="font-bold text-sm text-foreground mb-1 leading-tight truncate pl-2.5">{activeTemplate.name}</div>
                     {activeTemplate.exercises.length > 0 && (
-                      <div className="space-y-px">
+                      <div className="space-y-0.5 pl-2.5">
                         {activeTemplate.exercises.slice(0, 3).map((ex, i) => (
-                          <div key={i} className="text-[9px] opacity-75 leading-tight truncate">
+                          <div key={i} className="text-[10px] text-muted-foreground leading-tight truncate">
                             • {ex.name}
                           </div>
                         ))}
                         {activeTemplate.exercises.length > 3 && (
-                          <div className="text-[9px] opacity-60 leading-tight">
+                          <div className="text-[10px] text-muted-foreground/70 leading-tight">
                             +{activeTemplate.exercises.length - 3} autres
                           </div>
                         )}
@@ -187,23 +209,22 @@ export const StartWorkout = ({
                 ) : null}
               </DragOverlay>
             </DndContext>
-            
-            <div className="max-w-md mx-auto mt-4 space-y-4">
+
+            <div className="space-y-4 pt-2">
               <CreateTemplateDialog onCreate={onCreateTemplate}>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full rounded-xl h-11 border-dashed border-2 hover:border-primary hover:text-primary">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Créer un nouveau modèle
                 </Button>
               </CreateTemplateDialog>
-              
-              <div className="border-t border-border pt-4">
+
+              <div className="border-t border-border/60 pt-4">
                 <CustomExerciseManagement />
               </div>
             </div>
           </>
         )}
       </div>
-
     </div>
   );
 };

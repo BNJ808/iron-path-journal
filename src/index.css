@@ -3,42 +3,51 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
 @layer base {
   :root {
-    --background: 222 47% 11%; /* slate-900 */
-    --foreground: 210 40% 98%; /* slate-50 */
-    --card: 222 47% 20%; /* Plus clair que background pour meilleur contraste */
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --secondary: 222 28% 28%; /* slate-700 */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 28% 28%; /* slate-700 */
-    --muted-foreground: 220 14% 65%; /* slate-400 */
-    --accent: 222 28% 32%; /* slightly darker slate-700 for hover */
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84% 60%; /* Brighter red */
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 22% 35%; /* Bordure plus marquée et plus claire */
-    --input: 222 28% 28%; /* slate-700 */
-    --radius: 0.5rem;
-    
-    /* Custom accent colors - versions plus vives et contrastées */
-    --accent-blue: 217 80% 60%;
-    --accent-purple: 262 70% 65%;
-    --accent-yellow: 48 90% 60%;
-    --accent-green: 142 70% 55%;
-    --accent-orange: 25 90% 60%;
-    --accent-red: 0 80% 60%;
-    --accent-rose: 340 80% 65%;
-    
-    /* Default theme (violet vibrant) */
-    --primary: 262 70% 65%;
-    --primary-foreground: 222 47% 11%;
-    --ring: 262 70% 65%;
+    /* Light sporty theme — default */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --radius: 0.75rem;
+
+    /* Electric blue primary */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 217 91% 60%;
+
+    /* Accent colors — adjusted for light theme */
+    --accent-blue: 217 91% 60%;
+    --accent-purple: 262 70% 55%;
+    --accent-yellow: 45 93% 47%;
+    --accent-green: 142 71% 45%;
+    --accent-orange: 24 95% 53%;
+    --accent-red: 0 84% 60%;
+    --accent-rose: 340 75% 55%;
+
+    /* Surface & shadow tokens */
+    --surface-elevated: 0 0% 100%;
+    --surface-subtle: 210 40% 98%;
+    --shadow-card: 0 4px 20px -4px hsl(222 47% 11% / 0.08);
+    --shadow-elevated: 0 12px 40px -12px hsl(222 47% 11% / 0.12);
   }
 
-  /* Thèmes avec couleurs vives */
+  /* Legacy theme classes kept for optional overrides */
   .violet {
     --primary: 262 70% 65%;
     --primary-foreground: 222 47% 11%;
@@ -46,39 +55,39 @@
   }
 
   .blue {
-    --primary: 217 80% 60%;
-    --primary-foreground: 222 47% 11%;
-    --ring: 217 80% 60%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 217 91% 60%;
   }
 
   .green {
-    --primary: 142 70% 55%;
-    --primary-foreground: 222 47% 11%;
-    --ring: 142 70% 55%;
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 142 71% 45%;
   }
 
   .yellow {
-    --primary: 48 90% 60%;
+    --primary: 45 93% 47%;
     --primary-foreground: 222 47% 11%;
-    --ring: 48 90% 60%;
+    --ring: 45 93% 47%;
   }
-  
+
   .orange {
-    --primary: 25 90% 60%;
-    --primary-foreground: 222 47% 11%;
-    --ring: 25 90% 60%;
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 24 95% 53%;
   }
-  
+
   .red {
-    --primary: 0 80% 60%;
-    --primary-foreground: 222 47% 11%;
-    --ring: 0 80% 60%;
+    --primary: 0 84% 60%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 0 84% 60%;
   }
-  
+
   .rose {
-    --primary: 340 80% 65%;
-    --primary-foreground: 222 47% 11%;
-    --ring: 340 80% 65%;
+    --primary: 340 75% 55%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 340 75% 55%;
   }
 }
 
@@ -86,21 +95,35 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  html {
+    font-family: 'DM Sans', system-ui, sans-serif;
   }
-  
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
   /* Unified card styles for consistency across the app */
   .app-card {
-    @apply bg-card border border-border rounded-xl shadow-md;
+    @apply bg-card border border-border rounded-2xl shadow-[0_4px_20px_-4px_hsl(var(--foreground)_/_0.08)];
   }
-  
+
   .app-card-content {
-    @apply bg-card/90 border border-border/70 rounded-xl;
+    @apply bg-card/90 border border-border/70 rounded-2xl;
   }
-  
+
   /* Legacy custom-card class now uses unified styles */
   .custom-card {
     @apply app-card;
+  }
+
+  /* Primary CTA surface */
+  .primary-surface {
+    @apply bg-primary text-primary-foreground rounded-3xl shadow-lg shadow-primary/20;
   }
 }
