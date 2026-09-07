@@ -28,12 +28,12 @@ export function ThemeSwitcher() {
 
   return (
     <div className="space-y-2">
-        <Label htmlFor="theme-select" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
+        <Label htmlFor="theme-select" className="flex items-center gap-2 font-semibold text-sm text-foreground">
             <Palette className="h-4 w-4 text-primary" />
             Thème de l'application
         </Label>
         <Select value={theme} onValueChange={handleThemeChange}>
-            <SelectTrigger id="theme-select">
+            <SelectTrigger id="theme-select" className="rounded-xl">
                 <SelectValue placeholder="Sélectionner un thème" />
             </SelectTrigger>
             <SelectContent>

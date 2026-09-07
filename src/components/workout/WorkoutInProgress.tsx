@@ -65,21 +65,21 @@ export const WorkoutInProgress = ({
   }, [workout]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {workout.exercises.length === 0 ? (
-        <div className="text-center text-muted-foreground py-8 px-4 rounded-lg bg-secondary">
+        <div className="text-center text-muted-foreground py-10 px-4 rounded-2xl bg-secondary border border-border/50">
           <p>Commencez par ajouter un exercice à votre séance.</p>
         </div>
       ) : (
         <div className="space-y-6">
           {groupedWorkoutExercises.map(([groupName, exercises]) => (
             <div key={groupName}>
-              <h3 className={`text-lg font-semibold uppercase tracking-wider mb-3 ${MUSCLE_GROUP_COLORS[groupName] || 'text-accent-yellow'}`}>{groupName}</h3>
+              <h3 className={`text-sm font-bold uppercase tracking-wider mb-3 ${MUSCLE_GROUP_COLORS[groupName] || 'text-accent-yellow'}`}>{groupName}</h3>
               <div className="space-y-4">
                 {exercises.map(ex => (
-                  <ExerciseItem 
-                    key={ex.id} 
-                    exercise={ex} 
+                  <ExerciseItem
+                    key={ex.id}
+                    exercise={ex}
                     onUpdate={onUpdateExercise}
                     onRemove={onRemoveExercise}
                   />
@@ -91,10 +91,10 @@ export const WorkoutInProgress = ({
       )}
 
       <AddExerciseDialog onAddExercise={onAddExercise} />
-      
+
       <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="workout-notes" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
+            <label htmlFor="workout-notes" className="flex items-center gap-2 font-semibold text-sm text-foreground">
                 <StickyNote className="h-4 w-4 text-accent-yellow" />
                 Notes sur la séance
             </label>
@@ -104,7 +104,7 @@ export const WorkoutInProgress = ({
                 value={workout.notes || ''}
                 onChange={(e) => onUpdateWorkoutNotes(e.target.value)}
                 rows={3}
-                className="text-base"
+                className="text-base rounded-xl bg-card"
             />
           </div>
       </div>
@@ -113,16 +113,16 @@ export const WorkoutInProgress = ({
 
       <div className="flex flex-col sm:flex-row gap-2">
           <SaveTemplateDialog onSave={onSaveAsTemplate}>
-              <Button variant="outline" className="w-full" disabled={workout.exercises.length === 0}>
+              <Button variant="outline" className="w-full rounded-xl h-11" disabled={workout.exercises.length === 0}>
                   <Bookmark className="mr-2 h-4 w-4 text-accent-purple" />
                   Enregistrer en modèle
               </Button>
           </SaveTemplateDialog>
-          
+
           {hasUncompletedSets ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button disabled={workout.exercises.length === 0} className="w-full">
+                <Button disabled={workout.exercises.length === 0} className="w-full rounded-xl h-11" size="lg">
                   <Save className="mr-2 h-4 w-4" />
                   Terminer et Sauvegarder
                 </Button>
@@ -143,13 +143,13 @@ export const WorkoutInProgress = ({
               </AlertDialogContent>
             </AlertDialog>
           ) : (
-            <Button onClick={onFinishWorkout} disabled={workout.exercises.length === 0} className="w-full">
+            <Button onClick={onFinishWorkout} disabled={workout.exercises.length === 0} className="w-full rounded-xl h-11" size="lg">
                 <Save className="mr-2 h-4 w-4" />
                 Terminer et Sauvegarder
             </Button>
           )}
       </div>
-      
+
       <div className="mt-8 text-center">
         <AlertDialog>
           <AlertDialogTrigger asChild>

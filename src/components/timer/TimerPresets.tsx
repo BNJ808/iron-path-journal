@@ -18,7 +18,7 @@ interface TimerPresetsProps {
 export const TimerPresets = ({ currentDuration, onDurationSelect }: TimerPresetsProps) => {
   return (
     <div className="text-center">
-      <p className="text-gray-400 mb-4">Choisissez une durée prédéfinie :</p>
+      <p className="text-muted-foreground mb-4">Choisissez une durée prédéfinie :</p>
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {PRESET_DURATIONS.map(({ label, value }) => (
           <Button
@@ -26,7 +26,8 @@ export const TimerPresets = ({ currentDuration, onDurationSelect }: TimerPresets
             variant={currentDuration === value ? 'default' : 'outline'}
             onClick={() => onDurationSelect(value)}
             className={cn(
-              currentDuration === value && 'bg-accent-green hover:bg-green-600 text-black border-accent-green'
+              'rounded-xl',
+              currentDuration === value && 'bg-accent-green hover:bg-accent-green/90 text-primary-foreground border-accent-green'
             )}
           >
             {label}
