@@ -34,7 +34,7 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.8 : 1,
-    touchAction: 'none', // Empêche le scroll lors du drag sur mobile
+    touchAction: 'none',
   };
 
   return (
@@ -42,16 +42,16 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
       ref={setNodeRef}
       style={style}
       className={cn(
-        `${plan.color} text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing`,
+        `${plan.color} text-primary-foreground rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 cursor-grab active:cursor-grabbing`,
         isDragging && "shadow-2xl scale-105 z-50",
         "p-2 min-h-[48px] flex items-center gap-2",
-        "select-none" // Désactive la sélection de texte
+        "select-none"
       )}
       {...attributes}
       {...listeners}
     >
       <GripVertical className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
-      
+
       <div className="flex-1 min-w-0 select-none">
         <div className="font-semibold text-sm truncate select-none">{plan.name}</div>
         {plan.exercises.length > 0 && (
@@ -67,17 +67,15 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 w-6 p-0 hover:bg-white/20 flex-shrink-0"
+            className="h-6 w-6 p-0 hover:bg-primary-foreground/20 flex-shrink-0 text-primary-foreground"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
             }}
             onPointerDown={(e) => {
-              // Empêche le drag quand on clique sur le menu
               e.stopPropagation();
             }}
             onTouchStart={(e) => {
-              // Empêche le drag quand on touche le menu sur mobile
               e.stopPropagation();
             }}
           >
@@ -96,7 +94,7 @@ export const WorkoutPlanCard = ({ plan, onUpdate, onDelete }: WorkoutPlanCardPro
           </EditWorkoutPlanDialog>
           <DropdownMenuItem
             onClick={() => onDelete(plan.id)}
-            className="text-red-600"
+            className="text-destructive"
           >
             <Trash2 className="h-4 w-4 mr-2" />
             Supprimer

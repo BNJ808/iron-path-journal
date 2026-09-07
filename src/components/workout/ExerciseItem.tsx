@@ -42,8 +42,8 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
       const currentLocalSet = localSets[setId];
       const updatedSets = exercise.sets.map((set) => {
         if (set.id === setId) {
-          return { 
-            ...set, 
+          return {
+            ...set,
             [field]: value as boolean,
             // Apply any pending local changes
             weight: currentLocalSet?.weight || set.weight,
@@ -97,7 +97,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
   };
 
   return (
-    <div className="p-4 rounded-lg bg-secondary/60 backdrop-blur-sm space-y-4 border border-border/30 shadow-lg">
+    <div className="p-4 rounded-2xl bg-card border border-border/60 shadow-[0_4px_20px_-4px_hsl(var(--foreground)_/_0.08)] space-y-4">
       <div className="flex justify-between items-center gap-4">
         <div className="flex items-center gap-1 flex-shrink min-w-0">
             <Button variant="ghost" size="icon" className="-ml-2 flex-shrink-0" onClick={() => toggleFavorite(exercise.exerciseId)} aria-label="Toggle favorite">
@@ -123,13 +123,13 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
             value={localNotes}
             onChange={handleNoteChange}
             onBlur={handleNoteBlur}
-            className="mt-2 text-base bg-background/50"
+            className="mt-2 text-base bg-secondary/50 rounded-xl"
         />
       )}
 
 
       <div className="space-y-3">
-        <div className="grid grid-cols-[2rem_1fr_auto_1fr_2.5rem_2.5rem] gap-x-2 items-center text-sm text-foreground font-medium px-1">
+        <div className="grid grid-cols-[2rem_1fr_auto_1fr_2.5rem_2.5rem] gap-x-2 items-center text-sm text-muted-foreground font-medium px-1">
           <span className="text-center">#</span>
           <span className="text-center">Poids</span>
           <span />
@@ -147,11 +147,11 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
                   onChange={(e) => handleSetChange(set.id, 'weight', e.target.value)}
                   onBlur={() => handleSetBlur(set.id, 'weight')}
                   placeholder="-"
-                  className="text-base text-center bg-transparent border-border/50 focus:border-primary pr-7"
+                  className="text-base text-center bg-secondary/40 border-border/60 focus:border-primary rounded-xl pr-7"
                 />
-                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-foreground/60 pointer-events-none">kg</span>
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">kg</span>
             </div>
-            
+
             <span className="text-foreground/80 font-semibold">x</span>
 
             <Input
@@ -160,7 +160,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
               onChange={(e) => handleSetChange(set.id, 'reps', e.target.value)}
               onBlur={() => handleSetBlur(set.id, 'reps')}
               placeholder="-"
-              className="text-base text-center bg-transparent border-border/50 focus:border-primary"
+              className="text-base text-center bg-secondary/40 border-border/60 focus:border-primary rounded-xl"
             />
             <div className="flex justify-center">
               <button
@@ -169,7 +169,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
                   className={cn(
                       'flex items-center justify-center h-8 w-8 rounded-lg border-2 transition-all',
                       set.completed
-                          ? 'bg-accent-green border-accent-green text-black'
+                          ? 'bg-accent-green border-accent-green text-primary-foreground'
                           : 'bg-transparent border-foreground/30 text-foreground/50 hover:border-accent-red hover:text-accent-red'
                   )}
               >
@@ -185,7 +185,7 @@ export const ExerciseItem = ({ exercise, onUpdate, onRemove }: ExerciseItemProps
         ))}
       </div>
 
-      <Button onClick={addSet} variant="outline" className="w-full border-dashed hover:border-solid hover:border-primary/70 text-foreground/80 hover:text-primary-foreground">
+      <Button onClick={addSet} variant="outline" className="w-full border-dashed hover:border-solid hover:border-primary/70 hover:text-primary rounded-xl h-11">
         <Plus size={16} className="mr-2" />
         Ajouter une série
       </Button>
