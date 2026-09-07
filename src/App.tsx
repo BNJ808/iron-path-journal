@@ -21,7 +21,7 @@ const App = () => (
     <BrowserRouter>
       <ThemeProvider
         attribute="class"
-        defaultTheme="violet"
+        defaultTheme="blue"
         enableSystem={false}
       >
         <Toaster />
