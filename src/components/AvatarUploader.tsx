@@ -46,17 +46,17 @@ export const AvatarUploader = ({ avatarUrl, username, onUpload, isLoading }: Ava
 
     return (
         <div className="relative group w-32 h-32 mx-auto cursor-pointer" onClick={handleAvatarClick}>
-            <Avatar className="w-32 h-32 text-4xl">
+            <Avatar className="w-32 h-32 text-4xl ring-4 ring-border">
                 <AvatarImage src={avatarUrl ?? undefined} alt={username ?? 'Avatar'} />
-                <AvatarFallback className="bg-gray-700 text-gray-300">
+                <AvatarFallback className="bg-secondary text-muted-foreground">
                     {uploading ? <Loader2 className="animate-spin" /> : getInitials(username)}
                 </AvatarFallback>
             </Avatar>
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                 {uploading ? (
-                    <Loader2 className="animate-spin text-white" />
+                    <Loader2 className="animate-spin text-background" />
                 ) : (
-                    <Pencil className="text-white" />
+                    <Pencil className="text-background" />
                 )}
             </div>
             <input

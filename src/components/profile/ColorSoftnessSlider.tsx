@@ -7,12 +7,12 @@ import { Palette } from 'lucide-react'
 // Base HSL values for vibrant themes
 const themes = {
   violet: { h: 262, s: 70, l: 65 },
-  blue: { h: 217, s: 80, l: 60 },
-  green: { h: 142, s: 70, l: 55 },
-  yellow: { h: 48, s: 90, l: 60 },
-  orange: { h: 25, s: 90, l: 60 },
-  red: { h: 0, s: 80, l: 60 },
-  rose: { h: 340, s: 80, l: 65 }
+  blue: { h: 217, s: 91, l: 60 },
+  green: { h: 142, s: 71, l: 45 },
+  yellow: { h: 45, s: 93, l: 47 },
+  orange: { h: 25, s: 95, l: 53 },
+  red: { h: 0, s: 84, l: 60 },
+  rose: { h: 340, s: 75, l: 55 }
 };
 
 const applyColorSoftness = (softnessValue: number) => {
@@ -20,16 +20,16 @@ const applyColorSoftness = (softnessValue: number) => {
   Object.entries(themes).forEach(([themeName, { h, s, l }]) => {
     const adjustedS = Math.max(20, s - (softnessValue * (s / 150)))
     const adjustedL = Math.min(90, l + (softnessValue * 0.20))
-    
+
     document.documentElement.style.setProperty(
       `--accent-${themeName === 'violet' ? 'purple' : themeName}`,
       `${h} ${adjustedS}% ${adjustedL}%`
     )
-    
+
     // Update the main theme colors as well
     const isCurrentTheme = document.documentElement.classList.contains(themeName)
-    const isDefaultTheme = themeName === 'violet' && !Array.from(document.documentElement.classList).some(c => Object.keys(themes).includes(c));
-    
+    const isDefaultTheme = themeName === 'blue' && !Array.from(document.documentElement.classList).some(c => Object.keys(themes).includes(c));
+
     if (isCurrentTheme || isDefaultTheme) {
       document.documentElement.style.setProperty(
         '--primary',
@@ -62,7 +62,7 @@ export function ColorSoftnessSlider() {
   React.useEffect(() => {
     applyColorSoftness(softness[0]);
   }, [softness]);
-  
+
   const handleValueChange = (value: number[]) => {
     setSoftness(value);
     try {
@@ -74,7 +74,7 @@ export function ColorSoftnessSlider() {
 
   return (
     <div className="space-y-4">
-      <Label htmlFor="color-softness" className="flex items-center gap-2 font-semibold text-sm text-gray-300">
+      <Label htmlFor="color-softness" className="flex items-center gap-2 font-semibold text-sm text-foreground">
         <Palette className="h-4 w-4 text-primary" />
         Douceur des couleurs
       </Label>
@@ -88,7 +88,7 @@ export function ColorSoftnessSlider() {
           onValueChange={handleValueChange}
           className="w-full"
         />
-        <div className="flex justify-between text-xs text-gray-400">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>Couleurs vives</span>
           <span>Couleurs douces</span>
         </div>
