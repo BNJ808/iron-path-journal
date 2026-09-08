@@ -43,9 +43,9 @@ export const StrengthRatios = ({ ratios }: StrengthRatiosProps) => {
 
     const getStatusIcon = (status: string) => {
         switch (status) {
-            case 'équilibré': return <CheckCircle className="h-4 w-4 text-green-500" />;
-            case 'déséquilibré': return <AlertTriangle className="h-4 w-4 text-red-500" />;
-            default: return <CheckCircle className="h-4 w-4 text-blue-500" />;
+            case 'équilibré': return <CheckCircle className="h-4 w-4 text-accent-green" />;
+            case 'déséquilibré': return <AlertTriangle className="h-4 w-4 text-accent-red" />;
+            default: return <CheckCircle className="h-4 w-4 text-accent-blue" />;
         }
     };
 

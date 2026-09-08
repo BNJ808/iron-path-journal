@@ -171,7 +171,7 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                     className="w-full"
                   />
                   {form.formState.errors.weight && (
-                    <p className="text-sm text-red-500">{form.formState.errors.weight.message}</p>
+                    <p className="text-sm text-destructive">{form.formState.errors.weight.message}</p>
                   )}
                 </div>
                 
@@ -231,7 +231,7 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(measurement.id)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

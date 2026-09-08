@@ -212,9 +212,9 @@ const StatsPage = () => {
                     />
                     <label htmlFor={moduleId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2">
                       {!hiddenModules.includes(moduleId) ? (
-                        <Eye className="h-4 w-4 text-green-500" />
+                        <Eye className="h-4 w-4 text-accent-green" />
                       ) : (
-                        <EyeOff className="h-4 w-4 text-red-500" />
+                        <EyeOff className="h-4 w-4 text-destructive" />
                       )}
                       {moduleLabels[moduleId as keyof typeof moduleLabels]}
                     </label>
