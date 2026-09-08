@@ -17,7 +17,7 @@ export const TimerDisplay = ({ timeLeft, duration }: TimerDisplayProps) => {
     <div className="relative w-64 h-64 flex items-center justify-center mb-8">
       <svg className="absolute w-full h-full" viewBox="0 0 100 100">
         <circle
-          className="text-gray-700"
+          className="text-muted"
           stroke="currentColor"
           strokeWidth="4"
           cx="50"
