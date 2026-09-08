@@ -17,8 +17,8 @@ export const OfflineIndicator = () => {
       <div className={cn(
         "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold",
         isOnline
-          ? "bg-green-100 text-green-700"
-          : "bg-red-100 text-red-700"
+          ? "bg-accent-green/15 text-accent-green"
+          : "bg-destructive/15 text-destructive"
       )}>
         {isOnline ? (
           <>
@@ -35,7 +35,7 @@ export const OfflineIndicator = () => {
 
       {/* Badge pour données en attente */}
       {showPendingBadge && (
-        <Badge variant="outline" className="flex items-center gap-1 text-yellow-700 border-yellow-400 bg-yellow-50">
+        <Badge variant="outline" className="flex items-center gap-1 text-accent-yellow border-accent-yellow/50 bg-accent-yellow/10">
           <AlertCircle className="h-3 w-3" />
           <span className="hidden sm:inline">En attente</span>
         </Badge>
@@ -47,7 +47,7 @@ export const OfflineIndicator = () => {
           variant="outline"
           size="sm"
           onClick={forcSync}
-          className="flex items-center gap-1 h-7 px-2 text-xs font-semibold"
+          className="flex items-center gap-1 h-7 px-2 text-xs font-semibold rounded-xl"
         >
           <RotateCw className="h-3 w-3" />
           <span className="hidden sm:inline">Sync</span>

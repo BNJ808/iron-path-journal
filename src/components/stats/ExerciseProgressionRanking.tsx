@@ -42,9 +42,9 @@ export const ExerciseProgressionRanking = ({ progressions }: ExerciseProgression
     }
 
     const getRankIcon = (index: number) => {
-        if (index === 0) return <Trophy className="h-4 w-4 text-yellow-500" />;
-        if (index === 1) return <Trophy className="h-4 w-4 text-gray-400" />;
-        if (index === 2) return <Trophy className="h-4 w-4 text-amber-600" />;
+        if (index === 0) return <Trophy className="h-4 w-4 text-accent-yellow" />;
+        if (index === 1) return <Trophy className="h-4 w-4 text-muted-foreground" />;
+        if (index === 2) return <Trophy className="h-4 w-4 text-accent-orange" />;
         return <span className="text-sm font-bold text-muted-foreground">#{index + 1}</span>;
     };
 

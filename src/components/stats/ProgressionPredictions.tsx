@@ -40,18 +40,18 @@ export const ProgressionPredictions = ({ predictions }: ProgressionPredictionsPr
     const getTrendIcon = (trend: string) => {
         switch (trend) {
             case 'ascending':
-                return <TrendingUp className="h-3 w-3 text-green-500" />;
+                return <TrendingUp className="h-3 w-3 text-accent-green" />;
             case 'descending':
-                return <TrendingDown className="h-3 w-3 text-red-500" />;
+                return <TrendingDown className="h-3 w-3 text-accent-red" />;
             default:
-                return <Minus className="h-3 w-3 text-gray-500" />;
+                return <Minus className="h-3 w-3 text-muted-foreground" />;
         }
     };
 
     const getConfidenceColor = (confidence: number) => {
-        if (confidence >= 80) return 'bg-green-500';
-        if (confidence >= 60) return 'bg-yellow-500';
-        return 'bg-red-500';
+        if (confidence >= 80) return 'bg-accent-green';
+        if (confidence >= 60) return 'bg-accent-yellow';
+        return 'bg-accent-red';
     };
 
     return (

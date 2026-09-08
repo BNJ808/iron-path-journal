@@ -41,9 +41,9 @@ export const WeightPerformanceCorrelation = ({ correlations }: WeightPerformance
 
     const getSignificanceColor = (significance: string) => {
         switch (significance) {
-            case 'forte': return 'bg-green-500';
-            case 'modérée': return 'bg-yellow-500';
-            default: return 'bg-gray-500';
+            case 'forte': return 'bg-accent-green';
+            case 'modérée': return 'bg-accent-yellow';
+            default: return 'bg-muted';
         }
     };
 
@@ -76,9 +76,9 @@ export const WeightPerformanceCorrelation = ({ correlations }: WeightPerformance
                                         <h4 className="font-medium text-sm truncate">{corr.exercise}</h4>
                                         <div className="flex items-center gap-2">
                                             {corr.correlation > 0 ? (
-                                                <TrendingUp className="h-4 w-4 text-green-500" />
+                                                <TrendingUp className="h-4 w-4 text-accent-green" />
                                             ) : (
-                                                <TrendingDown className="h-4 w-4 text-red-500" />
+                                                <TrendingDown className="h-4 w-4 text-accent-red" />
                                             )}
                                             <Badge 
                                                 variant="outline" 

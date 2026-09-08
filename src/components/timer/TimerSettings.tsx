@@ -46,7 +46,7 @@ export const TimerSettings = ({
         onClick={handleToggleSound}
         className={cn(
           "flex items-center gap-2",
-          soundEnabled ? "text-accent-green" : "text-gray-500"
+          soundEnabled ? "text-accent-green" : "text-muted-foreground"
         )}
       >
         {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -59,7 +59,7 @@ export const TimerSettings = ({
         onClick={handleToggleNotifications}
         className={cn(
           "flex items-center gap-2",
-          notificationsEnabled ? "text-accent-green" : "text-gray-500"
+          notificationsEnabled ? "text-accent-green" : "text-muted-foreground"
         )}
       >
         {notificationsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}

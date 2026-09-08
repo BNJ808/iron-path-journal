@@ -212,9 +212,9 @@ const StatsPage = () => {
                     />
                     <label htmlFor={moduleId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2">
                       {!hiddenModules.includes(moduleId) ? (
-                        <Eye className="h-4 w-4 text-green-500" />
+                        <Eye className="h-4 w-4 text-accent-green" />
                       ) : (
-                        <EyeOff className="h-4 w-4 text-red-500" />
+                        <EyeOff className="h-4 w-4 text-destructive" />
                       )}
                       {moduleLabels[moduleId as keyof typeof moduleLabels]}
                     </label>
@@ -225,9 +225,9 @@ const StatsPage = () => {
           </Dialog>
           <button
             onClick={() => setIsDndEnabled(!isDndEnabled)}
-            className={`${isMobile ? 'px-2 py-1' : 'px-3 py-1'} rounded-md text-sm font-medium transition-colors ${
+            className={`${isMobile ? 'px-2 py-1' : 'px-3 py-1'} rounded-xl text-sm font-medium transition-colors ${
               isDndEnabled 
-                ? 'bg-accent-blue text-white' 
+                ? 'bg-primary text-primary-foreground' 
                 : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
             }`}
           >
