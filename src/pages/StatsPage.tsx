@@ -225,9 +225,9 @@ const StatsPage = () => {
           </Dialog>
           <button
             onClick={() => setIsDndEnabled(!isDndEnabled)}
-            className={`${isMobile ? 'px-2 py-1' : 'px-3 py-1'} rounded-md text-sm font-medium transition-colors ${
+            className={`${isMobile ? 'px-2 py-1' : 'px-3 py-1'} rounded-xl text-sm font-medium transition-colors ${
               isDndEnabled 
-                ? 'bg-accent-blue text-white' 
+                ? 'bg-primary text-primary-foreground' 
                 : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
             }`}
           >

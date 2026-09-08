@@ -138,7 +138,7 @@ export const WorkoutCalendar = () => {
 
             <DragOverlay>
               {activePlan && (
-                <div className={`${activePlan.color} text-white px-4 py-3 rounded-lg text-sm font-medium shadow-xl border-2 border-white/30 backdrop-blur-sm`}>
+                <div className={`${activePlan.color} text-white px-4 py-3 rounded-xl text-sm font-medium shadow-xl border-2 border-background/30 backdrop-blur-sm`}>
                   {activePlan.name}
                 </div>
               )}
