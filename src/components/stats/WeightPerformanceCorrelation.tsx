@@ -76,9 +76,9 @@ export const WeightPerformanceCorrelation = ({ correlations }: WeightPerformance
                                         <h4 className="font-medium text-sm truncate">{corr.exercise}</h4>
                                         <div className="flex items-center gap-2">
                                             {corr.correlation > 0 ? (
-                                                <TrendingUp className="h-4 w-4 text-green-500" />
+                                                <TrendingUp className="h-4 w-4 text-accent-green" />
                                             ) : (
-                                                <TrendingDown className="h-4 w-4 text-red-500" />
+                                                <TrendingDown className="h-4 w-4 text-accent-red" />
                                             )}
                                             <Badge 
                                                 variant="outline" 
