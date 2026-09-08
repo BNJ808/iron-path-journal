@@ -41,9 +41,9 @@ export const WeightPerformanceCorrelation = ({ correlations }: WeightPerformance
 
     const getSignificanceColor = (significance: string) => {
         switch (significance) {
-            case 'forte': return 'bg-green-500';
-            case 'modérée': return 'bg-yellow-500';
-            default: return 'bg-gray-500';
+            case 'forte': return 'bg-accent-green';
+            case 'modérée': return 'bg-accent-yellow';
+            default: return 'bg-muted';
         }
     };
 

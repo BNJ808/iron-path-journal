@@ -51,9 +51,9 @@ export const StrengthRatios = ({ ratios }: StrengthRatiosProps) => {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'équilibré': return 'bg-green-100 text-green-800 border-green-200';
-            case 'déséquilibré': return 'bg-red-100 text-red-800 border-red-200';
-            default: return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'équilibré': return 'bg-accent-green/15 text-accent-green border-accent-green/25';
+            case 'déséquilibré': return 'bg-accent-red/15 text-accent-red border-accent-red/25';
+            default: return 'bg-accent-blue/15 text-accent-blue border-accent-blue/25';
         }
     };
 
