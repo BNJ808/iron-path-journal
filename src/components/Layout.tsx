@@ -21,7 +21,7 @@ const Layout = () => {
       <RouteSeo />
 
       {/* Header épuré */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-border/60">
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-lg border-b border-border/60">
         <div className="container mx-auto px-4 h-14 flex justify-between items-center">
           <div className="flex items-baseline gap-2">
             <h1 className="text-xl font-bold tracking-tight font-['Space_Grotesk']">Carnet Muscu</h1>
