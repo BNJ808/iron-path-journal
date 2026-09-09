@@ -5,6 +5,9 @@ import App from './App.tsx'
 import './index.css'
 import { registerServiceWorker } from './utils/pwaUtils'
 import { TimerProvider } from './contexts/TimerContext'
+import { initAppearanceMode } from './hooks/useDarkMode'
+
+initAppearanceMode();
 
 // Enregistrer le service worker
 if (import.meta.env.PROD) {

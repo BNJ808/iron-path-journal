@@ -6,6 +6,7 @@ import { LogOut, User, Settings } from 'lucide-react';
 import { AvatarUploader } from '@/components/AvatarUploader';
 import { useProfile } from '@/hooks/useProfile';
 import { ThemeSwitcher } from '@/components/profile/ThemeSwitcher';
+import { DarkModeSwitcher } from '@/components/profile/DarkModeSwitcher';
 import { ColorSoftnessSlider } from '@/components/profile/ColorSoftnessSlider';
 import { SyncStatus } from '@/components/profile/SyncStatus';
 import { DataExport } from '@/components/profile/DataExport';
@@ -103,6 +104,7 @@ const ProfilePage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              <DarkModeSwitcher />
               <ThemeSwitcher />
               <ColorSoftnessSlider />
             </CardContent>
