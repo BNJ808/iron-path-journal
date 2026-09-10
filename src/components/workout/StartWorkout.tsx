@@ -133,7 +133,7 @@ export const StartWorkout = ({
           className="w-full bg-white text-primary hover:bg-white/90 rounded-xl h-12 text-base font-bold shadow-lg shadow-primary/20"
         >
           <Play className="mr-2 h-5 w-5 fill-current" />
-          {isValidateRunning ? 'Valider la sortie running' : 'Démarrer un entraînement de zéro'}
+          {isValidateRunning ? 'Valider la sortie running' : 'Démarrer une séance libre'}
         </Button>
 
         <div className="flex items-center gap-2 text-sm text-primary-foreground/90">
