@@ -6,7 +6,6 @@ import { WorkoutPlan } from '@/types/workout-calendar';
 
 interface WorkoutPlansSectionProps {
   plans: WorkoutPlan[];
-  onAdd: (plan: Omit<WorkoutPlan, 'id'>) => void;
   onUpdate: (planId: string, updates: Partial<WorkoutPlan>) => void;
   onDelete: (planId: string) => void;
 }
