@@ -125,7 +125,6 @@ export const WorkoutCalendar = () => {
           >
             <WorkoutPlansSection
               plans={calendar.plans}
-              onAdd={addPlan}
               onUpdate={updatePlan}
               onDelete={deletePlan}
             />
