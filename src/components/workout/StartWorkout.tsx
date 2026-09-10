@@ -156,7 +156,7 @@ export const StartWorkout = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
           <List className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-bold text-foreground font-['Space_Grotesk']">Démarrer depuis un modèle</h2>
+          <h2 className="text-lg font-bold text-foreground font-['Space_Grotesk']">Séances</h2>
         </div>
 
         {isLoadingTemplates ? (
