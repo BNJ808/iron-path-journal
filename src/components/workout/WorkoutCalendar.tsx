@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Trash2 } from 'lucide-react';
+import { Calendar, Trash2, Plus } from 'lucide-react';
+import { CreateWorkoutPlanDialog } from './CreateWorkoutPlanDialog';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, format } from 'date-fns';
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
@@ -97,14 +98,22 @@ export const WorkoutCalendar = () => {
               <Calendar className="h-5 w-5 text-accent-blue" />
               Planification
             </div>
-            <Button
-              variant={isDeleteMode ? "destructive" : "outline"}
-              size="sm"
-              onClick={() => setIsDeleteMode(!isDeleteMode)}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <CreateWorkoutPlanDialog onAdd={addPlan}>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Nouveau plan
+                </Button>
+              </CreateWorkoutPlanDialog>
+              <Button
+                variant={isDeleteMode ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setIsDeleteMode(!isDeleteMode)}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -116,7 +125,6 @@ export const WorkoutCalendar = () => {
           >
             <WorkoutPlansSection
               plans={calendar.plans}
-              onAdd={addPlan}
               onUpdate={updatePlan}
               onDelete={deletePlan}
             />
