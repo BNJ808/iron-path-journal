@@ -61,15 +61,15 @@ const Layout = () => {
               <Timer className="h-[18px] w-[18px]" />
             </Button>
 
-            <Button asChild variant="ghost" size="sm" className="hidden sm:flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground">
+            <Button asChild variant="ghost" size="sm" className="h-9 w-9 sm:h-auto sm:w-auto p-0 sm:px-2.5 sm:py-1.5 rounded-full sm:rounded-lg flex items-center justify-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary">
               <a
                 href="https://musclewiki.com/fr-fr"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Ouvrir MuscleWiki dans un nouvel onglet"
+                aria-label="MuscleWiki"
               >
-                MuscleWiki
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-[18px] w-[18px] sm:h-3 sm:w-3" />
+                <span className="hidden sm:inline">MuscleWiki</span>
               </a>
             </Button>
 
