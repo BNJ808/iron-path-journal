@@ -2,16 +2,18 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Trash2 } from 'lucide-react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, format } from 'date-fns';
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
 import { WorkoutPlansSection } from './calendar/WorkoutPlansSection';
 import { CalendarGrid } from './calendar/CalendarGrid';
+import { CreateWorkoutPlanDialog } from './CreateWorkoutPlanDialog';
 import { useDragAndDropSync } from './calendar/useDragAndDropSync';
 import { useWorkoutCalendarSync } from '@/hooks/useWorkoutCalendarSync';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { useManualDayValidations } from '@/hooks/useManualDayValidations';
+import { WorkoutPlan } from '@/types/workout-calendar';
 
 // Re-export types for backward compatibility
 export type { WorkoutPlan } from '@/types/workout-calendar';
