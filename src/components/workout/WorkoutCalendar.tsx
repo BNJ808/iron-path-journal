@@ -94,19 +94,27 @@ export const WorkoutCalendar = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-accent-blue" />
-              Planification
+              Plans d'entrainement
             </div>
-            <Button
-              variant={isDeleteMode ? "destructive" : "outline"}
-              size="sm"
-              onClick={() => setIsDeleteMode(!isDeleteMode)}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <CreateWorkoutPlanDialog onAdd={addPlan}>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Nouveau plan
+                </Button>
+              </CreateWorkoutPlanDialog>
+              <Button
+                variant={isDeleteMode ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setIsDeleteMode(!isDeleteMode)}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
