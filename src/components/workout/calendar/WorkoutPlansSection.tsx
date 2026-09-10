@@ -1,10 +1,7 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { WorkoutPlanCard } from '../WorkoutPlanCard';
-import { CreateWorkoutPlanDialog } from '../CreateWorkoutPlanDialog';
 import { WorkoutPlan } from '@/types/workout-calendar';
 
 interface WorkoutPlansSectionProps {
