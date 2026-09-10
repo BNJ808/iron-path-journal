@@ -97,14 +97,22 @@ export const WorkoutCalendar = () => {
               <Calendar className="h-5 w-5 text-accent-blue" />
               Planification
             </div>
-            <Button
-              variant={isDeleteMode ? "destructive" : "outline"}
-              size="sm"
-              onClick={() => setIsDeleteMode(!isDeleteMode)}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <CreateWorkoutPlanDialog onAdd={addPlan}>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Nouveau plan
+                </Button>
+              </CreateWorkoutPlanDialog>
+              <Button
+                variant={isDeleteMode ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setIsDeleteMode(!isDeleteMode)}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
