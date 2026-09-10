@@ -2,18 +2,16 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Trash2 } from 'lucide-react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, format } from 'date-fns';
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
 import { WorkoutPlansSection } from './calendar/WorkoutPlansSection';
 import { CalendarGrid } from './calendar/CalendarGrid';
-import { CreateWorkoutPlanDialog } from './CreateWorkoutPlanDialog';
 import { useDragAndDropSync } from './calendar/useDragAndDropSync';
 import { useWorkoutCalendarSync } from '@/hooks/useWorkoutCalendarSync';
 import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 import { useManualDayValidations } from '@/hooks/useManualDayValidations';
-import { WorkoutPlan } from '@/types/workout-calendar';
 
 // Re-export types for backward compatibility
 export type { WorkoutPlan } from '@/types/workout-calendar';
@@ -94,27 +92,19 @@ export const WorkoutCalendar = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-accent-blue" />
-              Plans d'entrainement
+              Planification
             </div>
-            <div className="flex items-center gap-2">
-              <CreateWorkoutPlanDialog onAdd={addPlan}>
-                <Button variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Nouveau plan
-                </Button>
-              </CreateWorkoutPlanDialog>
-              <Button
-                variant={isDeleteMode ? "destructive" : "outline"}
-                size="sm"
-                onClick={() => setIsDeleteMode(!isDeleteMode)}
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant={isDeleteMode ? "destructive" : "outline"}
+              size="sm"
+              onClick={() => setIsDeleteMode(!isDeleteMode)}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -126,6 +116,7 @@ export const WorkoutCalendar = () => {
           >
             <WorkoutPlansSection
               plans={calendar.plans}
+              onAdd={addPlan}
               onUpdate={updatePlan}
               onDelete={deletePlan}
             />
