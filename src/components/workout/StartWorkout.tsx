@@ -117,31 +117,21 @@ export const StartWorkout = ({
   return (
     <div className="py-6 space-y-8 max-w-2xl mx-auto px-2 sm:px-4">
       {/* Primary CTA */}
-      <div className="primary-surface p-6 space-y-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-foreground/70">Nouvelle séance</p>
-            <h2 className="text-2xl font-bold text-primary-foreground mt-1 font-['Space_Grotesk']">Prêt à t'entraîner ?</h2>
-          </div>
-          <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl">
-            <Play className="h-6 w-6 text-primary-foreground fill-primary-foreground" />
-          </div>
-        </div>
-
+      <div className="space-y-2">
         <Button
           onClick={handleStartWorkout}
-          className="w-full bg-white text-primary hover:bg-white/90 rounded-xl h-12 text-base font-bold shadow-lg shadow-primary/20"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl h-11 text-sm font-bold shadow-md"
         >
-          <Play className="mr-2 h-5 w-5 fill-current" />
-          {isValidateRunning ? 'Valider la sortie running' : 'Démarrer une séance libre'}
+          <Play className="mr-2 h-4 w-4 fill-current" />
+          {isValidateRunning ? 'Valider la sortie running' : 'Séance libre'}
         </Button>
 
-        <div className="flex items-center gap-2 text-sm text-primary-foreground/90">
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
           <Checkbox
             id="validate-running"
             checked={isValidateRunning}
             onCheckedChange={(checked) => setIsValidateRunning(checked === true)}
-            className="border-white/40 data-[state=checked]:bg-white data-[state=checked]:text-primary"
+            className="h-3.5 w-3.5 border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
           />
           <label
             htmlFor="validate-running"
