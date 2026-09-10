@@ -18,7 +18,7 @@ export const WorkoutPlansSection = ({ plans, onAdd, onUpdate, onDelete }: Workou
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium">Plans d'entraînement</h4>
+        <h4 className="font-medium">{"\n"}</h4>
         <CreateWorkoutPlanDialog onAdd={onAdd}>
           <Button variant="outline" size="sm">
             <Plus className="h-4 w-4 mr-1" />

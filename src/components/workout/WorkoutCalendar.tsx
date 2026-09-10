@@ -75,7 +75,7 @@ export const WorkoutCalendar = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-accent-blue" />
-              Planification
+              Plans d'entrainement
             </CardTitle>
           </CardHeader>
           <CardContent>
