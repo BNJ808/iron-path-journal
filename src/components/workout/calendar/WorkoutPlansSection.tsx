@@ -10,7 +10,7 @@ interface WorkoutPlansSectionProps {
   onDelete: (planId: string) => void;
 }
 
-export const WorkoutPlansSection = ({ plans, onAdd, onUpdate, onDelete }: WorkoutPlansSectionProps) => {
+export const WorkoutPlansSection = ({ plans, onUpdate, onDelete }: WorkoutPlansSectionProps) => {
   return (
     <div className="space-y-4">
       
