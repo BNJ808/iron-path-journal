@@ -214,7 +214,7 @@ export const StartWorkout = ({
               <CreateTemplateDialog onCreate={onCreateTemplate}>
                 <Button variant="outline" className="w-full rounded-xl h-11 border-dashed border-2 hover:border-primary hover:text-primary">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Créer un nouveau modèle
+                  Créer une nouvelle séance
                 </Button>
               </CreateTemplateDialog>
 
