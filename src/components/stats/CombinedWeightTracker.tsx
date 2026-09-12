@@ -7,7 +7,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarIcon, Scale, Trash2, TrendingUp } from 'lucide-react';
+import { CalendarIcon, Scale, Target, Trash2, TrendingUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useBodyMeasurements } from '@/hooks/useBodyMeasurements';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
 
@@ -32,6 +33,10 @@ interface CombinedWeightTrackerProps {
 
 export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ dateRange }) => {
   const { measurements, isLoading, addMeasurement, deleteMeasurement } = useBodyMeasurements();
+  const { settings, updateSettings, isLoading: isLoadingSettings } = useUserSettings();
+  const [goalWeight, setGoalWeight] = React.useState(70);
+  const [goalDate, setGoalDate] = React.useState<Date>(new Date());
+  const weightGoals = settings.weightGoals || [];
   
   const form = useForm<WeightFormValues>({
     resolver: zodResolver(weightFormSchema),
@@ -69,6 +74,51 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
         fullDate: format(parseISO(measurement.date), 'dd/MM/yyyy', { locale: fr })
       }));
   }, [measurements, dateRange]);
+
+  const filteredGoals = React.useMemo(() => {
+    return weightGoals
+      .filter((goal) => {
+        const date = parseISO(goal.date);
+        if (dateRange?.from && date < dateRange.from) return false;
+        if (dateRange?.to && date > dateRange.to) return false;
+        return true;
+      })
+      .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
+  }, [weightGoals, dateRange]);
+
+  const chartData = React.useMemo(() => {
+    const points = new Map<string, {
+      date: string;
+      displayDate: string;
+      fullDate: string;
+      weight?: number;
+      goalWeight?: number;
+    }>();
+
+    filteredMeasurements.forEach((measurement) => {
+      points.set(measurement.date, {
+        date: measurement.date,
+        displayDate: measurement.displayDate,
+        fullDate: measurement.fullDate,
+        weight: measurement.weight,
+      });
+    });
+
+    filteredGoals.forEach((goal) => {
+      const existing = points.get(goal.date);
+      points.set(goal.date, {
+        date: goal.date,
+        displayDate: format(parseISO(goal.date), 'd MMM', { locale: fr }),
+        fullDate: format(parseISO(goal.date), 'dd/MM/yyyy', { locale: fr }),
+        weight: existing?.weight,
+        goalWeight: goal.weight,
+      });
+    });
+
+    return Array.from(points.values()).sort(
+      (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()
+    );
+  }, [filteredMeasurements, filteredGoals]);
 
   // Calculer les statistiques
   const stats = React.useMemo(() => {
@@ -118,7 +168,37 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
     }
   };
 
-  if (isLoading) {
+  const handleAddGoal = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!Number.isFinite(goalWeight) || goalWeight < 20 || goalWeight > 300) {
+      toast.error('Le poids objectif doit être compris entre 20 et 300 kg');
+      return;
+    }
+
+    const date = format(goalDate, 'yyyy-MM-dd');
+    const nextGoals = [
+      ...weightGoals.filter((goal) => goal.date !== date),
+      { id: crypto.randomUUID(), weight: goalWeight, date },
+    ].sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
+
+    try {
+      await updateSettings({ weightGoals: nextGoals });
+      toast.success('Objectif enregistré');
+    } catch (error) {
+      console.error('Erreur lors de l’ajout de l’objectif:', error);
+    }
+  };
+
+  const handleDeleteGoal = async (goalId: string) => {
+    try {
+      await updateSettings({ weightGoals: weightGoals.filter((goal) => goal.id !== goalId) });
+      toast.success('Objectif supprimé');
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l’objectif:', error);
+    }
+  };
+
+  if (isLoading || isLoadingSettings) {
     return (
       <Card className="app-card">
         <CardHeader>
@@ -146,7 +226,7 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="add" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="add" className="flex items-center gap-2">
               <Scale className="h-4 w-4" />
               Ajouter
@@ -154,6 +234,10 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
             <TabsTrigger value="evolution" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Évolution
+            </TabsTrigger>
+            <TabsTrigger value="goals" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Objectifs
             </TabsTrigger>
           </TabsList>
 
@@ -247,7 +331,7 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
           </TabsContent>
 
           <TabsContent value="evolution" className="mt-6">
-            {filteredMeasurements.length === 0 ? (
+            {chartData.length === 0 ? (
               <div className="h-64 flex items-center justify-center">
                 <p className="text-muted-foreground">
                   Aucune mesure de poids pour cette période
@@ -280,7 +364,7 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
 
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={filteredMeasurements}>
+                    <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                       <XAxis 
                         dataKey="displayDate"
@@ -301,9 +385,8 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                             return (
                               <div className="bg-background border rounded-lg p-3 shadow-lg">
                                 <p className="font-medium">{data.fullDate}</p>
-                                <p className="text-accent-blue">
-                                  Poids: {payload[0].value} kg
-                                </p>
+                                {data.weight !== undefined && <p className="text-accent-blue">Poids : {data.weight} kg</p>}
+                                {data.goalWeight !== undefined && <p className="text-accent-yellow">Objectif : {data.goalWeight} kg</p>}
                               </div>
                             );
                           }
@@ -317,12 +400,99 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                         strokeWidth={2}
                         dot={{ fill: 'hsl(var(--accent-blue))', strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6, stroke: 'hsl(var(--accent-blue))', strokeWidth: 2 }}
+                        connectNulls
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="goalWeight"
+                        name="Objectif"
+                        stroke="hsl(var(--accent-yellow))"
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                        dot={{ fill: 'hsl(var(--accent-yellow))', strokeWidth: 2, r: 5 }}
+                        activeDot={{ r: 7, stroke: 'hsl(var(--accent-yellow))', strokeWidth: 2 }}
+                        connectNulls
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </>
             )}
+          </TabsContent>
+
+          <TabsContent value="goals" className="space-y-6 mt-6">
+            <form onSubmit={handleAddGoal} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="goal-weight">Poids objectif (kg)</Label>
+                  <Input
+                    id="goal-weight"
+                    type="number"
+                    min="20"
+                    max="300"
+                    step="0.1"
+                    value={goalWeight}
+                    onChange={(event) => setGoalWeight(event.target.valueAsNumber)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Date cible</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {format(goalDate, 'dd/MM/yyyy', { locale: fr })}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={goalDate}
+                        onSelect={(date) => date && setGoalDate(date)}
+                        initialFocus
+                        locale={fr}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              <Button type="submit" className="w-full">
+                <Target className="mr-2 h-4 w-4" />
+                Ajouter l’objectif
+              </Button>
+            </form>
+
+            <div className="space-y-3">
+              <h4 className="font-medium">Objectifs enregistrés</h4>
+              {weightGoals.length > 0 ? (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {[...weightGoals]
+                    .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
+                    .map((goal) => (
+                      <div key={goal.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <p className="font-medium">{goal.weight} kg</p>
+                          <p className="text-sm text-muted-foreground">
+                            {format(parseISO(goal.date), 'dd/MM/yyyy', { locale: fr })}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteGoal(goal.id)}
+                          className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                          aria-label={`Supprimer l’objectif du ${format(parseISO(goal.date), 'dd/MM/yyyy')}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center py-4">Aucun objectif enregistré</p>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
