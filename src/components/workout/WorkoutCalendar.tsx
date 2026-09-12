@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Trash2 } from 'lucide-react';
+import { Calendar, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, format } from 'date-fns';
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { CalendarHeader } from './calendar/CalendarHeader';
@@ -19,6 +19,7 @@ export type { WorkoutPlan } from '@/types/workout-calendar';
 export const WorkoutCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [arePlansVisible, setArePlansVisible] = useState(true);
   
   const {
     calendar,
@@ -92,19 +93,31 @@ export const WorkoutCalendar = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-accent-blue" />
               Planification
             </div>
-            <Button
-              variant={isDeleteMode ? "destructive" : "outline"}
-              size="sm"
-              onClick={() => setIsDeleteMode(!isDeleteMode)}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setArePlansVisible((visible) => !visible)}
+                className="gap-2"
+                aria-label={arePlansVisible ? 'Masquer les plans' : 'Afficher les plans'}
+              >
+                {arePlansVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                <span className="hidden sm:inline">{arePlansVisible ? 'Masquer les plans' : 'Afficher les plans'}</span>
+              </Button>
+              <Button
+                variant={isDeleteMode ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setIsDeleteMode(!isDeleteMode)}
+                aria-label={isDeleteMode ? 'Quitter le mode suppression' : 'Supprimer une planification'}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -114,12 +127,14 @@ export const WorkoutCalendar = () => {
             onDragEnd={handleDragEnd}
             collisionDetection={pointerWithin}
           >
-            <WorkoutPlansSection
-              plans={calendar.plans}
-              onAdd={addPlan}
-              onUpdate={updatePlan}
-              onDelete={deletePlan}
-            />
+            {arePlansVisible && (
+              <WorkoutPlansSection
+                plans={calendar.plans}
+                onAdd={addPlan}
+                onUpdate={updatePlan}
+                onDelete={deletePlan}
+              />
+            )}
 
             <CalendarHeader currentDate={currentDate} onDateChange={setCurrentDate} />
 
