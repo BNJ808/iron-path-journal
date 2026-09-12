@@ -14,6 +14,11 @@ export interface UserSettings {
   statsCardOrder?: string[];
   statsDateRange?: DateRange;
   hiddenStatsModules?: string[];
+  weightGoals?: Array<{
+    id: string;
+    weight: number;
+    date: string;
+  }>;
   
   // Autres préférences
   timerSettings?: {

@@ -1,7 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { List, PlusCircle, Play, Settings } from 'lucide-react';
+import { List, PlusCircle, Play } from 'lucide-react';
 import type { WorkoutTemplate, ExerciseLog } from '@/hooks/useWorkoutTemplates';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
 import { WorkoutTemplateCard } from './WorkoutTemplateCard';
@@ -14,7 +13,6 @@ import { cn } from '@/lib/utils';
 interface StartWorkoutProps {
   onStartWorkout: () => void;
   onStartFromTemplate: (template: WorkoutTemplate) => void;
-  onValidateRunning: () => void;
   templates: WorkoutTemplate[];
   isLoadingTemplates: boolean;
   onUpdateTemplate: (id: string, name: string, exercises: ExerciseLog[], color?: string) => void;
@@ -25,7 +23,6 @@ interface StartWorkoutProps {
 export const StartWorkout = ({
   onStartWorkout,
   onStartFromTemplate,
-  onValidateRunning,
   templates,
   isLoadingTemplates,
   onUpdateTemplate,
@@ -34,7 +31,6 @@ export const StartWorkout = ({
 }: StartWorkoutProps) => {
   const [orderedTemplates, setOrderedTemplates] = useState<WorkoutTemplate[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [isValidateRunning, setIsValidateRunning] = useState(false);
 
   // Charger l'ordre sauvegardé depuis le localStorage
   useEffect(() => {
@@ -106,40 +102,17 @@ export const StartWorkout = ({
 
   const activeTemplate = activeId ? orderedTemplates.find(t => t.id === activeId) : null;
 
-  const handleStartWorkout = () => {
-    if (isValidateRunning) {
-      onValidateRunning();
-    } else {
-      onStartWorkout();
-    }
-  };
-
   return (
     <div className="py-6 space-y-8 max-w-2xl mx-auto px-2 sm:px-4">
       {/* Primary CTA */}
       <div className="space-y-2">
         <Button
-          onClick={handleStartWorkout}
+          onClick={onStartWorkout}
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl h-11 text-sm font-bold shadow-md"
         >
           <Play className="mr-2 h-4 w-4 fill-current" />
-          {isValidateRunning ? 'Valider la sortie running' : 'Séance libre'}
+          Séance libre
         </Button>
-
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <Checkbox
-            id="validate-running"
-            checked={isValidateRunning}
-            onCheckedChange={(checked) => setIsValidateRunning(checked === true)}
-            className="h-3.5 w-3.5 border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-          />
-          <label
-            htmlFor="validate-running"
-            className="cursor-pointer"
-          >
-            Valider une sortie running
-          </label>
-        </div>
       </div>
 
       {/* Templates section */}
