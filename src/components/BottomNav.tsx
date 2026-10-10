@@ -34,9 +34,8 @@ const BottomNav = ({ onTimerClick }: BottomNavProps) => {
               )}
             >
               <item.icon
-                className={cn('h-5 w-5 transition-all duration-200', isActive && 'scale-110')}
-                fill={isActive ? 'currentColor' : 'none'}
-                strokeWidth={isActive ? 2 : 1.8}
+                className="h-5 w-5 transition-colors duration-200"
+                strokeWidth={2}
               />
               <span className={cn('text-[10px] font-semibold leading-none', isActive && 'font-bold')}>
                 {item.label}
@@ -44,7 +43,7 @@ const BottomNav = ({ onTimerClick }: BottomNavProps) => {
               {isActive && (
                 <motion.div
                   layoutId="bottom-nav-indicator"
-                  className="absolute -top-0.5 w-1 h-1 rounded-full bg-primary"
+                  className="absolute -top-0.5 w-1.5 h-1.5 rounded-full bg-primary"
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}
