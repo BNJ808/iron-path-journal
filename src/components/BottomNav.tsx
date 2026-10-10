@@ -34,9 +34,8 @@ const BottomNav = ({ onTimerClick }: BottomNavProps) => {
               )}
             >
               <item.icon
-                className={cn('h-5 w-5 transition-all duration-200', isActive && 'scale-110')}
-                fill={isActive ? 'currentColor' : 'none'}
-                strokeWidth={isActive ? 2 : 1.8}
+                className="h-5 w-5 transition-colors duration-200"
+                strokeWidth={2}
               />
               <span className={cn('text-[10px] font-semibold leading-none', isActive && 'font-bold')}>
                 {item.label}
