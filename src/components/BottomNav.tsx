@@ -43,7 +43,7 @@ const BottomNav = ({ onTimerClick }: BottomNavProps) => {
               {isActive && (
                 <motion.div
                   layoutId="bottom-nav-indicator"
-                  className="absolute -top-0.5 w-1 h-1 rounded-full bg-primary"
+                  className="absolute -top-0.5 w-1.5 h-1.5 rounded-full bg-primary"
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}
