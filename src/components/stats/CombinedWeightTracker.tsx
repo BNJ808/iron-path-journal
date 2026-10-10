@@ -416,6 +416,17 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-2">
+                    <span className="h-0.5 w-6 rounded-full bg-accent-blue" aria-hidden />
+                    Poids enregistré
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="h-0.5 w-6 rounded-full bg-accent-purple" aria-hidden style={{ backgroundImage: 'repeating-linear-gradient(to right, hsl(var(--accent-purple)) 0 5px, transparent 5px 10px)' }} />
+                    Objectif
+                  </span>
+                </div>
               </>
             )}
           </TabsContent>
