@@ -386,7 +386,7 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                               <div className="bg-background border rounded-lg p-3 shadow-lg">
                                 <p className="font-medium">{data.fullDate}</p>
                                 {data.weight !== undefined && <p className="text-accent-blue">Poids : {data.weight} kg</p>}
-                                {data.goalWeight !== undefined && <p className="text-accent-yellow">Objectif : {data.goalWeight} kg</p>}
+                                {data.goalWeight !== undefined && <p className="text-accent-purple">Objectif : {data.goalWeight} kg</p>}
                               </div>
                             );
                           }
@@ -406,15 +406,26 @@ export const CombinedWeightTracker: React.FC<CombinedWeightTrackerProps> = ({ da
                         type="monotone"
                         dataKey="goalWeight"
                         name="Objectif"
-                        stroke="hsl(var(--accent-yellow))"
+                        stroke="hsl(var(--accent-purple))"
                         strokeWidth={2}
                         strokeDasharray="5 5"
-                        dot={{ fill: 'hsl(var(--accent-yellow))', strokeWidth: 2, r: 5 }}
-                        activeDot={{ r: 7, stroke: 'hsl(var(--accent-yellow))', strokeWidth: 2 }}
+                        dot={{ fill: 'hsl(var(--accent-purple))', strokeWidth: 2, r: 5 }}
+                        activeDot={{ r: 7, stroke: 'hsl(var(--accent-purple))', strokeWidth: 2 }}
                         connectNulls
                       />
                     </LineChart>
                   </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-2">
+                    <span className="h-0.5 w-6 rounded-full bg-accent-blue" aria-hidden />
+                    Poids enregistré
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="h-0.5 w-6 rounded-full bg-accent-purple" aria-hidden style={{ backgroundImage: 'repeating-linear-gradient(to right, hsl(var(--accent-purple)) 0 5px, transparent 5px 10px)' }} />
+                    Objectif
+                  </span>
                 </div>
               </>
             )}
